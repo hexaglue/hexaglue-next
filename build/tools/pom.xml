@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- No parent to avoid circular dependency: this artifact is consumed as a
+         dependency of the quality plugins declared in the parent POM. -->
+    <groupId>io.hexaglue</groupId>
+    <artifactId>hexaglue-build-tools</artifactId>
+    <version>7.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>HexaGlue Build Tools</name>
+    <description>Shared build configuration resources (Checkstyle, PMD, SpotBugs) for the HexaGlue reactor</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>17</maven.compiler.release>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
+    <build>
+        <plugins>
+            <!-- Declared skipped so reactor-wide spotless invocations resolve a
+                 pinned version here despite the missing parent. -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>3.2.1</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

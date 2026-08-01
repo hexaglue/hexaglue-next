@@ -7,3 +7,8 @@ paths-ignore:
   # Narrow on purpose: io.hexaglue.testkit.corpus holds real code that must
   # stay analysed, so only the fixtures below resources/ are excluded.
   - '**/src/main/resources/corpus/**'
+  # Test sources are built by test-compile, which the scanning job does not
+  # run, so they can never be extracted and would sit in the baseline forever.
+  - '**/src/test/java/**'
+  # Licence header template, kept as .java for editor support but not code.
+  - 'docs/**'

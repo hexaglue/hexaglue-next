@@ -83,6 +83,10 @@
         <!-- Javadoc is optional -->
         <exclude name="CommentRequired"/>
         <exclude name="CommentSize"/>
+        <!-- False positive on record compact constructors: the javadoc tool attaches
+             their comment (and strict doclint requires it), but PMD reports it as
+             dangling. Presence of Javadoc is enforced by doclint, not PMD. -->
+        <exclude name="DanglingJavadoc"/>
     </rule>
 
     <!-- Error Prone -->

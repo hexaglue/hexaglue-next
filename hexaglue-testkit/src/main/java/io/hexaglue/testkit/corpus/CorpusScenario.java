@@ -34,6 +34,9 @@ import java.util.Objects;
  */
 public record CorpusScenario(String id, String basePackage, String origin, List<SourceFile> sources) {
 
+    /**
+     * Validates the components and defensively copies the source list.
+     */
     public CorpusScenario {
         requireNonBlank(id, "id");
         requireNonBlank(basePackage, "basePackage");
@@ -76,6 +79,9 @@ public record CorpusScenario(String id, String basePackage, String origin, List<
      */
     public record SourceFile(String relativePath, String content) {
 
+        /**
+         * Validates that the path and the content are non-blank.
+         */
         public SourceFile {
             if (relativePath == null || relativePath.isBlank()) {
                 throw new IllegalArgumentException("relativePath must not be blank");

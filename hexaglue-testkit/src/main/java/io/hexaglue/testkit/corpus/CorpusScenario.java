@@ -22,12 +22,14 @@ import java.util.Objects;
  * One acceptance-corpus scenario: a self-contained set of Java sources with the base package to
  * analyze them under.
  *
+ * <p>Construction rejects blank components and an empty source list with
+ * {@link IllegalArgumentException}, and defensively copies {@code sources}.
+ *
  * @param id unique scenario identifier, e.g. {@code ClassificationGoldenFilesTest-minimalExample}
  * @param basePackage the base package the analysis is scoped to
  * @param origin provenance of the fixture in the harvested code base, e.g. {@code
  *     ClassificationGoldenFilesTest#createMinimalExample}
  * @param sources the fixture source files, in stable order
- * @throws IllegalArgumentException if any component is blank or {@code sources} is empty
  * @since 7.0.0
  */
 public record CorpusScenario(String id, String basePackage, String origin, List<SourceFile> sources) {
@@ -66,9 +68,10 @@ public record CorpusScenario(String id, String basePackage, String origin, List<
     /**
      * A single fixture source file.
      *
+     * <p>Construction rejects a blank path or content with {@link IllegalArgumentException}.
+     *
      * @param relativePath path relative to the scenario source root, e.g. {@code com/acme/Order.java}
      * @param content the Java source text
-     * @throws IllegalArgumentException if the path or content is blank
      * @since 7.0.0
      */
     public record SourceFile(String relativePath, String content) {

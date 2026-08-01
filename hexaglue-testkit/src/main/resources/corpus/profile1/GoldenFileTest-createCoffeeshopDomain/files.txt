@@ -1,0 +1,6 @@
+com/coffeeshop/domain/order/OrderId.java
+com/coffeeshop/domain/order/Location.java
+com/coffeeshop/domain/order/LineItem.java
+com/coffeeshop/domain/order/Order.java
+com/coffeeshop/ports/in/OrderingCoffee.java
+com/coffeeshop/ports/out/OrderRepository.java

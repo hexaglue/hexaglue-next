@@ -1,0 +1,2 @@
+com/example/ports/in/QueryHandler.java
+com/example/application/SimpleQueryHandler.java

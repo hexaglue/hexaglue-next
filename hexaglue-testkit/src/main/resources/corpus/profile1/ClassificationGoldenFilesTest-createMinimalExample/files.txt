@@ -1,0 +1,4 @@
+com/example/domain/TaskId.java
+com/example/domain/Task.java
+com/example/ports/out/TaskRepository.java
+com/example/ports/in/TaskUseCases.java

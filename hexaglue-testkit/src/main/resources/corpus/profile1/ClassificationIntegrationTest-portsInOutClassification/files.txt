@@ -1,0 +1,4 @@
+com/example/domain/Order.java
+com/example/ports/in/PlaceOrderUseCase.java
+com/example/ports/out/OrderRepository.java
+com/example/infrastructure/PaymentGateway.java

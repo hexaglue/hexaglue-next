@@ -1,0 +1,1 @@
+com/example/ports/in/CustomerRepository.java

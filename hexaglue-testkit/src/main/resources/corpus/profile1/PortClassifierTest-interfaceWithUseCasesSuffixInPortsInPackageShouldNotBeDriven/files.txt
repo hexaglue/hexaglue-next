@@ -1,0 +1,2 @@
+com/example/domain/Task.java
+com/example/ports/in/TaskUseCases.java

@@ -33,6 +33,38 @@ class ModelVocabularyTest {
     }
 
     @Test
+    @DisplayName("architectural kinds cover the hexagon and the categorized fallback")
+    void archKindsCoverHexagonAndFallback() {
+        assertThat(ArchKind.values())
+                .extracting(Enum::name)
+                .containsExactly(
+                        "AGGREGATE_ROOT",
+                        "ENTITY",
+                        "VALUE_OBJECT",
+                        "IDENTIFIER",
+                        "DOMAIN_EVENT",
+                        "DOMAIN_SERVICE",
+                        "DRIVING_PORT",
+                        "DRIVEN_PORT",
+                        "APPLICATION_SERVICE",
+                        "COMMAND_HANDLER",
+                        "QUERY_HANDLER",
+                        "UNCLASSIFIED");
+        assertThat(ArchKind.AGGREGATE_ROOT.isDomain()).isTrue();
+        assertThat(ArchKind.DRIVEN_PORT.isPort()).isTrue();
+        assertThat(ArchKind.APPLICATION_SERVICE.isApplication()).isTrue();
+        assertThat(ArchKind.UNCLASSIFIED.isDomain()).isFalse();
+        assertThat(ArchKind.UNCLASSIFIED.isPort()).isFalse();
+        assertThat(ArchKind.UNCLASSIFIED.isApplication()).isFalse();
+    }
+
+    @Test
+    @DisplayName("port directions cover both sides of the hexagon")
+    void portDirectionsCoverBothSides() {
+        assertThat(PortDirection.values()).extracting(Enum::name).containsExactly("DRIVING", "DRIVEN");
+    }
+
+    @Test
     @DisplayName("modifiers cover the Java modifier set")
     void modifiersCoverJavaModifierSet() {
         assertThat(Modifier.values())

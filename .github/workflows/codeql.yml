@@ -11,6 +11,9 @@ on:
 permissions:
   contents: read
   security-events: write
+  # Required by github/codeql-action on private repositories: the analyze step
+  # reads the workflow run to attach the SARIF results to it.
+  actions: read
 
 jobs:
   analyze:

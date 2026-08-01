@@ -1,0 +1,9 @@
+name: HexaGlue CodeQL config
+
+paths-ignore:
+  # Java sources under the testkit corpus are fixtures: they are analysis input
+  # for the classifier, never compiled or shipped. Counting them as scannable
+  # code makes the code scanning coverage ratio meaningless.
+  # Narrow on purpose: io.hexaglue.testkit.corpus holds real code that must
+  # stay analysed, so only the fixtures below resources/ are excluded.
+  - '**/src/main/resources/corpus/**'

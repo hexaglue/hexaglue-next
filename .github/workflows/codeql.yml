@@ -11,8 +11,8 @@ on:
 permissions:
   contents: read
   security-events: write
-  # Required by github/codeql-action on private repositories: the analyze step
-  # reads the workflow run to attach the SARIF results to it.
+  # Required by github/codeql-action: the analyze step reads the workflow run
+  # to attach the SARIF results to it.
   actions: read
 
 jobs:
@@ -29,6 +29,7 @@ jobs:
         with:
           languages: java-kotlin
           build-mode: manual
+          config-file: .github/codeql/codeql-config.yml
       - name: Compile
         run: make compile
       - uses: github/codeql-action/analyze@v4

@@ -20,6 +20,11 @@
  * {@link io.hexaglue.model.classification.Classification}; construction rejects a verdict whose
  * kind does not match the record that carries it.</p>
  *
+ * <p>The {@link io.hexaglue.model.arch.ArchModel} container assembles the verdicts, answers
+ * provenance queries ({@code classificationOf}, {@code explain}) and exposes the deterministic
+ * indexes — domain, ports, composition — and the {@code ModuleTopology} describing the build
+ * layout of a multi-module reactor.</p>
+ *
  * @since 7.0.0
  */
 package io.hexaglue.model.arch;

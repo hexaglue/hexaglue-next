@@ -111,6 +111,10 @@
     <rule ref="category/java/multithreading.xml">
         <!-- Allow using volatile for simple flags -->
         <exclude name="AvoidUsingVolatile"/>
+        <!-- Fires on every map instantiation regardless of concurrency. Models and
+             builders are single-threaded at construction and immutable afterwards;
+             ordered maps (TreeMap, LinkedHashMap) are chosen for determinism. -->
+        <exclude name="UseConcurrentHashMap"/>
     </rule>
 
     <!-- Performance -->

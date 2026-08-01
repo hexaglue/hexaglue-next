@@ -27,6 +27,16 @@
         <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
     </Match>
 
+    <!-- The model is immutable by construction: records normalize their collections into
+         unmodifiable views with a deterministic iteration order (Collections.unmodifiable*
+         wrappers, which SpotBugs cannot prove immutable, unlike Set/Map.copyOf whose
+         iteration order is unspecified), and builders hand their state to a record
+         constructor that copies defensively. -->
+    <Match>
+        <Package name="~io\.hexaglue\.model.*"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+
     <!-- Allow System.out in CLI/logging contexts -->
     <Match>
         <Package name="~io\.hexaglue\.core\.diagnostics.*"/>

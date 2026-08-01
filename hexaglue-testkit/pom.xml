@@ -21,6 +21,12 @@
     </properties>
 
     <dependencies>
+        <!-- Compile scope: the harness renders ArchModel snapshots for golden-file comparison. -->
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.jspecify</groupId>
             <artifactId>jspecify</artifactId>

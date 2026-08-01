@@ -57,9 +57,10 @@ coverage: ## Run tests and generate JaCoCo reports per module
 	mvn verify
 	@echo "$(GREEN)Coverage reports: <module>/target/site/jacoco/index.html$(RESET)"
 
+# Single invocation: the testkit resolves hexaglue-model from the reactor, which
+# requires the model to be built in the same Maven session as the PIT goal.
 mutation: ## Run mutation testing on production modules
-	mvn test -pl hexaglue-model,hexaglue-testkit -q
-	mvn org.pitest:pitest-maven:mutationCoverage -pl hexaglue-model,hexaglue-testkit
+	mvn test org.pitest:pitest-maven:mutationCoverage -pl hexaglue-model,hexaglue-testkit
 
 build: clean test ## Clean build with tests
 

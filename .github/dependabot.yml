@@ -17,3 +17,16 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    groups:
+      actions:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # Actions are pinned to their floating major tag, so patch and minor
+      # releases are picked up without a pull request. Only major bumps,
+      # which can break the workflow contract, are worth reviewing.
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-minor
+          - version-update:semver-patch

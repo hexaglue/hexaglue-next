@@ -55,7 +55,7 @@ public record Evidence(
         if (fact.isBlank() || justification.isBlank()) {
             throw new IllegalArgumentException("fact and justification must not be blank");
         }
-        if (force.ordinal() < tier.maxConfidence().ordinal()) {
+        if (force.isStrongerThan(tier.maxConfidence())) {
             throw new IllegalArgumentException(
                     "evidence force " + force + " exceeds the " + tier.code() + " ceiling " + tier.maxConfidence());
         }

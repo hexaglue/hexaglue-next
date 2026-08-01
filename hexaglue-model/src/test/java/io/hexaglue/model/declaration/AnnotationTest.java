@@ -122,8 +122,8 @@ class AnnotationTest {
         @Test
         @DisplayName("class values expose the referenced type")
         void classValuesExposeReferencedType() {
-            AnnotationValue.ClassValue value =
-                    (AnnotationValue.ClassValue) AnnotationValue.ofClass(TypeRef.of("com.a.Converter"));
+            AnnotationValue.ClassRefValue value =
+                    (AnnotationValue.ClassRefValue) AnnotationValue.ofClass(TypeRef.of("com.a.Converter"));
 
             assertThat(value.qualifiedName()).isEqualTo("com.a.Converter");
             assertThat(value.kind()).isEqualTo(AnnotationValue.Kind.CLASS);

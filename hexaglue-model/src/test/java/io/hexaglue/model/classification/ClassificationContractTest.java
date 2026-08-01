@@ -38,6 +38,14 @@ class ClassificationContractTest {
         }
 
         @Test
+        @DisplayName("strictly stronger means above, not equal")
+        void strictlyStrongerMeansAboveNotEqual() {
+            assertThat(Confidence.EXPLICIT.isStrongerThan(Confidence.HIGH)).isTrue();
+            assertThat(Confidence.HIGH.isStrongerThan(Confidence.HIGH)).isFalse();
+            assertThat(Confidence.LOW.isStrongerThan(Confidence.MEDIUM)).isFalse();
+        }
+
+        @Test
         @DisplayName("only EXPLICIT and HIGH are reliable")
         void onlyExplicitAndHighAreReliable() {
             assertThat(Confidence.EXPLICIT.isReliable()).isTrue();

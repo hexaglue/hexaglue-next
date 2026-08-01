@@ -89,7 +89,7 @@ public sealed interface AnnotationValue {
      * @return an AnnotationValue
      */
     static AnnotationValue ofClass(TypeRef typeRef) {
-        return new ClassValue(typeRef);
+        return new ClassRefValue(typeRef);
     }
 
     /**
@@ -237,12 +237,12 @@ public sealed interface AnnotationValue {
      * @param typeRef the referenced type
      * @since 7.0.0
      */
-    record ClassValue(TypeRef typeRef) implements AnnotationValue {
+    record ClassRefValue(TypeRef typeRef) implements AnnotationValue {
 
         /**
          * Validates the reference.
          */
-        public ClassValue {
+        public ClassRefValue {
             Objects.requireNonNull(typeRef, "typeRef must not be null");
         }
 

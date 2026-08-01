@@ -49,6 +49,16 @@ public enum Confidence {
      * @return true when this confidence is at least the threshold
      */
     public boolean isAtLeast(Confidence threshold) {
-        return this.ordinal() <= threshold.ordinal();
+        return this.compareTo(threshold) <= 0;
+    }
+
+    /**
+     * Returns whether this confidence is strictly stronger than the given one.
+     *
+     * @param other the confidence to compare against
+     * @return true when this confidence sits strictly above the other on the scale
+     */
+    public boolean isStrongerThan(Confidence other) {
+        return this.compareTo(other) < 0;
     }
 }

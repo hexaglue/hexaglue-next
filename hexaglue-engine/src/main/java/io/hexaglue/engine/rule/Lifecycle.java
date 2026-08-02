@@ -20,6 +20,7 @@ import io.hexaglue.engine.RelationKind;
 import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.TypeId;
 import io.hexaglue.model.TypeNature;
+import io.hexaglue.model.classification.RuleId;
 import io.hexaglue.model.code.TypeNode;
 import io.hexaglue.model.declaration.Field;
 import java.util.List;
@@ -99,6 +100,23 @@ final class Lifecycle {
                 .filter(part -> !part.equals(owner.id()))
                 .filter(part -> isPart(derivation, part))
                 .toList();
+    }
+
+    /**
+     * States the composition the two readings of this wave share as a tie from owner to part.
+     *
+     * <p>Which kind a part reads as is one question, whose part it is another. A generator writing
+     * a mapping needs the owner and not merely the kind, and recovering the owner from the shape a
+     * second time would be a second definition of what counts as a part — the one thing this class
+     * exists to prevent.</p>
+     *
+     * @param derivation the derivation the rule is running under
+     * @param owner the declaration the part belongs to
+     * @param part the type it is made of
+     * @param rule the rule stating it, which the proof names
+     */
+    static void tie(Derivation derivation, TypeNode owner, TypeId part, RuleId rule) {
+        derivation.derive(Relation.derived(owner.id(), RelationKind.OWNS, part, rule));
     }
 
     /**

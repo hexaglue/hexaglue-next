@@ -14,9 +14,14 @@
 package io.hexaglue.engine.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import io.hexaglue.engine.Classifier;
 import io.hexaglue.engine.EngineContext;
+import io.hexaglue.engine.Relation;
+import io.hexaglue.engine.RelationKind;
+import io.hexaglue.engine.RuleSet;
+import io.hexaglue.engine.Saturation;
 import io.hexaglue.engine.Verdicts;
 import io.hexaglue.knowledge.KnowledgePacks;
 import io.hexaglue.model.ArchKind;
@@ -98,7 +103,7 @@ class OwnedPartTest {
                 .build();
     }
 
-    private static Verdicts verdicts(TypeNode... types) {
+    private static EngineContext context(TypeNode... types) {
         CodeModel.Builder code = CodeModel.builder();
         for (TypeNode type : types) {
             code.addType(type);
@@ -106,8 +111,21 @@ class OwnedPartTest {
         code.addType(wrapper(HULL_TAG, TypeRef.of(IDENTIFIER)));
         code.addType(TypeNode.externalStub(TypeId.of(IDENTIFIER), TypeNature.INTERFACE));
         code.supertypes(HULL_TAG, List.of(TypeId.of(IDENTIFIER)));
-        return Classifier.classify(
-                EngineContext.of(code.build(), KnowledgePacks.embedded(), HexaGlueConfig.defaults()));
+        return EngineContext.of(code.build(), KnowledgePacks.embedded(), HexaGlueConfig.defaults());
+    }
+
+    private static Verdicts verdicts(TypeNode... types) {
+        return Classifier.classify(context(types));
+    }
+
+    /** The ties held once the verdicts have settled, which is where the model reads them. */
+    private static List<Relation> ownerships(TypeNode... types) {
+        EngineContext context = context(types);
+        return Saturation.saturate(RuleSet.standard(), context.withVerdicts(Classifier.classify(context)))
+                .all(Relation.class)
+                .stream()
+                .filter(relation -> relation.kind() == RelationKind.OWNS)
+                .toList();
     }
 
     @Nested
@@ -207,6 +225,48 @@ class OwnedPartTest {
                     TypeNode.builder(CONTRACT, TypeNature.INTERFACE).build());
 
             assertThat(settled.kindOf(CONTRACT)).contains(ArchKind.DRIVEN_PORT);
+        }
+    }
+
+    @Nested
+    @DisplayName("states the composition as a tie")
+    class StatesTheCompositionAsATie {
+
+        @Test
+        @DisplayName("from the owner to each of its parts, one carrying an identity and one not")
+        void fromTheOwnerToEachOfItsParts() {
+            // Saying that a part is a value is not saying whose part it is, and a generator writing
+            // a mapping needs the owner, not the kind alone.
+            List<Relation> ties = ownerships(
+                    owner(keepsMany("hulls", HULL), keeps("manifest", MANIFEST)),
+                    identified(Field.of("code", TEXT)),
+                    mutable(MANIFEST));
+
+            assertThat(ties)
+                    .extracting(Relation::subject, Relation::object)
+                    .containsExactlyInAnyOrder(tuple(OWNER, HULL), tuple(OWNER, MANIFEST));
+        }
+
+        @Test
+        @DisplayName("and on down, from a part that owns parts of its own")
+        void andOnDownFromAPartThatOwnsPartsOfItsOwn() {
+            List<Relation> ties = ownerships(
+                    owner(keepsMany("hulls", HULL)), identified(keeps("manifest", MANIFEST)), mutable(MANIFEST));
+
+            assertThat(ties)
+                    .extracting(Relation::subject, Relation::object)
+                    .containsExactlyInAnyOrder(tuple(OWNER, HULL), tuple(HULL, MANIFEST));
+        }
+
+        @Test
+        @DisplayName("never about what the composition leaves alone")
+        void neverAboutWhatTheCompositionLeavesAlone() {
+            List<Relation> ties = ownerships(
+                    owner(keeps("tag", TAG), keeps("ledger", CONTRACT)),
+                    wrapper(TAG),
+                    TypeNode.builder(CONTRACT, TypeNature.INTERFACE).build());
+
+            assertThat(ties).isEmpty();
         }
     }
 }

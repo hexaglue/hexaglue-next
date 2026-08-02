@@ -25,5 +25,11 @@ public enum RelationKind {
     MANAGES,
 
     /** The identity of the subject is carried by the object type. */
-    IDENTIFIED_BY
+    IDENTIFIED_BY,
+
+    /** The subject is made of the object type, which lives and dies inside it. */
+    OWNS,
+
+    /** The subject aggregate hands the object type back as something that has happened. */
+    ANNOUNCES
 }

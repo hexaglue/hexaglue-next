@@ -51,7 +51,7 @@ public final class OwnedValue implements Rule {
 
     @Override
     public Set<Predicate> writes() {
-        return Set.of(Predicate.EVIDENCE);
+        return Set.of(Predicate.EVIDENCE, Predicate.RELATION);
     }
 
     @Override
@@ -74,6 +74,7 @@ public final class OwnedValue implements Rule {
                         owner.id().simpleName() + " is made of it and it carries no identity of its own",
                         List.of(owner.id()),
                         ID);
+                Lifecycle.tie(derivation, owner, part, ID);
             }
         }
     }

@@ -16,6 +16,8 @@ package io.hexaglue.engine.rule;
 import io.hexaglue.engine.Derivation;
 import io.hexaglue.engine.PortRole;
 import io.hexaglue.engine.Predicate;
+import io.hexaglue.engine.Relation;
+import io.hexaglue.engine.RelationKind;
 import io.hexaglue.engine.Rule;
 import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.TypeId;
@@ -23,6 +25,7 @@ import io.hexaglue.model.arch.DrivenPortType;
 import io.hexaglue.model.classification.RuleId;
 import io.hexaglue.model.code.TypeNode;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -63,7 +66,7 @@ public final class PublishedEvent implements Rule {
 
     @Override
     public Set<Predicate> writes() {
-        return Set.of(Predicate.EVIDENCE);
+        return Set.of(Predicate.EVIDENCE, Predicate.RELATION);
     }
 
     @Override
@@ -103,25 +106,28 @@ public final class PublishedEvent implements Rule {
                 .distinct()
                 .filter(answer -> !kept.contains(answer))
                 .toList()) {
-            speak(
+            boolean spoke = speak(
                     derivation,
                     answered,
                     "ANSWERED_BY(" + aggregate.id().qualifiedName() + ")",
                     aggregate.id().simpleName() + " hands it back without keeping any of it",
                     aggregate.id());
+            if (spoke) {
+                derivation.derive(Relation.derived(aggregate.id(), RelationKind.ANNOUNCES, answered, ID));
+            }
         }
     }
 
     /**
      * States the reading, on the one condition both readings share: what happened cannot be
-     * edited afterwards.
+     * edited afterwards. Answers whether there was anything to state, because only one of the two
+     * readings goes on to name where the event came from — a way out announcing one says that it
+     * leaves, not where it was born.
      */
-    private void speak(Derivation derivation, TypeId subject, String fact, String why, TypeId related) {
-        derivation
-                .code()
-                .type(subject)
-                .filter(Shapes::isImmutable)
-                .ifPresent(node ->
-                        Contracts.speak(derivation, subject, ArchKind.DOMAIN_EVENT, fact, why, List.of(related), ID));
+    private boolean speak(Derivation derivation, TypeId subject, String fact, String why, TypeId related) {
+        Optional<TypeNode> happened = derivation.code().type(subject).filter(Shapes::isImmutable);
+        happened.ifPresent(
+                node -> Contracts.speak(derivation, subject, ArchKind.DOMAIN_EVENT, fact, why, List.of(related), ID));
+        return happened.isPresent();
     }
 }

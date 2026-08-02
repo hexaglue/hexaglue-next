@@ -14,9 +14,14 @@
 package io.hexaglue.engine.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import io.hexaglue.engine.Classifier;
 import io.hexaglue.engine.EngineContext;
+import io.hexaglue.engine.Relation;
+import io.hexaglue.engine.RelationKind;
+import io.hexaglue.engine.RuleSet;
+import io.hexaglue.engine.Saturation;
 import io.hexaglue.engine.Verdicts;
 import io.hexaglue.knowledge.KnowledgePacks;
 import io.hexaglue.model.ArchKind;
@@ -108,13 +113,26 @@ class PublishedEventTest {
         return Method.of(name, TypeRef.of(with.qualifiedName()));
     }
 
-    private static Verdicts verdicts(TypeNode... types) {
+    private static EngineContext context(TypeNode... types) {
         CodeModel.Builder code = CodeModel.builder();
         for (TypeNode type : types) {
             code.addType(type);
         }
-        return Classifier.classify(
-                EngineContext.of(code.build(), KnowledgePacks.embedded(), HexaGlueConfig.defaults()));
+        return EngineContext.of(code.build(), KnowledgePacks.embedded(), HexaGlueConfig.defaults());
+    }
+
+    private static Verdicts verdicts(TypeNode... types) {
+        return Classifier.classify(context(types));
+    }
+
+    /** The ties held once the verdicts have settled, which is where the model reads them. */
+    private static List<Relation> announcements(TypeNode... types) {
+        EngineContext context = context(types);
+        return Saturation.saturate(RuleSet.standard(), context.withVerdicts(Classifier.classify(context)))
+                .all(Relation.class)
+                .stream()
+                .filter(relation -> relation.kind() == RelationKind.ANNOUNCES)
+                .toList();
     }
 
     @Nested
@@ -208,6 +226,41 @@ class PublishedEventTest {
 
             assertThat(settled.kindOf(PORT)).contains(ArchKind.DRIVEN_PORT);
             assertThat(settled.kindOf(SAILING)).contains(ArchKind.VALUE_OBJECT);
+        }
+    }
+
+    @Nested
+    @DisplayName("states what the domain announces as a tie")
+    class StatesWhatTheDomainAnnouncesAsATie {
+
+        @Test
+        @DisplayName("from the aggregate that answers with it, which is where the event comes from")
+        void fromTheAggregateThatAnswersWithIt() {
+            List<Relation> ties = announcements(
+                    aggregate(List.of(Field.of("reference", TEXT)), List.of(answers("sail", SAILING))),
+                    immutable(SAILING));
+
+            assertThat(ties).extracting(Relation::subject, Relation::object).containsExactly(tuple(AGGREGATE, SAILING));
+        }
+
+        @Test
+        @DisplayName("and from nobody when what the aggregate answers with can still change")
+        void andFromNobodyWhenTheAnswerCanStillChange() {
+            // Nothing was announced, so nothing announced it: the tie has to fall with the reading
+            // rather than outlive it.
+            assertThat(announcements(
+                            aggregate(List.of(Field.of("reference", TEXT)), List.of(answers("sail", SAILING))),
+                            mutable(SAILING)))
+                    .isEmpty();
+        }
+
+        @Test
+        @DisplayName("and from nobody when a way out is the one carrying it outward")
+        void andFromNobodyWhenAWayOutCarriesIt() {
+            // A port announcing an event says that it leaves, not where it came from, and naming a
+            // source the sources do not name would be an invention.
+            assertThat(announcements(announcer(SAILING), caller(), immutable(SAILING)))
+                    .isEmpty();
         }
     }
 }

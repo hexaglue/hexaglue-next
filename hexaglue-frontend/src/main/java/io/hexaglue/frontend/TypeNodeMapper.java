@@ -62,7 +62,8 @@ final class TypeNodeMapper {
         TypeNode.Builder builder = TypeNode.builder(idOf(type), natureOf(type))
                 .modifiers(Modifiers.of(type.getModifiers()))
                 .interfaces(sorted(type.getSuperInterfaces()))
-                .permittedSubtypes(permittedSubtypesOf(type));
+                .permittedSubtypes(permittedSubtypesOf(type))
+                .annotations(Annotations.of(type.getAnnotations()));
         CtType<?> enclosing = type.getDeclaringType();
         if (enclosing != null) {
             builder.enclosingType(idOf(enclosing));

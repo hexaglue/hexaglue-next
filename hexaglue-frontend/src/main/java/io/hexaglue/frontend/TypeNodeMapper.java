@@ -47,9 +47,11 @@ final class TypeNodeMapper {
     private static final Comparator<TypeRef> BY_DISPLAY = Comparator.comparing(TypeRef::toDisplayString);
 
     private final SourceLocations locations;
+    private final Members members;
 
     TypeNodeMapper(SourceLocations locations) {
         this.locations = locations;
+        this.members = new Members(locations);
     }
 
     /**
@@ -63,7 +65,10 @@ final class TypeNodeMapper {
                 .modifiers(Modifiers.of(type.getModifiers()))
                 .interfaces(sorted(type.getSuperInterfaces()))
                 .permittedSubtypes(permittedSubtypesOf(type))
-                .annotations(Annotations.of(type.getAnnotations()));
+                .annotations(Annotations.of(type.getAnnotations()))
+                .fields(members.fieldsOf(type))
+                .methods(members.methodsOf(type))
+                .constructors(members.constructorsOf(type));
         CtType<?> enclosing = type.getDeclaringType();
         if (enclosing != null) {
             builder.enclosingType(idOf(enclosing));

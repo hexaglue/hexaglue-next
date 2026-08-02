@@ -16,11 +16,12 @@ package io.hexaglue.frontend;
 import io.hexaglue.model.TypeId;
 import io.hexaglue.model.code.MethodBodyFacts;
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.TreeMap;
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtCase;
@@ -56,7 +57,10 @@ final class MethodBodies {
     /** Names the body of a constructor, which has no name of its own. */
     static final String CONSTRUCTOR = "<init>";
 
-    private final Map<CtExecutable<?>, Integer> complexities = new IdentityHashMap<>();
+    // Keyed by signature rather than by the parsed element: signatures are unique within a type,
+    // and comparing parser elements means comparing whole syntax trees.
+    private final Map<String, Integer> complexities = new TreeMap<>();
+
     private final List<MethodBodyFacts> facts = new ArrayList<>();
 
     private MethodBodies() {}
@@ -76,12 +80,12 @@ final class MethodBodies {
         TypeId declaring = TypeNodeMapper.idOf(type);
         type.getMethods().stream()
                 .filter(method -> !method.isImplicit())
-                .sorted(java.util.Comparator.comparing(CtMethod::getSimpleName))
+                .sorted(Comparator.comparing(CtMethod::getSimpleName))
                 .forEach(method -> bodies.read(declaring, method.getSimpleName(), method));
         if (type instanceof CtClass<?> declaration) {
             declaration.getConstructors().stream()
                     .filter(constructor -> !constructor.isImplicit())
-                    .sorted(java.util.Comparator.comparing(CtConstructor::getSignature))
+                    .sorted(Comparator.comparing(CtConstructor::getSignature))
                     .forEach(constructor -> bodies.read(declaring, CONSTRUCTOR, constructor));
         }
         return bodies;
@@ -94,7 +98,7 @@ final class MethodBodies {
      * @return the cyclomatic complexity
      */
     OptionalInt complexityOf(CtExecutable<?> executable) {
-        Integer complexity = complexities.get(executable);
+        Integer complexity = complexities.get(executable.getSignature());
         return complexity == null ? OptionalInt.empty() : OptionalInt.of(complexity);
     }
 
@@ -113,7 +117,7 @@ final class MethodBodies {
         }
         BodyScanner scanner = new BodyScanner();
         executable.getBody().accept(scanner);
-        complexities.put(executable, scanner.decisions);
+        complexities.put(executable.getSignature(), scanner.decisions);
         facts.add(new MethodBodyFacts(declaring, name, scanner.invocations, scanner.instantiations));
     }
 

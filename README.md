@@ -10,11 +10,17 @@ architectural model with evidence-backed proofs, then consumed by plugins
 
 | Module | Role |
 |---|---|
-| `hexaglue-testkit` | Published test harness: fixture DSL, golden-file harness, reference corpus |
+| `hexaglue-model` | The contract: immutable records and sealed interfaces for the code model, the architectural model, classification traces, findings and typed configuration. Zero dependencies, zero logic beyond structural invariants |
+| `hexaglue-frontend` | Reads Java sources and their classpath into the code model: type nodes, external stubs for classpath types, typed edges with provenance, typed annotation values and the supertype closure. The only module that sees a parser |
+| `hexaglue-testkit` | Published test harness: source fixture helpers, golden-file harness, determinism checks and the reference acceptance corpus |
 
-Further modules (`hexaglue-model`, `hexaglue-frontend`, `hexaglue-knowledge`,
-`hexaglue-engine`, `hexaglue-spi`, plugins, Maven adapter, CLI) arrive as the
-reactor is built out.
+Dependencies point one way: `frontend → model ← engine ← spi ← plugins`. The
+boundary between stages is a data model, never a layer of interfaces — a
+second frontend, if one ever exists, produces the same code model rather than
+implementing an abstraction invented in advance.
+
+Further modules (`hexaglue-knowledge`, `hexaglue-engine`, `hexaglue-spi`,
+plugins, Maven adapter, CLI) arrive as the reactor is built out.
 
 ## Build
 
@@ -22,7 +28,17 @@ reactor is built out.
 make compile      # compile without tests
 make test         # run all tests
 make format       # apply Palantir Java Format
-make verify       # tests + quality checks
+make verify       # tests + quality checks (incremental)
+make ci           # clean build: the gate that must be green before a release
+make mutation     # mutation testing on the production modules
 ```
 
 Requires JDK 21+ (bytecode target: Java 17) and Maven 3.9+.
+
+Quality gates run on every build: Error Prone and NullAway at compile time,
+Checkstyle, PMD and SpotBugs as blocking checks, strict Javadoc linting,
+JaCoCo line coverage, ArchUnit rules applied to the reactor itself, and
+`bannedDependencies` keeping the parser and the build-tool APIs inside the
+single module each belongs to. Use `make ci` rather than `make verify` when
+what matters is that nothing warns: an incremental build does not recompile
+untouched modules, and their compiler warnings go unreported.

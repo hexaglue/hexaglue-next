@@ -98,7 +98,7 @@ class AnnotationValuesTest {
     void readsPrimitiveAttributes() {
         writeOrderAnnotatedWith("@Table(name = \"orders\", unique = false, length = 50)");
 
-        assertThat(valueOf("unique")).isEqualTo(AnnotationValue.ofPrimitive(Boolean.FALSE));
+        assertThat(valueOf("unique")).isEqualTo(AnnotationValue.ofPrimitive(false));
         assertThat(valueOf("length")).isEqualTo(AnnotationValue.ofPrimitive(50));
     }
 

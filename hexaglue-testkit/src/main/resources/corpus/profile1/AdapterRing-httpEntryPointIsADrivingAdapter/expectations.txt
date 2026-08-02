@@ -1,0 +1,13 @@
+# AdapterRing-httpEntryPointIsADrivingAdapter
+#
+# Authored for the outer ring of the hexagon. The vocabulary is deliberately
+# unconventional: what places a type on the ring is the framework symbol it
+# carries or the tool it holds, never its name or its package.
+
+# The controller is called from outside the application and nothing else here says so: it
+# carries no suffix a reader could lean on, and its package is a word. The interface it
+# holds stays undecided on purpose - nobody in the perimeter implements it, so there is
+# nothing yet to tell a driving port from an internal contract.
+status: reviewed
+expect: com.acme.hangar.web.HangarDoor = DRIVING_ADAPTER
+expect: com.acme.hangar.core.Assembly = UNCLASSIFIED

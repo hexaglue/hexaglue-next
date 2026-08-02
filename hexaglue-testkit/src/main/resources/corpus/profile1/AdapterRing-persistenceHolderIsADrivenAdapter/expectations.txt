@@ -1,0 +1,14 @@
+# AdapterRing-persistenceHolderIsADrivenAdapter
+#
+# Authored for the outer ring of the hexagon. The vocabulary is deliberately
+# unconventional: what places a type on the ring is the framework symbol it
+# carries or the tool it holds, never its name or its package.
+
+# Holding an EntityManager is talking to a store on the application's behalf, which is what
+# a driven adapter is. The class implements no interface and its name says nothing; the tool
+# it keeps is the whole signal.
+#
+# The type it reads stays undecided: no anchor, a mutable shape, and no port managing it.
+status: reviewed
+expect: com.acme.hangar.store.HangarBooks = DRIVEN_ADAPTER
+expect: com.acme.hangar.core.Fleet = UNCLASSIFIED

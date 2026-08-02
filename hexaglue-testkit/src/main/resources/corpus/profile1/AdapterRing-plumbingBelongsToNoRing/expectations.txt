@@ -1,0 +1,13 @@
+# AdapterRing-plumbingBelongsToNoRing
+#
+# Authored for the outer ring of the hexagon. The vocabulary is deliberately
+# unconventional: what places a type on the ring is the framework symbol it
+# carries or the tool it holds, never its name or its package.
+
+# A counter-case for the third family of framework facts. Configuration and the boot class
+# are plumbing: they belong to no ring, and the packs say so rather than leaving them to be
+# guessed at. They are undecided here, and categorized as technical once the model is
+# assembled.
+status: reviewed
+expect: com.acme.hangar.Wiring = UNCLASSIFIED
+expect: com.acme.hangar.Launcher = UNCLASSIFIED

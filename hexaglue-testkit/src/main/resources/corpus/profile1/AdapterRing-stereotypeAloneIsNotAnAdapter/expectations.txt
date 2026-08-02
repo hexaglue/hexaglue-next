@@ -1,0 +1,13 @@
+# AdapterRing-stereotypeAloneIsNotAnAdapter
+#
+# Authored for the outer ring of the hexagon. The vocabulary is deliberately
+# unconventional: what places a type on the ring is the framework symbol it
+# carries or the tool it holds, never its name or its package.
+
+# A counter-case, and the one that matters most on enterprise code: a Spring stereotype is
+# worn by application services, adapters and helpers alike, so it supports a reading and
+# carries none. Neither of these types is called from outside nor holds a way out, and
+# neither is placed on the ring.
+status: reviewed
+expect: com.acme.hangar.core.Dispatch = UNCLASSIFIED
+expect: com.acme.hangar.core.Sweeper = UNCLASSIFIED

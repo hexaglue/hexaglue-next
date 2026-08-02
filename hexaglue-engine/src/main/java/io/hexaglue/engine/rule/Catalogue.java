@@ -40,6 +40,8 @@ public final class Catalogue {
                 new DeclaredKind(),
                 new ConventionalName(),
                 new LocalShape(),
-                new RepositorySubject());
+                new RepositorySubject(),
+                new FrameworkEntryPoint(),
+                new InfrastructureDependency());
     }
 }

@@ -1,0 +1,11 @@
+# AdapterRing-neutralDependencyIsNotAWayOut
+#
+# Authored for the outer ring of the hexagon. The vocabulary is deliberately
+# unconventional: what places a type on the ring is the framework symbol it
+# carries or the tool it holds, never its name or its package.
+
+# A counter-case. Logging and validation are part of how any code is written, not ways out
+# of the hexagon: a purity report that called this class an adapter would teach its readers
+# to ignore it. The packs state both as neutral, and neutral means exactly this.
+status: reviewed
+expect: com.acme.hangar.core.Manifest = UNCLASSIFIED

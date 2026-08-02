@@ -29,7 +29,10 @@ public enum Predicate {
     KNOWLEDGE(KnowledgeAssertion.class),
 
     /** A signal supporting one kind for one type, at one tier of the hierarchy. */
-    EVIDENCE(KindEvidence.class);
+    EVIDENCE(KindEvidence.class),
+
+    /** A tie between two types: which aggregate a port manages, what carries an identity. */
+    RELATION(Relation.class);
 
     // Class is immutable; the checker only sees a field of a non-final type.
     @SuppressWarnings("ImmutableEnumChecker")

@@ -17,24 +17,23 @@ import io.hexaglue.engine.Rule;
 import java.util.List;
 
 /**
- * The catalogue of rules the engine runs.
+ * Every rule the engine runs.
  *
  * <p>Listing them in one place is what makes the rule set reviewable: what the engine knows how
  * to conclude is this list, and nothing hides in a cascade of conditions somewhere else.</p>
  *
  * @since 7.0.0
  */
-public final class SeedRules {
+public final class Catalogue {
 
-    private SeedRules() {}
+    private Catalogue() {}
 
     /**
-     * Returns every rule of the catalogue, in no particular order — the rule set orders them by
-     * identifier.
+     * Returns every rule, in no particular order — the rule set orders them by identifier.
      *
      * @return the rules
      */
     public static List<Rule> all() {
-        return List.of(new AssertKnowledge(), new ConfiguredKind(), new DeclaredKind());
+        return List.of(new AssertKnowledge(), new ConfiguredKind(), new DeclaredKind(), new RepositorySubject());
     }
 }

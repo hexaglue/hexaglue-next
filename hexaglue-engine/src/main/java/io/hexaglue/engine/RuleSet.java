@@ -13,7 +13,7 @@
 
 package io.hexaglue.engine;
 
-import io.hexaglue.engine.rule.SeedRules;
+import io.hexaglue.engine.rule.Catalogue;
 import io.hexaglue.model.classification.RuleId;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
@@ -65,7 +65,7 @@ public final class RuleSet {
      * @return the standard rule set
      */
     public static RuleSet standard() {
-        return of(SeedRules.all());
+        return of(Catalogue.all());
     }
 
     /**

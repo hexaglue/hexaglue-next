@@ -13,7 +13,7 @@
 # say, not what the names suggest.
 #
 # The inbound interface stays undecided: the core implements it, but no adapter calls it,
-# so nothing tells a driving port from an internal contract (R5, decision D14).
+# so nothing tells a driving port from an internal contract (R5).
 status: reviewed
 expect: com.example.application.OrderService = APPLICATION_SERVICE
 expect: com.example.ports.out.OrderRepository = DRIVEN_PORT

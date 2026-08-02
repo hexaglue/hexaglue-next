@@ -13,7 +13,7 @@
 # The service consumes the repository, which makes it a driven port (R4) and makes the
 # service the application layer (R6); the port's signatures converge on Order, which makes
 # it the aggregate (R1b) and its search key the identity (R2). The inbound interface stays
-# undecided for want of an adapter calling it (R5, decision D14).
+# undecided for want of an adapter calling it (R5).
 status: reviewed
 expect: com.example.order.application.OrderService = APPLICATION_SERVICE
 expect: com.example.order.domain.Order = AGGREGATE_ROOT

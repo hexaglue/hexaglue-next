@@ -13,8 +13,8 @@
 
 # Reviewed under the doctrine: the parent declares its kind and gets it; the subclass
 # declares nothing. A Java annotation is not inherited unless it says so, and no rule of
-# the referential carries a kind down a hierarchy. Whether it should is a question for the
-# referential, not for this fixture.
+# the engine carries a kind down a hierarchy. Whether one should is a question about the
+# rules themselves, not about this fixture.
 status: reviewed
 expect: com.example.BaseOrder = AGGREGATE_ROOT
 expect: com.example.PremiumOrder = UNCLASSIFIED

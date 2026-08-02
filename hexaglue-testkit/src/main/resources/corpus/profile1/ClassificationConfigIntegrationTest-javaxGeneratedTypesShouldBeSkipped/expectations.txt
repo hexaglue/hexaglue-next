@@ -12,10 +12,10 @@
 # and owes it no verdict. Re-reading what a generator emitted would teach the tool the
 # generator's conventions instead of the author's intent.
 #
-# Worth noting as a divergence: the referential foresees generated code as an UNCLASSIFIED
-# carrying the GENERATED_CODE category, and the jakarta pack carries a GENERATED_CODE entry
-# that no source type can trigger while the frontend filters first. This scenario states
-# what is delivered; which of the two doctrines wins is recorded at the registry.
+# Worth noting as a divergence: the stated doctrine of the engine foresees generated code
+# as an UNCLASSIFIED carrying the GENERATED_CODE category, and the jakarta pack carries such
+# an entry, which no source type can trigger while the frontend filters first. It states
+# what is delivered; which of the two wins is still open.
 status: reviewed
 expect: com.example.OrderMapper = NO VERDICT
 expect: com.example.Order = UNCLASSIFIED

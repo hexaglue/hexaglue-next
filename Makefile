@@ -60,7 +60,7 @@ coverage: ## Run tests and generate JaCoCo reports per module
 # Single invocation: the testkit resolves hexaglue-model from the reactor, which
 # requires the model to be built in the same Maven session as the PIT goal.
 mutation: ## Run mutation testing on production modules
-	mvn test org.pitest:pitest-maven:mutationCoverage -pl hexaglue-model,hexaglue-frontend,hexaglue-testkit,hexaglue-knowledge
+	mvn test org.pitest:pitest-maven:mutationCoverage -pl hexaglue-model,hexaglue-frontend,hexaglue-testkit,hexaglue-knowledge,hexaglue-engine
 
 build: clean test ## Clean build with tests
 

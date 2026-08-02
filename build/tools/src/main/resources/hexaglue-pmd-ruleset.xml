@@ -36,6 +36,9 @@
         <exclude name="CommentDefaultAccessModifier"/>
         <!-- Allow short method names like ir() -->
         <exclude name="ShortMethodName"/>
+        <!-- The vocabulary of the design is short on purpose: Fact, Rule, Edge, Field.
+             Padding a name to reach a character count would say less, not more. -->
+        <exclude name="ShortClassName"/>
         <!-- Control statement braces already checked by Checkstyle -->
         <exclude name="ControlStatementBraces"/>
         <!-- Allow multiple return statements for early exits -->

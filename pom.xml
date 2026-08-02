@@ -34,6 +34,7 @@
         <module>hexaglue-model</module>
         <module>hexaglue-frontend</module>
         <module>hexaglue-knowledge</module>
+        <module>hexaglue-engine</module>
         <module>hexaglue-testkit</module>
     </modules>
 
@@ -105,6 +106,11 @@
             <dependency>
                 <groupId>io.hexaglue</groupId>
                 <artifactId>hexaglue-knowledge</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.hexaglue</groupId>
+                <artifactId>hexaglue-engine</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

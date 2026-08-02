@@ -37,6 +37,14 @@
         <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
     </Match>
 
+    <!-- Same reasoning for the frontend request: its collections are unmodifiable views
+         normalized by the record constructor, and the enum set keeps a natural iteration
+         order that Set.copyOf would not guarantee. -->
+    <Match>
+        <Class name="io.hexaglue.frontend.FrontendRequest"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+
     <!-- Allow System.out in CLI/logging contexts -->
     <Match>
         <Package name="~io\.hexaglue\.core\.diagnostics.*"/>

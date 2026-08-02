@@ -32,6 +32,7 @@
     <modules>
         <module>build/tools</module>
         <module>hexaglue-model</module>
+        <module>hexaglue-frontend</module>
         <module>hexaglue-testkit</module>
     </modules>
 
@@ -48,6 +49,7 @@
         <archunit.version>1.4.2</archunit.version>
         <jspecify.version>1.0.1</jspecify.version>
         <slf4j.version>2.0.18</slf4j.version>
+        <spoon.version>11.5.0</spoon.version>
 
         <!-- Compilation guard rails -->
         <error-prone.version>2.50.0</error-prone.version>
@@ -94,6 +96,11 @@
             </dependency>
             <dependency>
                 <groupId>io.hexaglue</groupId>
+                <artifactId>hexaglue-frontend</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.hexaglue</groupId>
                 <artifactId>hexaglue-testkit</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -108,6 +115,13 @@
                 <groupId>org.jspecify</groupId>
                 <artifactId>jspecify</artifactId>
                 <version>${jspecify.version}</version>
+            </dependency>
+
+            <!-- Java parser, confined to hexaglue-frontend -->
+            <dependency>
+                <groupId>fr.inria.gforge.spoon</groupId>
+                <artifactId>spoon-core</artifactId>
+                <version>${spoon.version}</version>
             </dependency>
 
             <!-- Logging -->

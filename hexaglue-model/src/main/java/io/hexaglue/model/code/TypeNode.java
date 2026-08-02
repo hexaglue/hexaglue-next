@@ -43,8 +43,8 @@ import java.util.Set;
  * @param external true for a classpath stub, false for an analyzed source type
  * @param enclosingType the enclosing type for nested types, when any
  * @param superClass the extended class, when any
- * @param interfaces the implemented (or extended, for interfaces) interfaces, in declaration order
- * @param permittedSubtypes the permitted subtypes of a sealed type, in declaration order
+ * @param interfaces the implemented (or extended, for interfaces) interfaces, in a stable order
+ * @param permittedSubtypes the permitted subtypes of a sealed type, in a stable order
  * @param annotations the annotations on this type, in declaration order
  * @param fields the declared fields, in declaration order
  * @param methods the declared methods, in declaration order
@@ -208,7 +208,7 @@ public record TypeNode(
         /**
          * Sets the implemented or extended interfaces.
          *
-         * @param interfaces the interface references, in declaration order
+         * @param interfaces the interface references, in a stable order
          * @return this builder
          */
         public Builder interfaces(List<TypeRef> interfaces) {
@@ -219,7 +219,7 @@ public record TypeNode(
         /**
          * Sets the permitted subtypes of a sealed type.
          *
-         * @param permittedSubtypes the permitted subtype references, in declaration order
+         * @param permittedSubtypes the permitted subtype references, in a stable order
          * @return this builder
          */
         public Builder permittedSubtypes(List<TypeRef> permittedSubtypes) {

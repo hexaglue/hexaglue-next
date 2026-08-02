@@ -45,6 +45,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- Reads the supertype hierarchy of classpath types from their bytecode, which the
+             parser cannot see without their sources. -->
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

@@ -16,6 +16,7 @@ package io.hexaglue.frontend;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.TypeNode;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -64,11 +65,14 @@ public final class SpoonFrontend {
         List<TypeNode> nodes = analyzed.stream().map(mapper::map).toList();
         Edges relations = Edges.from(nodes);
 
+        List<TypeNode> allNodes = new ArrayList<>(nodes);
+        allNodes.addAll(relations.stubs());
+
         CodeModel.Builder model = CodeModel.builder();
         request.capabilities().forEach(model::capability);
-        nodes.forEach(model::addType);
-        relations.stubs().forEach(model::addType);
+        allNodes.forEach(model::addType);
         relations.all().forEach(model::addEdge);
+        Supertypes.closures(allNodes, request.classpath()).forEach(model::supertypes);
         LOG.debug(
                 "Code model built: {} analyzed types, {} external stubs, {} edges",
                 nodes.size(),

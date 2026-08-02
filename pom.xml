@@ -50,6 +50,7 @@
         <jspecify.version>1.0.1</jspecify.version>
         <slf4j.version>2.0.18</slf4j.version>
         <spoon.version>11.5.0</spoon.version>
+        <classgraph.version>4.8.180</classgraph.version>
 
         <!-- Compilation guard rails -->
         <error-prone.version>2.50.0</error-prone.version>
@@ -122,6 +123,13 @@
                 <groupId>fr.inria.gforge.spoon</groupId>
                 <artifactId>spoon-core</artifactId>
                 <version>${spoon.version}</version>
+            </dependency>
+
+            <!-- Bytecode hierarchy reader, confined to hexaglue-frontend -->
+            <dependency>
+                <groupId>io.github.classgraph</groupId>
+                <artifactId>classgraph</artifactId>
+                <version>${classgraph.version}</version>
             </dependency>
 
             <!-- Logging -->

@@ -26,13 +26,19 @@ import java.util.Objects;
  * by the frontend. Keeping it here rather than copying it into the fact base is what keeps the
  * base to what the engine <em>concluded</em>, and the proofs to what is worth explaining.</p>
  *
+ * <p>The verdicts are those of the previous round, empty on the first one. A propagation rule
+ * reads them to condition on what its neighbours turned out to be — and because they come from a
+ * finished round, no rule ever sees a verdict half-formed.</p>
+ *
  * @param code the analyzed sources, classpath stubs included
  * @param knowledge what the packs recognize
  * @param config the user's configuration
  * @param perimeter the types owed a verdict
+ * @param verdicts what the previous round concluded
  * @since 7.0.0
  */
-public record EngineContext(CodeModel code, FrameworkKnowledge knowledge, HexaGlueConfig config, Perimeter perimeter) {
+public record EngineContext(
+        CodeModel code, FrameworkKnowledge knowledge, HexaGlueConfig config, Perimeter perimeter, Verdicts verdicts) {
 
     /**
      * Validates that every component is present.
@@ -42,6 +48,7 @@ public record EngineContext(CodeModel code, FrameworkKnowledge knowledge, HexaGl
         Objects.requireNonNull(knowledge, "knowledge must not be null");
         Objects.requireNonNull(config, "config must not be null");
         Objects.requireNonNull(perimeter, "perimeter must not be null");
+        Objects.requireNonNull(verdicts, "verdicts must not be null");
     }
 
     /**
@@ -55,6 +62,16 @@ public record EngineContext(CodeModel code, FrameworkKnowledge knowledge, HexaGl
     public static EngineContext of(CodeModel code, FrameworkKnowledge knowledge, HexaGlueConfig config) {
         Objects.requireNonNull(code, "code must not be null");
         Objects.requireNonNull(config, "config must not be null");
-        return new EngineContext(code, knowledge, config, Perimeter.of(code, config.analysis()));
+        return new EngineContext(code, knowledge, config, Perimeter.of(code, config.analysis()), Verdicts.none());
+    }
+
+    /**
+     * Returns the same context, reading the given verdicts.
+     *
+     * @param verdicts what the previous round concluded
+     * @return a context for the next round
+     */
+    public EngineContext withVerdicts(Verdicts verdicts) {
+        return new EngineContext(code, knowledge, config, perimeter, verdicts);
     }
 }

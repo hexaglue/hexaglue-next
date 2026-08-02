@@ -14,12 +14,15 @@
 package io.hexaglue.engine;
 
 import io.hexaglue.knowledge.FrameworkKnowledge;
+import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.TypeId;
+import io.hexaglue.model.classification.Classification;
 import io.hexaglue.model.classification.RuleId;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.config.HexaGlueConfig;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -81,6 +84,28 @@ public final class Derivation {
      */
     public Perimeter perimeter() {
         return context.perimeter();
+    }
+
+    /**
+     * Returns what the previous round concluded about a type — empty on the first round, and on
+     * any type outside the perimeter.
+     *
+     * @param id the type id
+     * @return the verdict of the previous round
+     */
+    public Optional<Classification> verdict(TypeId id) {
+        return context.verdicts().verdict(id);
+    }
+
+    /**
+     * Returns the kind the previous round decided for a type, which is what a propagation rule
+     * conditions on.
+     *
+     * @param id the type id
+     * @return the kind of the previous round
+     */
+    public Optional<ArchKind> kindOf(TypeId id) {
+        return context.verdicts().kindOf(id);
     }
 
     /**

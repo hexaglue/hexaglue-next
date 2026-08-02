@@ -10,5 +10,11 @@
 #   assertThat(result.matchedCriteria()).isEqualTo("explicit-aggregate-root")
 #   assertThat(result.confidence()).isEqualTo(ConfidenceLevel.EXPLICIT)
 
-status: draft
-# the assertions name no single subject; decide by hand
+# Reviewed under the doctrine: the author declares the kind, and a declaration is the
+# strongest evidence there is. The legacy verdict said the same thing.
+#
+# The interface alongside it stays undecided: nobody implements it and nobody consumes
+# it, so it holds no position (the anti-rule, again).
+status: reviewed
+expect: com.example.Order = AGGREGATE_ROOT
+expect: com.example.OrderRepository = UNCLASSIFIED

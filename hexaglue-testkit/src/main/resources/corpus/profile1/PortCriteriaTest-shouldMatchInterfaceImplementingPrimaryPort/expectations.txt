@@ -10,5 +10,11 @@
 #   assertThat(criteria.targetKind()).isEqualTo(PortKind.USE_CASE)
 #   assertThat(criteria.targetDirection()).isEqualTo(PortDirection.DRIVING)
 
-status: draft
-# the legacy test asserted a match without naming a kind; decide by hand
+# Reviewed under the doctrine, and DELIBERATELY DIFFERENT from the carriere. The fixture
+# extends a jMolecules hexagonal port symbol, which jMolecules ships as an annotation and
+# not as an interface: no compiler accepts this declaration, so no intent is validly
+# declared by it. The legacy engine reached its verdict by matching a simple name on the
+# supertypes, which is the naming shortcut v7 removes. A scenario that owes DRIVING_PORT is
+# one that annotates the interface, and the corpus already holds it.
+status: reviewed
+expect: com.example.OrderingCoffee = UNCLASSIFIED

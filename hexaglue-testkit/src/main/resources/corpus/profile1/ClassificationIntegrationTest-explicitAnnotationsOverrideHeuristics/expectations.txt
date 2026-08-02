@@ -9,5 +9,7 @@
 #   assertThat(result.matchedCriteria()).isEqualTo("explicit-value-object")
 #   assertThat(result.hasConflicts()).isFalse()
 
-status: draft
-# no expectation could be drafted; read the assertions above and decide by hand
+# Reviewed under the doctrine: the author declares the kind, and a declaration is the
+# strongest evidence there is. The legacy verdict said the same thing.
+status: reviewed
+expect: com.example.Money = VALUE_OBJECT

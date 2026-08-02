@@ -6,5 +6,19 @@
 #
 #   (no assertion found)
 
-status: draft
-# the assertions name no single subject; decide by hand
+# Reviewed under the doctrine: this fixture carries the wiring the rules read, so it states
+# what the engine owes once the waves are built. The claims below are what the relations
+# say, not what the names suggest.
+#
+# Three declared repositories, three aggregates read off their signatures (R1b), three
+# identities read off their search keys (R2). No name is involved in any of the nine.
+status: reviewed
+expect: com.ecommerce.order.Order = AGGREGATE_ROOT
+expect: com.ecommerce.order.OrderId = IDENTIFIER
+expect: com.ecommerce.order.OrderRepository = DRIVEN_PORT
+expect: com.ecommerce.product.Product = AGGREGATE_ROOT
+expect: com.ecommerce.product.ProductId = IDENTIFIER
+expect: com.ecommerce.product.ProductRepository = DRIVEN_PORT
+expect: com.ecommerce.customer.Customer = AGGREGATE_ROOT
+expect: com.ecommerce.customer.CustomerId = IDENTIFIER
+expect: com.ecommerce.customer.CustomerRepository = DRIVEN_PORT

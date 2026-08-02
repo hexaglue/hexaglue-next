@@ -11,5 +11,9 @@
 #   assertThat(criteria.targetDirection()).isEqualTo(PortDirection.DRIVEN)
 #   assertThat(criteria.priority()).isEqualTo(100)
 
-status: draft
-# the legacy test asserted a match without naming a kind; decide by hand
+# Reviewed under the doctrine: the author declares the port with a jMolecules annotation.
+# The legacy engine answered a port family (REPOSITORY, GATEWAY); v7 states the kind and
+# carries the family as an attribute of the port - the same statement in another
+# vocabulary.
+status: reviewed
+expect: com.example.OrderRepository = DRIVEN_PORT

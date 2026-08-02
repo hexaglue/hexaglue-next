@@ -6,5 +6,12 @@
 #
 #   assertThat(result.matched()).isFalse()
 
-status: draft
-# no expectation could be drafted; read the assertions above and decide by hand
+# Reviewed under the doctrine: the wiring reaches the driven side but stops before the
+# edge. A driving port is an interface the core implements AND an adapter calls; this
+# fixture has the implementation and no adapter, so the interface stays undecided. That is
+# the measured gap, not an oversight of the review.
+#
+# The implementer consumes no port either, so R6 has nothing to read on it.
+status: reviewed
+expect: com.example.application.AbstractService = UNCLASSIFIED
+expect: com.example.ports.in.OrderUseCases = UNCLASSIFIED

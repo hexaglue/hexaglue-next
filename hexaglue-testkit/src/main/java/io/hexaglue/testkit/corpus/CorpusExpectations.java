@@ -36,7 +36,13 @@ import java.util.Objects;
  * status: reviewed
  * expect: com.example.Order = AGGREGATE_ROOT
  * reject: com.example.Order = VALUE_OBJECT
+ * expect: com.example.OrderEntity = NO VERDICT
  * }</pre>
+ *
+ * <p>A claim usually names an {@code ArchKind}. {@code NO VERDICT} is the one exception: it is
+ * what the harness renders when a type reached no verdict at all, and claiming it is how a
+ * scenario states that a type is absent from the analyzed model — generated code, which the
+ * frontend keeps out, rather than a type the engine considered and could not name.</p>
  *
  * @param scenarioId the scenario these expectations belong to
  * @param reviewed whether a human has vouched for them

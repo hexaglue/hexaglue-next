@@ -7,5 +7,9 @@
 #   assertThat(result.isUnclassified()).isTrue()
 #   assertThat(result.status()).isEqualTo(ClassificationStatus.UNCLASSIFIED)
 
-status: draft
+# Reviewed under the doctrine, and this is the anti-rule the corpus exists to pin: not
+# every interface is a port. Nobody implements this one and nobody consumes it, so there
+# is no direction to read - a driven port is consumed by the core, a driving port is
+# implemented by the core and called by the edge. Its name is not a substitute for either.
+status: reviewed
 expect: com.example.Callback = UNCLASSIFIED

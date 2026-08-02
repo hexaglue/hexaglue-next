@@ -9,5 +9,9 @@
 #   assertThat(result.hasConflicts()).isTrue()
 #   assertThat(conflictKinds.size()).isGreaterThanOrEqualTo(1)
 
-status: draft
-# no expectation could be drafted; read the assertions above and decide by hand
+# Reviewed under the doctrine: the author declares two kinds at once, at the same tier and
+# the same distance. Nothing separates them, so the engine says so and keeps both as
+# candidates rather than picking one. An honest "I could not tell" is what a report can
+# act on.
+status: reviewed
+expect: com.example.Ambiguous = UNCLASSIFIED

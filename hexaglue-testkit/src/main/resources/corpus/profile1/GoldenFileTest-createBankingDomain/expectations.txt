@@ -6,5 +6,16 @@
 #
 #   (no assertion found)
 
-status: draft
-# the assertions name no single subject; decide by hand
+# Reviewed under the doctrine: this fixture carries the wiring the rules read, so it states
+# what the engine owes once the waves are built. The claims below are what the relations
+# say, not what the names suggest.
+#
+# Money, Transaction and both ports are declared. Account is the subject of the
+# repository's signatures (R1b) and AccountId its search key and its identity field (R2).
+status: reviewed
+expect: com.example.banking.domain.Account = AGGREGATE_ROOT
+expect: com.example.banking.domain.AccountId = IDENTIFIER
+expect: com.example.banking.domain.Money = VALUE_OBJECT
+expect: com.example.banking.domain.Transaction = ENTITY
+expect: com.example.banking.ports.out.AccountRepository = DRIVEN_PORT
+expect: com.example.banking.ports.in.TransferUseCase = DRIVING_PORT

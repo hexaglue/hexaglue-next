@@ -9,5 +9,9 @@
 #   assertThat(markerFacts.implementedByCore()).isTrue()
 #   assertThat(result.matched()) .as("Marker interface (no methods) should not be classified as DRIVING port") .isFalse()
 
-status: draft
-# no expectation could be drafted; read the assertions above and decide by hand
+# Reviewed under the doctrine, and this is the anti-rule the corpus exists to pin: not
+# every interface is a port. Nobody implements this one and nobody consumes it, so there
+# is no direction to read - a driven port is consumed by the core, a driving port is
+# implemented by the core and called by the edge. Its name is not a substitute for either.
+status: reviewed
+expect: com.example.DomainEvent = UNCLASSIFIED

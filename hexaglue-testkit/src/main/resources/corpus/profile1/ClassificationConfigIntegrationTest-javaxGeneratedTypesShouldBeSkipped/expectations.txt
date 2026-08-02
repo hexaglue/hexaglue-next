@@ -7,8 +7,15 @@
 #   assertThat(results.get(NodeId.type("com.example.Order"))).isPresent()
 #   assertThat(results.get(NodeId.type("com.example.OrderMapper"))).isEmpty()
 
-status: draft
-# the legacy engine returned no verdict at all on this type. v7 owes a verdict to
-# every type of the perimeter (A5), so the counterpart of absent is unclassified —
-# unless the type is out of scope, which is a different statement.
+# Reviewed under the doctrine, and this pins a real behaviour: the frontend keeps generated
+# code out of the model altogether (AnalysisPerimeter), so the engine never sees the type
+# and owes it no verdict. Re-reading what a generator emitted would teach the tool the
+# generator's conventions instead of the author's intent.
+#
+# Worth noting as a divergence: the referential foresees generated code as an UNCLASSIFIED
+# carrying the GENERATED_CODE category, and the jakarta pack carries a GENERATED_CODE entry
+# that no source type can trigger while the frontend filters first. This scenario states
+# what is delivered; which of the two doctrines wins is recorded at the registry.
+status: reviewed
+expect: com.example.OrderMapper = NO VERDICT
 expect: com.example.Order = UNCLASSIFIED

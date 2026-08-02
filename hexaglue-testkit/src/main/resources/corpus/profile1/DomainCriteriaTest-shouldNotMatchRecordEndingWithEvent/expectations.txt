@@ -6,5 +6,11 @@
 #
 #   assertThat(result.matched()).isFalse()
 
-status: draft
-# no expectation could be drafted; read the assertions above and decide by hand
+# Reviewed under the doctrine: an immutable single-value wrapper is as much a value object
+# as an identity, and nothing in this fixture separates the two. Both readings are kept as
+# candidates and the verdict says so instead of picking. What would separate them is use -
+# an identity is the search key of a port managing an aggregate - and there is no port
+# here.
+status: reviewed
+expect: com.example.EventHandler = UNCLASSIFIED
+expect: com.example.OrderCreatedEvent = UNCLASSIFIED

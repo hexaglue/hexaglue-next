@@ -7,5 +7,7 @@
 #   assertThat(result.matched()).isTrue()
 #   assertThat(result.confidence()).isEqualTo(ConfidenceLevel.MEDIUM)
 
-status: draft
-# the legacy test asserted a match without naming a kind; decide by hand
+# Reviewed under the doctrine: the shape decides, and it decides alone. A type whose state
+# cannot change after construction is a value, whatever it is called and whoever uses it.
+status: reviewed
+expect: com.example.PaymentReceivedEvent = VALUE_OBJECT

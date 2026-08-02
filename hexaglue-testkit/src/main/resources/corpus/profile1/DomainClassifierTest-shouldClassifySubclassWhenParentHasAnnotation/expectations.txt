@@ -11,5 +11,10 @@
 #   assertThat(childResult.kind()).isEqualTo("AGGREGATE_ROOT")
 #   assertThat(childResult.matchedCriteria()).isEqualTo("inherited-classification")
 
-status: draft
-# the assertions name no single subject; decide by hand
+# Reviewed under the doctrine: the parent declares its kind and gets it; the subclass
+# declares nothing. A Java annotation is not inherited unless it says so, and no rule of
+# the referential carries a kind down a hierarchy. Whether it should is a question for the
+# referential, not for this fixture.
+status: reviewed
+expect: com.example.BaseOrder = AGGREGATE_ROOT
+expect: com.example.PremiumOrder = UNCLASSIFIED

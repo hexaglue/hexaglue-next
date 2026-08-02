@@ -10,5 +10,8 @@
 #   assertThat(criteria.targetKind()).isEqualTo(ElementKind.VALUE_OBJECT)
 #   assertThat(criteria.priority()).isEqualTo(65)
 
-status: draft
+# Reviewed under the doctrine: the shape decides, and it decides alone. A type whose state
+# cannot change after construction is a value, whatever it is called and whoever uses it.
+status: reviewed
+expect: com.example.Order = UNCLASSIFIED
 expect: com.example.ShippingRate = VALUE_OBJECT

@@ -6,5 +6,10 @@
 #
 #   assertThat(result.matched()).isFalse()
 
-status: draft
-# no expectation could be drafted; read the assertions above and decide by hand
+# Reviewed under the doctrine: a role is a position in a graph, and this fixture holds one
+# type with no position. No anchor is declared on it, its shape says nothing, and no
+# relation reaches it. UNCLASSIFIED with its candidates is the correct verdict, not a
+# default one. Remediation, when this happens on real code: widen the perimeter to the
+# code that uses the type, wire it, or declare its kind.
+status: reviewed
+expect: com.example.application.PlainService = UNCLASSIFIED

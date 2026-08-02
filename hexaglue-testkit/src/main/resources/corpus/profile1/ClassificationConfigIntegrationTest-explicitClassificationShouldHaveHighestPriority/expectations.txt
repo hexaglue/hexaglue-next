@@ -7,7 +7,10 @@
 #   assertThat(result).isPresent()
 #   assertThat(result.get().kind()).isEqualTo("ENTITY")
 
-status: draft
-# CONDITIONAL: the legacy test configured the classifier, and the corpus does not
-# carry that configuration yet. The expectation below holds only under it.
-expect: com.example.Order = ENTITY
+# Reviewed under the doctrine: the author declares the kind, and a declaration is the
+# strongest evidence there is. The legacy verdict said the same thing.
+#
+# The legacy test declared a competing kind through the configuration, which harvesting
+# left behind; the annotation is what the sources carry.
+status: reviewed
+expect: com.example.Order = AGGREGATE_ROOT

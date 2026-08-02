@@ -8,5 +8,13 @@
 #   assertThat(result.confidence()).isEqualTo(ConfidenceLevel.HIGH)
 #   assertThat(result.justification()).contains("driving port").contains("driven")
 
-status: draft
-# the legacy test asserted a match without naming a kind; decide by hand
+# Reviewed under the doctrine: this fixture carries the wiring the rules read, so it states
+# what the engine owes once the waves are built. The claims below are what the relations
+# say, not what the names suggest.
+#
+# The inbound interface stays undecided: the core implements it, but no adapter calls it,
+# so nothing tells a driving port from an internal contract (R5, decision D14).
+status: reviewed
+expect: com.example.application.OrderService = APPLICATION_SERVICE
+expect: com.example.ports.out.OrderRepository = DRIVEN_PORT
+expect: com.example.ports.in.OrderUseCases = UNCLASSIFIED

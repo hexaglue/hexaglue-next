@@ -10,7 +10,14 @@
 #   assertThat(criteria.targetKind()).isEqualTo(ElementKind.ENTITY)
 #   assertThat(criteria.priority()).isEqualTo(70)
 
-# Reviewed: the expectation is right and the engine cannot reach it yet. It needs R3, which
-# reads what a confirmed aggregate holds.
+# Reviewed under the doctrine: a role is a position in a graph, and this fixture holds one
+# type with no position. No anchor is declared on it, its shape says nothing, and no
+# relation reaches it. UNCLASSIFIED with its candidates is the correct verdict, not a
+# default one. Remediation, when this happens on real code: widen the perimeter to the
+# code that uses the type, wire it, or declare its kind.
+#
+# R3a reads what a CONFIRMED aggregate or entity owns, and nothing confirms the container
+# here: no anchor, no port managing it, and a mutable shape says nothing.
 status: reviewed
-expect: com.example.OrderLine = ENTITY
+expect: com.example.Order = UNCLASSIFIED
+expect: com.example.OrderLine = UNCLASSIFIED

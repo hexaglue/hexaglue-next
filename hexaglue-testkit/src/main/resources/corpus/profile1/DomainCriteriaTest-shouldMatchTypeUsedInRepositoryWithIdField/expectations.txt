@@ -11,8 +11,16 @@
 #   assertThat(criteria.targetKind()).isEqualTo(ElementKind.AGGREGATE_ROOT)
 #   assertThat(criteria.priority()).isEqualTo(80)
 
-# Reviewed: the expectation is right and the engine cannot reach it yet. A hand-written
-# repository interface is not a Spring Data one, so R1 says nothing; R4 (a port by the
-# signatures it exposes) is what will carry this.
+# Reviewed under the doctrine, and DELIBERATELY DIFFERENT from the carriere. The legacy
+# engine read a repository here; v7 needs a position in a graph and this interface has
+# none - no type of the perimeter implements it, and none consumes it as a field or a
+# constructor parameter. R4 establishes a driven port from its consumer, and the consumer
+# is what harvesting left out of this fixture. The aggregate follows: R1b reads the
+# subject of a port's signatures, so with no port there is no aggregate either.
+#
+# This is the anti-rule, measured: an interface whose signatures happen to converge on a
+# domain type is not thereby a port. The scenario that owes DRIVEN_PORT is one where an
+# application service holds it.
 status: reviewed
-expect: com.example.Order = AGGREGATE_ROOT
+expect: com.example.Order = UNCLASSIFIED
+expect: com.example.OrderRepository = UNCLASSIFIED

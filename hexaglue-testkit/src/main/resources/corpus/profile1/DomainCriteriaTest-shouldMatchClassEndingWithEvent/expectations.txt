@@ -10,5 +10,8 @@
 #   assertThat(criteria.targetKind()).isEqualTo(ElementKind.DOMAIN_EVENT)
 #   assertThat(criteria.priority()).isEqualTo(68)
 
-status: draft
-expect: com.example.OrderCreatedEvent = DOMAIN_EVENT
+# Reviewed under the doctrine: the legacy verdict rested on the name alone, which is no
+# longer read. Nothing else here speaks - the declaration carries no anchor and its shape
+# is silent - so the honest answer is no verdict.
+status: reviewed
+expect: com.example.OrderCreatedEvent = UNCLASSIFIED

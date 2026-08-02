@@ -10,7 +10,9 @@
 #   assertThat(result.get().confidence()).isEqualTo(ConfidenceLevel.HIGH)
 #   assertThat(result.get().matchedPriority()).isEqualTo(100)
 
-status: draft
-# CONDITIONAL: the legacy test configured the classifier, and the corpus does not
-# carry that configuration yet. The expectation below holds only under it.
-expect: com.example.OrderDetails = VALUE_OBJECT
+# Reviewed under the doctrine. The legacy test stated the kind through the tool
+# configuration, which is not part of the fixture: harvesting kept the sources and left the
+# configuration behind. What the sources carry is all this scenario can be held to, and
+# they carry nothing.
+status: reviewed
+expect: com.example.OrderDetails = UNCLASSIFIED

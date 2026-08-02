@@ -6,5 +6,9 @@
 #
 #   assertThat(result.portDirection()).isEqualTo(PortDirection.DRIVEN)
 
-status: draft
-# no expectation could be drafted; read the assertions above and decide by hand
+# Reviewed under the doctrine: the author declares the port with a jMolecules annotation.
+# The legacy engine answered a port family (REPOSITORY, GATEWAY); v7 states the kind and
+# carries the family as an attribute of the port - the same statement in another
+# vocabulary.
+status: reviewed
+expect: com.example.PaymentGateway = DRIVEN_PORT

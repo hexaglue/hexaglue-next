@@ -8,5 +8,7 @@
 #   assertThat(result.kind()).isEqualTo("VALUE_OBJECT")
 #   assertThat(result.matchedCriteria()).isEqualTo("domain-enum")
 
-status: draft
+# Reviewed under the doctrine: the shape decides, and it decides alone. A type whose state
+# cannot change after construction is a value, whatever it is called and whoever uses it.
+status: reviewed
 expect: com.example.Color = VALUE_OBJECT

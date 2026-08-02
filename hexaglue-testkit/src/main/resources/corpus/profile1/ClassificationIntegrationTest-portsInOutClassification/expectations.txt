@@ -14,5 +14,16 @@
 #   assertThat(gatewayResult.confidence()).isEqualTo(ConfidenceLevel.EXPLICIT)
 #   assertThat(gatewayResult.portDirection()).isEqualTo(PortDirection.DRIVEN)
 
-status: draft
-# the assertions name no single subject; decide by hand
+# Reviewed under the doctrine: the author declares the port with a jMolecules annotation.
+# The legacy engine answered a port family (REPOSITORY, GATEWAY); v7 states the kind and
+# carries the family as an attribute of the port - the same statement in another
+# vocabulary.
+#
+# The three ports are declared, and their packages are irrelevant to the verdict - one of
+# them sits in infrastructure and is a port all the same. The class nobody manages stays
+# undecided.
+status: reviewed
+expect: com.example.infrastructure.PaymentGateway = DRIVEN_PORT
+expect: com.example.ports.out.OrderRepository = DRIVEN_PORT
+expect: com.example.ports.in.PlaceOrderUseCase = DRIVING_PORT
+expect: com.example.domain.Order = UNCLASSIFIED

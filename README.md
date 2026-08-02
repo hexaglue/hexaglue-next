@@ -12,6 +12,7 @@ architectural model with evidence-backed proofs, then consumed by plugins
 |---|---|
 | `hexaglue-model` | The contract: immutable records and sealed interfaces for the code model, the architectural model, classification traces, findings and typed configuration. Zero dependencies, zero logic beyond structural invariants |
 | `hexaglue-frontend` | Reads Java sources and their classpath into the code model: type nodes, external stubs for classpath types, typed edges with provenance, typed annotation values and the supertype closure. The only module that sees a parser |
+| `hexaglue-knowledge` | What the frameworks mean, as versioned declarative packs: which annotation, supertype or package carries which technical fact. A symbol is always named in full, never by simple name |
 | `hexaglue-testkit` | Published test harness: source fixture helpers, golden-file harness, determinism checks and the reference acceptance corpus |
 
 Dependencies point one way: `frontend → model ← engine ← spi ← plugins`. The
@@ -19,8 +20,8 @@ boundary between stages is a data model, never a layer of interfaces — a
 second frontend, if one ever exists, produces the same code model rather than
 implementing an abstraction invented in advance.
 
-Further modules (`hexaglue-knowledge`, `hexaglue-engine`, `hexaglue-spi`,
-plugins, Maven adapter, CLI) arrive as the reactor is built out.
+Further modules (`hexaglue-engine`, `hexaglue-spi`, plugins, Maven adapter,
+CLI) arrive as the reactor is built out.
 
 ## Build
 

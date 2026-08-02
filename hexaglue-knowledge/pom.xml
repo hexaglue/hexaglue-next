@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.hexaglue</groupId>
+        <artifactId>hexaglue-parent</artifactId>
+        <version>7.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>hexaglue-knowledge</artifactId>
+    <packaging>jar</packaging>
+
+    <name>HexaGlue Knowledge</name>
+    <description>What the frameworks mean, stated as versioned declarative packs: which annotation, supertype or package carries which technical fact. Data read by the engine, never inference.</description>
+
+    <properties>
+        <hexaglue.root>${project.basedir}/..</hexaglue.root>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-model</artifactId>
+        </dependency>
+        <!-- Reads the pack resources. The binding on top of it is strict: an unknown
+             key is an error, so a mistyped pack fails the build instead of silently
+             losing knowledge. -->
+        <dependency>
+            <groupId>org.snakeyaml</groupId>
+            <artifactId>snakeyaml-engine</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

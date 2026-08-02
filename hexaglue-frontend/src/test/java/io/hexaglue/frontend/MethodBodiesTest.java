@@ -139,6 +139,48 @@ class MethodBodiesTest {
         }
 
         @Test
+        @DisplayName("counts every kind of branch a body can take")
+        void countsEveryKindOfBranch() {
+            SourceFixtures.write(sources, "com/acme/Branches.java", """
+                    package com.acme;
+                    public class Branches {
+                        public int all(int input, boolean flag) {
+                            int total = flag || input > 0 ? 1 : 0;
+                            while (total < 2) {
+                                total++;
+                            }
+                            do {
+                                total--;
+                            } while (total > 5);
+                            for (int step = 0; step < 3; step++) {
+                                total += step;
+                            }
+                            switch (input) {
+                                case 1: total++; break;
+                                default: break;
+                            }
+                            try {
+                                total += input;
+                            } catch (RuntimeException failure) {
+                                total = 0;
+                            }
+                            return total;
+                        }
+                    }
+                    """);
+
+            CodeModel model = analyze(true);
+
+            // One path, plus ||, the ternary, while, do, for, the case, the default case and the catch.
+            assertThat(model.type(TypeId.of("com.acme.Branches"))
+                            .orElseThrow()
+                            .methods()
+                            .get(0)
+                            .cyclomaticComplexity())
+                    .hasValue(9);
+        }
+
+        @Test
         @DisplayName("records body relations with the member they come from")
         void recordsBodyRelationsWithProvenance() {
             CodeModel model = analyze(true);

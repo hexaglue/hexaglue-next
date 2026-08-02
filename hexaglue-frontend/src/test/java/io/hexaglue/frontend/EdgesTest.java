@@ -238,6 +238,24 @@ class EdgesTest {
         }
 
         @Test
+        @DisplayName("reaches the type a wildcard is bounded by")
+        void reachesTheTypeAWildcardIsBoundedBy() {
+            SourceFixtures.write(sources, "com/acme/Order.java", """
+                    package com.acme;
+                    import java.util.List;
+                    public class Order {
+                        private List<? extends Line> lines;
+                        private List<? super Line> sink;
+                    }
+                    """);
+
+            assertThat(edgesOf(analyze(), "com.acme.Order"))
+                    .contains(
+                            "com.acme.Order -TYPE_ARGUMENT-> com.acme.Line @lines[arg 0]",
+                            "com.acme.Order -TYPE_ARGUMENT-> com.acme.Line @sink[arg 0]");
+        }
+
+        @Test
         @DisplayName("targets the component type of an array")
         void targetsTheComponentTypeOfAnArray() {
             SourceFixtures.write(

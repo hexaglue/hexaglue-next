@@ -165,6 +165,19 @@ class AnnotationValuesTest {
     }
 
     @Test
+    @DisplayName("reads a named constant as the value it holds, not as a symbol")
+    void readsNamedConstants() {
+        SourceFixtures.write(
+                sources,
+                "com/acme/meta/Names.java",
+                "package com.acme.meta; public final class Names { public static final String ORDERS = \"orders\"; private Names() {} }");
+        writeOrderAnnotatedWith("@Table(name = Names.ORDERS, length = Integer.MIN_VALUE)");
+
+        assertThat(valueOf("name")).isEqualTo(AnnotationValue.ofString("orders"));
+        assertThat(valueOf("length").kind()).isEqualTo(AnnotationValue.Kind.PRIMITIVE);
+    }
+
+    @Test
     @DisplayName("folds a constant expression into the value it denotes")
     void foldsConstantExpressions() {
         writeOrderAnnotatedWith("@Table(name = \"orders\", length = 10 * 5)");

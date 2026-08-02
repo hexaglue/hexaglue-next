@@ -281,6 +281,24 @@ class SpoonFrontendTest {
         }
 
         @Test
+        @DisplayName("reports no documentation when a type carries none of substance")
+        void reportsNoDocumentationWhenThereIsNone() {
+            SourceFixtures.write(sources, "com/acme/Order.java", "package com.acme; public class Order {}");
+            SourceFixtures.write(sources, "com/acme/Line.java", """
+                    package com.acme;
+                    /**
+                     * @since 1.0
+                     */
+                    public class Line {}
+                    """);
+
+            CodeModel model = analyze();
+
+            assertThat(node(model, "com.acme.Order").documentation()).isEmpty();
+            assertThat(node(model, "com.acme.Line").documentation()).isEmpty();
+        }
+
+        @Test
         @DisplayName("locates a type by a path relative to its source root")
         void locatesTypesRelativeToTheSourceRoot() {
             SourceFixtures.write(sources, "com/acme/Order.java", "package com.acme;\npublic class Order {}\n");

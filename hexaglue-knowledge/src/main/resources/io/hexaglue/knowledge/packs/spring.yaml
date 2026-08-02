@@ -1,0 +1,71 @@
+# What Spring's symbols say about a type. Nothing here decides a DDD kind: a stereotype
+# supports a reading, an entry point marks the outer ring, a template reaches outside.
+pack: spring
+description: What Spring's stereotypes, entry points, data interfaces and templates say about a type.
+entries:
+  # Stated once, on the root Spring Data derives everything from: JpaRepository,
+  # MongoRepository and every vendor interface below them answer to this entry,
+  # and the declaration hands over the aggregate and its identifier.
+  - supertype: org.springframework.data.repository.Repository
+    emits: SPRING_DATA_REPOSITORY
+
+  # Entry points the framework calls from outside the application.
+  - annotation: org.springframework.web.bind.annotation.RestController
+    emits: DRIVING_ENTRYPOINT
+  - annotation: org.springframework.stereotype.Controller
+    emits: DRIVING_ENTRYPOINT
+  - annotation: org.springframework.web.bind.annotation.ControllerAdvice
+    emits: DRIVING_ENTRYPOINT
+  - annotation: org.springframework.kafka.annotation.KafkaListener
+    emits: DRIVING_ENTRYPOINT
+  - annotation: org.springframework.jms.annotation.JmsListener
+    emits: DRIVING_ENTRYPOINT
+  - annotation: org.springframework.amqp.rabbit.annotation.RabbitListener
+    emits: DRIVING_ENTRYPOINT
+
+  # Stereotypes: worn by application services as often as by anything else, so they
+  # support a reading and never carry one on their own.
+  - annotation: org.springframework.stereotype.Service
+    emits: APPLICATION_STEREOTYPE
+  - annotation: org.springframework.stereotype.Component
+    emits: APPLICATION_STEREOTYPE
+  - annotation: org.springframework.transaction.annotation.Transactional
+    emits: APPLICATION_STEREOTYPE
+
+  # Plumbing: belongs to no ring of the hexagon, and is categorized rather than left unclassified.
+  - annotation: org.springframework.context.annotation.Configuration
+    emits: TECHNICAL
+  - annotation: org.springframework.boot.autoconfigure.SpringBootApplication
+    emits: TECHNICAL
+  - annotation: org.springframework.boot.context.properties.ConfigurationProperties
+    emits: TECHNICAL
+
+  # Mapping to a store is a fact about storage, never a DDD verdict.
+  - annotation: org.springframework.data.mongodb.core.mapping.Document
+    emits: PERSISTENCE_MODEL
+  - annotation: org.springframework.data.cassandra.core.mapping.Table
+    emits: PERSISTENCE_MODEL
+
+  # Tools that reach outside. A type holding one leaves the hexagon, whatever it calls itself.
+  - type: org.springframework.jdbc.core.JdbcTemplate
+    emits: INFRA_DEPENDENCY
+  - type: org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+    emits: INFRA_DEPENDENCY
+  - type: org.springframework.data.mongodb.core.MongoTemplate
+    emits: INFRA_DEPENDENCY
+  - type: org.springframework.data.redis.core.RedisTemplate
+    emits: INFRA_DEPENDENCY
+  - type: org.springframework.web.client.RestTemplate
+    emits: INFRA_DEPENDENCY
+  - type: org.springframework.web.reactive.function.client.WebClient
+    emits: INFRA_DEPENDENCY
+  - type: org.springframework.kafka.core.KafkaTemplate
+    emits: INFRA_DEPENDENCY
+  - type: org.springframework.amqp.rabbit.core.RabbitTemplate
+    emits: INFRA_DEPENDENCY
+  - type: org.springframework.jms.core.JmsTemplate
+    emits: INFRA_DEPENDENCY
+  - package-prefix: org.springframework.data.jpa.repository
+    emits: INFRA_DEPENDENCY
+  - package-prefix: org.springframework.data.mongodb.repository
+    emits: INFRA_DEPENDENCY

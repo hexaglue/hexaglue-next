@@ -1,0 +1,19 @@
+# The rest of a typical classpath: libraries that belong to no application framework
+# but still carry a fact about the types that touch them.
+pack: platform
+description: Code generators, logging and standalone HTTP clients, which nearly every classpath carries.
+entries:
+  # Written by a generator, and therefore nobody's declared intent.
+  - annotation: javax.annotation.processing.Generated
+    emits: GENERATED_CODE
+  - annotation: lombok.Generated
+    emits: GENERATED_CODE
+
+  # Logging is not infrastructure leaking into a domain, and a purity report that says
+  # otherwise teaches its readers to ignore it.
+  - package-prefix: org.slf4j
+    emits: NEUTRAL
+
+  # An HTTP client is a way out of the hexagon whoever ships it.
+  - package-prefix: feign
+    emits: INFRA_DEPENDENCY

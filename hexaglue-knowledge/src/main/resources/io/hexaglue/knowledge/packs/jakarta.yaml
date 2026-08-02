@@ -1,0 +1,60 @@
+# Jakarta EE, and the javax names the previous decade used for the same symbols.
+#
+# A persistence mapping states that a type is stored, and that alone. It is never an
+# evidence of kind, positive or negative: the kind is read from the graph as if the
+# annotation were not there, and a domain coupled to its storage is reported as a
+# finding rather than quietly reclassified.
+pack: jakarta
+description: Persistence mapping, resources, validation and generation markers, under both the jakarta and javax names.
+entries:
+  # Mapped to a store.
+  - annotation: jakarta.persistence.Entity
+    emits: PERSISTENCE_MODEL
+  - annotation: jakarta.persistence.Embeddable
+    emits: PERSISTENCE_MODEL
+  - annotation: jakarta.persistence.MappedSuperclass
+    emits: PERSISTENCE_MODEL
+  - annotation: jakarta.persistence.Table
+    emits: PERSISTENCE_MODEL
+  - annotation: javax.persistence.Entity
+    emits: PERSISTENCE_MODEL
+  - annotation: javax.persistence.Embeddable
+    emits: PERSISTENCE_MODEL
+  - annotation: javax.persistence.MappedSuperclass
+    emits: PERSISTENCE_MODEL
+  - annotation: javax.persistence.Table
+    emits: PERSISTENCE_MODEL
+
+  # The tools that perform the mapping.
+  - type: jakarta.persistence.EntityManager
+    emits: INFRA_DEPENDENCY
+  - type: jakarta.persistence.EntityManagerFactory
+    emits: INFRA_DEPENDENCY
+  - type: javax.persistence.EntityManager
+    emits: INFRA_DEPENDENCY
+  - type: javax.persistence.EntityManagerFactory
+    emits: INFRA_DEPENDENCY
+
+  # Entry points the container calls from outside.
+  - annotation: jakarta.ws.rs.Path
+    emits: DRIVING_ENTRYPOINT
+  - annotation: javax.ws.rs.Path
+    emits: DRIVING_ENTRYPOINT
+
+  # Stereotypes: they support a reading, never carry one.
+  - annotation: jakarta.ejb.Stateless
+    emits: APPLICATION_STEREOTYPE
+  - annotation: javax.ejb.Stateless
+    emits: APPLICATION_STEREOTYPE
+
+  # Constraints on a value are part of the domain's own vocabulary, not a leak of infrastructure.
+  - package-prefix: jakarta.validation
+    emits: NEUTRAL
+  - package-prefix: javax.validation
+    emits: NEUTRAL
+
+  # Written by a generator, and therefore nobody's declared intent.
+  - annotation: jakarta.annotation.Generated
+    emits: GENERATED_CODE
+  - annotation: javax.annotation.Generated
+    emits: GENERATED_CODE

@@ -1,0 +1,57 @@
+# jMolecules is how an author states architectural intent in HexaGlue: it is neutral,
+# it is designed to carry exactly this, and it couples a domain to no analysis tool.
+# Every symbol is matched by its exact qualified name, annotations and interfaces alike.
+pack: jmolecules
+description: Architectural intent, declared by the author through jMolecules annotations and interfaces.
+entries:
+  # The DDD vocabulary, declared as annotations.
+  - annotation: org.jmolecules.ddd.annotation.AggregateRoot
+    emits: DECLARED_KIND
+    kind: AGGREGATE_ROOT
+  - annotation: org.jmolecules.ddd.annotation.Entity
+    emits: DECLARED_KIND
+    kind: ENTITY
+  - annotation: org.jmolecules.ddd.annotation.ValueObject
+    emits: DECLARED_KIND
+    kind: VALUE_OBJECT
+  - annotation: org.jmolecules.ddd.annotation.Service
+    emits: DECLARED_KIND
+    kind: DOMAIN_SERVICE
+  # A repository is the archetypal way the hexagon reaches storage: a driven port.
+  - annotation: org.jmolecules.ddd.annotation.Repository
+    emits: DECLARED_KIND
+    kind: DRIVEN_PORT
+  - annotation: org.jmolecules.event.annotation.DomainEvent
+    emits: DECLARED_KIND
+    kind: DOMAIN_EVENT
+
+  # The same vocabulary, declared by implementing an interface instead.
+  - supertype: org.jmolecules.ddd.types.AggregateRoot
+    emits: DECLARED_KIND
+    kind: AGGREGATE_ROOT
+  - supertype: org.jmolecules.ddd.types.Entity
+    emits: DECLARED_KIND
+    kind: ENTITY
+  - supertype: org.jmolecules.ddd.types.ValueObject
+    emits: DECLARED_KIND
+    kind: VALUE_OBJECT
+  - supertype: org.jmolecules.ddd.types.Identifier
+    emits: DECLARED_KIND
+    kind: IDENTIFIER
+  - supertype: org.jmolecules.event.types.DomainEvent
+    emits: DECLARED_KIND
+    kind: DOMAIN_EVENT
+
+  # Both sides of the hexagon, named as jMolecules names them.
+  - annotation: org.jmolecules.architecture.hexagonal.PrimaryPort
+    emits: DECLARED_KIND
+    kind: DRIVING_PORT
+  - annotation: org.jmolecules.architecture.hexagonal.SecondaryPort
+    emits: DECLARED_KIND
+    kind: DRIVEN_PORT
+  - annotation: org.jmolecules.architecture.hexagonal.PrimaryAdapter
+    emits: DECLARED_KIND
+    kind: DRIVING_ADAPTER
+  - annotation: org.jmolecules.architecture.hexagonal.SecondaryAdapter
+    emits: DECLARED_KIND
+    kind: DRIVEN_ADAPTER

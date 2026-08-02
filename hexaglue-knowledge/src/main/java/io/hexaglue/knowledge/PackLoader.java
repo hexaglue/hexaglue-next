@@ -17,6 +17,9 @@ import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.model.finding.DiagnosticSeverity;
 import io.hexaglue.model.finding.IssueCode;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -114,6 +117,27 @@ public final class PackLoader {
         Objects.requireNonNull(origin, "origin must not be null");
         Objects.requireNonNull(yaml, "yaml must not be null");
         return bind(origin, parse(origin, yaml));
+    }
+
+    /**
+     * Reads a pack from a classpath resource.
+     *
+     * @param resourceName the resource path, e.g. {@code io/hexaglue/knowledge/packs/spring.yaml}
+     * @return the pack it states
+     * @throws KnowledgeException when the resource is absent, unreadable, or not a bindable pack
+     */
+    public static KnowledgePack loadResource(String resourceName) {
+        Objects.requireNonNull(resourceName, "resourceName must not be null");
+        // Read through the class rather than a class loader: a pack travels with the module that
+        // ships it, wherever that module ends up being loaded from.
+        try (InputStream resource = PackLoader.class.getResourceAsStream("/" + resourceName)) {
+            if (resource == null) {
+                throw failure(DOCUMENT_UNREADABLE, resourceName, "is not on the classpath");
+            }
+            return load(resourceName, new String(resource.readAllBytes(), StandardCharsets.UTF_8));
+        } catch (IOException unreadable) {
+            throw failure(DOCUMENT_UNREADABLE, resourceName, "cannot be read: " + unreadable.getMessage(), unreadable);
+        }
     }
 
     private static Object parse(String origin, String yaml) {

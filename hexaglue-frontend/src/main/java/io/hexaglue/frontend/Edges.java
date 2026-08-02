@@ -18,6 +18,7 @@ import io.hexaglue.model.TypeNature;
 import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.code.Edge;
 import io.hexaglue.model.code.EdgeKind;
+import io.hexaglue.model.code.MethodBodyFacts;
 import io.hexaglue.model.code.TypeNode;
 import io.hexaglue.model.declaration.Annotation;
 import io.hexaglue.model.declaration.Parameter;
@@ -67,9 +68,10 @@ final class Edges {
      * @param nodes the analyzed type nodes, in identity order
      * @return the derived relations and the stubs they point at
      */
-    static Edges from(List<TypeNode> nodes) {
+    static Edges from(List<TypeNode> nodes, List<MethodBodyFacts> bodyFacts) {
         Edges derived = new Edges(nodes.stream().map(TypeNode::id).collect(Collectors.toUnmodifiableSet()));
         nodes.forEach(derived::collect);
+        bodyFacts.forEach(derived::collect);
         return derived;
     }
 
@@ -123,6 +125,23 @@ final class Edges {
             parameters(source, member, constructor.parameters());
             annotations(source, constructor.annotations(), member, noIndex());
         });
+    }
+
+    /**
+     * Records what a body does. A body may call the same type many times; the facts keep every
+     * occurrence, the graph keeps one relation per member and target — a relation states that the
+     * dependency exists, not how often it is exercised.
+     */
+    private void collect(MethodBodyFacts facts) {
+        Optional<String> member = Optional.of(facts.methodName());
+        facts.invocations().stream()
+                .map(MethodBodyFacts.Invocation::target)
+                .distinct()
+                .forEach(target -> add(facts.declaringType(), EdgeKind.INVOKES, target, member, noIndex()));
+        facts.instantiations().stream()
+                .map(MethodBodyFacts.Instantiation::target)
+                .distinct()
+                .forEach(target -> add(facts.declaringType(), EdgeKind.INSTANTIATES, target, member, noIndex()));
     }
 
     private void parameters(TypeId source, Optional<String> member, List<Parameter> parameters) {

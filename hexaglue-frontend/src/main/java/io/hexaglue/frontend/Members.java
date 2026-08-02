@@ -85,10 +85,10 @@ final class Members {
      * @param type the parsed type
      * @return the declared methods
      */
-    List<Method> methodsOf(CtType<?> type) {
+    List<Method> methodsOf(CtType<?> type, MethodBodies bodies) {
         return type.getMethods().stream()
                 .filter(method -> !method.isImplicit())
-                .map(this::methodOf)
+                .map(method -> methodOf(method, bodies))
                 .sorted(BY_METHOD_SIGNATURE)
                 .toList();
     }
@@ -119,12 +119,13 @@ final class Members {
         return builder.build();
     }
 
-    private Method methodOf(CtMethod<?> method) {
+    private Method methodOf(CtMethod<?> method, MethodBodies bodies) {
         Method.Builder builder = Method.builder(method.getSimpleName(), TypeRefs.of(method.getType()))
                 .parameters(parametersOf(method))
                 .modifiers(modifiersOf(method))
                 .annotations(Annotations.of(method.getAnnotations()))
                 .thrownExceptions(thrownBy(method));
+        bodies.complexityOf(method).ifPresent(builder::cyclomaticComplexity);
         Javadocs.of(method).ifPresent(builder::documentation);
         locations.of(method).ifPresent(builder::sourceLocation);
         return builder.build();

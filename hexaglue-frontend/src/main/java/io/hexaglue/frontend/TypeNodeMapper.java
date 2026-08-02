@@ -16,6 +16,7 @@ package io.hexaglue.frontend;
 import io.hexaglue.model.TypeId;
 import io.hexaglue.model.TypeNature;
 import io.hexaglue.model.TypeRef;
+import io.hexaglue.model.code.MethodBodyFacts;
 import io.hexaglue.model.code.TypeNode;
 import java.util.Comparator;
 import java.util.List;
@@ -48,26 +49,29 @@ final class TypeNodeMapper {
 
     private final SourceLocations locations;
     private final Members members;
+    private final boolean readBodies;
 
-    TypeNodeMapper(SourceLocations locations) {
+    TypeNodeMapper(SourceLocations locations, boolean readBodies) {
         this.locations = locations;
         this.members = new Members(locations);
+        this.readBodies = readBodies;
     }
 
     /**
-     * Reads one parsed type.
+     * Reads one parsed type, and its bodies when the capability was requested.
      *
      * @param type the parsed type declaration
-     * @return the corresponding code model node
+     * @return the node and the facts read from its bodies
      */
-    TypeNode map(CtType<?> type) {
+    MappedType map(CtType<?> type) {
+        MethodBodies bodies = MethodBodies.of(type, readBodies);
         TypeNode.Builder builder = TypeNode.builder(idOf(type), natureOf(type))
                 .modifiers(Modifiers.of(type.getModifiers()))
                 .interfaces(sorted(type.getSuperInterfaces()))
                 .permittedSubtypes(permittedSubtypesOf(type))
                 .annotations(Annotations.of(type.getAnnotations()))
                 .fields(members.fieldsOf(type))
-                .methods(members.methodsOf(type))
+                .methods(members.methodsOf(type, bodies))
                 .constructors(members.constructorsOf(type));
         CtType<?> enclosing = type.getDeclaringType();
         if (enclosing != null) {
@@ -76,8 +80,16 @@ final class TypeNodeMapper {
         declaredSuperClassOf(type).ifPresent(builder::superClass);
         Javadocs.of(type).ifPresent(builder::documentation);
         locations.of(type).ifPresent(builder::sourceLocation);
-        return builder.build();
+        return new MappedType(builder.build(), bodies.facts());
     }
+
+    /**
+     * One read type: its node, and the facts its bodies carry when they were read.
+     *
+     * @param node the code model node
+     * @param bodyFacts the facts read from the bodies, empty without the capability
+     */
+    record MappedType(TypeNode node, List<MethodBodyFacts> bodyFacts) {}
 
     /**
      * Returns the identity of a parsed type. Nested types are named with the binary {@code $}

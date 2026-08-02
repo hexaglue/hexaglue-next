@@ -13,7 +13,11 @@
 
 package io.hexaglue.frontend;
 
+import static io.hexaglue.model.code.CodeModelCapability.METHOD_BODIES;
+
+import io.hexaglue.frontend.TypeNodeMapper.MappedType;
 import io.hexaglue.model.code.CodeModel;
+import io.hexaglue.model.code.MethodBodyFacts;
 import io.hexaglue.model.code.TypeNode;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -59,11 +63,15 @@ public final class SpoonFrontend {
         CtModel parsed = parse(request);
 
         AnalysisPerimeter perimeter = new AnalysisPerimeter(request.scope());
-        TypeNodeMapper mapper = new TypeNodeMapper(new SourceLocations(request.sourceRoots()));
-        List<CtType<?>> analyzed = analyzedTypes(parsed, perimeter);
+        TypeNodeMapper mapper =
+                new TypeNodeMapper(new SourceLocations(request.sourceRoots()), request.has(METHOD_BODIES));
+        List<MappedType> mapped =
+                analyzedTypes(parsed, perimeter).stream().map(mapper::map).toList();
 
-        List<TypeNode> nodes = analyzed.stream().map(mapper::map).toList();
-        Edges relations = Edges.from(nodes);
+        List<TypeNode> nodes = mapped.stream().map(MappedType::node).toList();
+        List<MethodBodyFacts> bodyFacts =
+                mapped.stream().flatMap(type -> type.bodyFacts().stream()).toList();
+        Edges relations = Edges.from(nodes, bodyFacts);
 
         List<TypeNode> allNodes = new ArrayList<>(nodes);
         allNodes.addAll(relations.stubs());
@@ -72,6 +80,7 @@ public final class SpoonFrontend {
         request.capabilities().forEach(model::capability);
         allNodes.forEach(model::addType);
         relations.all().forEach(model::addEdge);
+        bodyFacts.forEach(model::addBodyFacts);
         Supertypes.closures(allNodes, request.classpath()).forEach(model::supertypes);
         LOG.debug(
                 "Code model built: {} analyzed types, {} external stubs, {} edges",

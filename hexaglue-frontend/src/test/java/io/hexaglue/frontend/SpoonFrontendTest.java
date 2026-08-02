@@ -46,6 +46,14 @@ class SpoonFrontendTest {
                 FrontendRequest.builder().sourceRoot(sources).scope(scope).build());
     }
 
+    /** The types read from source, leaving out the stubs standing for classpath types. */
+    private List<TypeId> analyzedIds(CodeModel model) {
+        return model.types().stream()
+                .filter(node -> !node.external())
+                .map(TypeNode::id)
+                .toList();
+    }
+
     private TypeNode node(CodeModel model, String qualifiedName) {
         return model.type(TypeId.of(qualifiedName))
                 .orElseThrow(() -> new AssertionError("no node for " + qualifiedName + ", model holds "
@@ -65,9 +73,7 @@ class SpoonFrontendTest {
 
             CodeModel model = analyze();
 
-            assertThat(model.types())
-                    .extracting(TypeNode::id)
-                    .containsExactly(TypeId.of("com.acme.Order"), TypeId.of("com.acme.OrderId"));
+            assertThat(analyzedIds(model)).containsExactly(TypeId.of("com.acme.Order"), TypeId.of("com.acme.OrderId"));
         }
 
         @Test
@@ -85,8 +91,7 @@ class SpoonFrontendTest {
 
             CodeModel model = analyze();
 
-            assertThat(model.types())
-                    .extracting(TypeNode::id)
+            assertThat(analyzedIds(model))
                     .containsExactly(
                             TypeId.of("com.acme.Order"),
                             TypeId.of("com.acme.Order$Line"),
@@ -114,13 +119,13 @@ class SpoonFrontendTest {
 
             CodeModel model = analyze();
 
-            assertThat(model.types()).extracting(TypeNode::id).containsExactly(TypeId.of("com.acme.Order"));
+            assertThat(analyzedIds(model)).containsExactly(TypeId.of("com.acme.Order"));
         }
 
         @Test
         @DisplayName("produces no analyzed type when the source root is empty")
         void producesNoTypeWhenSourceRootIsEmpty() {
-            assertThat(analyze().types()).isEmpty();
+            assertThat(analyzedIds(analyze())).isEmpty();
         }
     }
 
@@ -300,7 +305,7 @@ class SpoonFrontendTest {
 
             CodeModel model = analyze(new AnalysisScope(Optional.empty(), List.of("com.acme"), List.of()));
 
-            assertThat(model.types()).extracting(TypeNode::id).containsExactly(TypeId.of("com.acme.Order"));
+            assertThat(analyzedIds(model)).containsExactly(TypeId.of("com.acme.Order"));
         }
 
         @Test
@@ -312,7 +317,7 @@ class SpoonFrontendTest {
 
             CodeModel model = analyze(new AnalysisScope(Optional.empty(), List.of(), List.of("com.acme.internal")));
 
-            assertThat(model.types()).extracting(TypeNode::id).containsExactly(TypeId.of("com.acme.Order"));
+            assertThat(analyzedIds(model)).containsExactly(TypeId.of("com.acme.Order"));
         }
 
         @Test
@@ -323,7 +328,7 @@ class SpoonFrontendTest {
 
             CodeModel model = analyze(new AnalysisScope(Optional.empty(), List.of("com.acme"), List.of()));
 
-            assertThat(model.types()).extracting(TypeNode::id).containsExactly(TypeId.of("com.acme.Order"));
+            assertThat(analyzedIds(model)).containsExactly(TypeId.of("com.acme.Order"));
         }
 
         @Test
@@ -334,7 +339,7 @@ class SpoonFrontendTest {
 
             CodeModel model = analyze(new AnalysisScope(Optional.of("com.acme"), List.of(), List.of()));
 
-            assertThat(model.types()).hasSize(2);
+            assertThat(analyzedIds(model)).hasSize(2);
         }
 
         @Test
@@ -349,7 +354,7 @@ class SpoonFrontendTest {
 
             CodeModel model = analyze();
 
-            assertThat(model.types()).extracting(TypeNode::id).containsExactly(TypeId.of("com.acme.Order"));
+            assertThat(analyzedIds(model)).containsExactly(TypeId.of("com.acme.Order"));
         }
 
         @Test
@@ -362,7 +367,7 @@ class SpoonFrontendTest {
 
             CodeModel model = analyze(new AnalysisScope(Optional.empty(), List.of(), List.of("com.acme.internal")));
 
-            assertThat(model.types()).isEmpty();
+            assertThat(analyzedIds(model)).isEmpty();
         }
     }
 
@@ -377,8 +382,8 @@ class SpoonFrontendTest {
             SourceFixtures.write(sources, "com/acme/Zebra.java", "package com.acme; public class Zebra {}");
             SourceFixtures.write(sources, "com/acme/Alpha.java", "package com.acme; public class Alpha {}");
 
-            List<TypeId> first = analyze().types().stream().map(TypeNode::id).toList();
-            List<TypeId> second = analyze().types().stream().map(TypeNode::id).toList();
+            List<TypeId> first = analyzedIds(analyze());
+            List<TypeId> second = analyzedIds(analyze());
 
             assertThat(first)
                     .containsExactly(

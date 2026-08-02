@@ -14,6 +14,7 @@
 package io.hexaglue.frontend;
 
 import io.hexaglue.model.code.CodeModel;
+import io.hexaglue.model.code.TypeNode;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -24,6 +25,7 @@ import spoon.Launcher;
 import spoon.compiler.Environment;
 import spoon.reflect.CtModel;
 import spoon.reflect.declaration.CtType;
+import spoon.reflect.declaration.CtTypeParameter;
 import spoon.reflect.visitor.filter.TypeFilter;
 
 /**
@@ -59,10 +61,19 @@ public final class SpoonFrontend {
         TypeNodeMapper mapper = new TypeNodeMapper(new SourceLocations(request.sourceRoots()));
         List<CtType<?>> analyzed = analyzedTypes(parsed, perimeter);
 
+        List<TypeNode> nodes = analyzed.stream().map(mapper::map).toList();
+        Edges relations = Edges.from(nodes);
+
         CodeModel.Builder model = CodeModel.builder();
         request.capabilities().forEach(model::capability);
-        analyzed.forEach(type -> model.addType(mapper.map(type)));
-        LOG.debug("Code model built: {} analyzed types", analyzed.size());
+        nodes.forEach(model::addType);
+        relations.stubs().forEach(model::addType);
+        relations.all().forEach(model::addEdge);
+        LOG.debug(
+                "Code model built: {} analyzed types, {} external stubs, {} edges",
+                nodes.size(),
+                relations.stubs().size(),
+                relations.all().size());
         return model.build();
     }
 
@@ -109,8 +120,17 @@ public final class SpoonFrontend {
                 .toList();
     }
 
+    /**
+     * Returns whether a parsed type is a type declaration of its own. The parser models a type
+     * parameter as a type too — {@code T} of {@code Box<T>} — but a type variable declares nothing
+     * and has no identity outside the declaration that introduces it.
+     */
     private static boolean isNamedDeclaration(CtType<?> type) {
         String qualifiedName = type.getQualifiedName();
-        return qualifiedName != null && !qualifiedName.isBlank() && !type.isAnonymous() && !type.isLocalType();
+        return qualifiedName != null
+                && !qualifiedName.isBlank()
+                && !(type instanceof CtTypeParameter)
+                && !type.isAnonymous()
+                && !type.isLocalType();
     }
 }

@@ -26,7 +26,9 @@ import io.hexaglue.model.classification.ProofNode;
 import io.hexaglue.model.classification.RuleId;
 import io.hexaglue.model.code.TypeNode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,18 +68,23 @@ public final class Aggregator {
      */
     private static final int MAX_PER_TIER = 9;
 
-    private static final int[] TIER_WEIGHT = tierWeights();
+    /**
+     * One decimal place per tier, strongest tier on the highest place: a count at a stronger tier
+     * outweighs any count below it, and counts at the same tier simply add up.
+     */
+    private static final Map<EvidenceTier, Integer> TIER_WEIGHT = tierWeights();
 
     private Aggregator() {}
 
-    private static int[] tierWeights() {
-        int[] weights = new int[EvidenceTier.values().length];
+    private static Map<EvidenceTier, Integer> tierWeights() {
+        List<EvidenceTier> tiers = List.of(EvidenceTier.values());
+        Map<EvidenceTier, Integer> weights = new EnumMap<>(EvidenceTier.class);
         int weight = 1;
-        for (int tier = weights.length - 1; tier >= 0; tier--) {
-            weights[tier] = weight;
+        for (int rank = tiers.size() - 1; rank >= 0; rank--) {
+            weights.put(tiers.get(rank), weight);
             weight *= 10;
         }
-        return weights;
+        return Collections.unmodifiableMap(weights);
     }
 
     /**
@@ -215,14 +222,13 @@ public final class Aggregator {
         }
 
         private static int score(List<KindEvidence> signals) {
-            int[] counts = new int[EvidenceTier.values().length];
+            Map<EvidenceTier, Integer> counts = new EnumMap<>(EvidenceTier.class);
             for (KindEvidence signal : signals) {
-                int tier = signal.evidence().tier().ordinal();
-                counts[tier] = counts[tier] + 1;
+                counts.merge(signal.evidence().tier(), 1, Integer::sum);
             }
             int score = 0;
-            for (int tier = 0; tier < counts.length; tier++) {
-                score += Math.min(counts[tier], MAX_PER_TIER) * TIER_WEIGHT[tier];
+            for (Map.Entry<EvidenceTier, Integer> counted : counts.entrySet()) {
+                score += Math.min(counted.getValue(), MAX_PER_TIER) * TIER_WEIGHT.getOrDefault(counted.getKey(), 0);
             }
             return score;
         }

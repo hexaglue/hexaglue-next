@@ -35,7 +35,8 @@ import java.util.TreeMap;
  * <p>The vocabulary sits here rather than in the engine because a naming convention is a property
  * of a code base, not of the tool: a team writing {@code OrderRef} instead of {@code OrderId} says
  * so, and is understood. It is also the single place a suffix may be written down — a rule
- * matching a name anywhere else would be an opinion nobody can configure away.</p>
+ * matching a name anywhere else would be an opinion nobody can configure away. It is empty until
+ * stated: reading names is a posture a code base opts into, never one it inherits.</p>
  *
  * <p>This record is shape only: reading the declarations belongs to the engine, binding them from
  * a document belongs to the host.</p>
@@ -90,27 +91,46 @@ public record ClassificationConfig(Map<TypeId, ArchKind> explicit, Map<ArchKind,
     }
 
     /**
-     * Returns the documented default posture: the user declares no kind, and their code base is
-     * taken to follow the conventional vocabulary.
+     * Returns the documented default posture: the user declares no kind, and no name is read.
+     *
+     * <p>The vocabulary is out of the defaults because what a type is called is a property of the
+     * habits of a code base, not of its architecture: a role is a position in a graph, and the
+     * engine derives it from anchors and relations. A name that decided alone would classify a
+     * type nobody wired to anything — an interface no one implements or calls is not a port, and
+     * saying so is the honest answer. The vocabulary remains available, stated by the user or
+     * taken from {@link #conventional()}.</p>
      *
      * @return the default configuration
      */
     public static ClassificationConfig defaults() {
-        return new ClassificationConfig(Map.of(), defaultNamingSuffixes());
+        return new ClassificationConfig(Map.of(), Map.of());
     }
 
     /**
-     * Returns the vocabulary the engine reads when the user states none.
+     * Returns the opt-in posture of a code base that states it follows the conventional
+     * vocabulary: no kind declared, and the shipped suffixes read as a weak signal.
+     *
+     * @return the configuration carrying the shipped vocabulary
+     */
+    public static ClassificationConfig conventional() {
+        return new ClassificationConfig(Map.of(), conventionalNamingSuffixes());
+    }
+
+    /**
+     * Returns the conventional naming vocabulary, for a user who opts into it.
      *
      * <p>It is deliberately short. Every entry is a convention strong enough that a reader of the
-     * code would draw the same conclusion, and nothing weaker is here: a default that guessed
-     * would be the engine holding an opinion under cover of a convention. {@code Service} suggests
-     * the application layer alone — a domain service wears the same suffix, and what tells the two
-     * apart is what the type does, not what it is called.</p>
+     * code would draw the same conclusion, and nothing weaker is here: a shipped suffix that
+     * guessed would be the engine holding an opinion under cover of a convention. {@code Service}
+     * suggests the application layer alone — a domain service wears the same suffix, and what
+     * tells the two apart is what the type does, not what it is called.</p>
+     *
+     * <p>Exposed on its own so it can be composed with declarations, and so a comparison run can
+     * measure what reading names actually buys.</p>
      *
      * @return the shipped naming vocabulary
      */
-    public static Map<ArchKind, List<String>> defaultNamingSuffixes() {
+    public static Map<ArchKind, List<String>> conventionalNamingSuffixes() {
         Map<ArchKind, List<String>> suffixes = new EnumMap<>(ArchKind.class);
         suffixes.put(ArchKind.IDENTIFIER, List.of("Id", "Identifier"));
         suffixes.put(ArchKind.DOMAIN_EVENT, List.of("Event"));
@@ -120,16 +140,6 @@ public record ClassificationConfig(Map<TypeId, ArchKind> explicit, Map<ArchKind,
         suffixes.put(ArchKind.QUERY_HANDLER, List.of("QueryHandler"));
         suffixes.put(ArchKind.APPLICATION_SERVICE, List.of("Service", "ApplicationService"));
         return Collections.unmodifiableMap(suffixes);
-    }
-
-    /**
-     * Returns the configuration that states nothing at all, vocabulary included — the posture of
-     * a run that must not read a single name.
-     *
-     * @return the silent configuration
-     */
-    public static ClassificationConfig silent() {
-        return new ClassificationConfig(Map.of(), Map.of());
     }
 
     /**

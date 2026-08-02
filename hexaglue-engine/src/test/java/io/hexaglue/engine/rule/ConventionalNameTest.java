@@ -46,6 +46,9 @@ import org.junit.jupiter.api.Test;
 
 class ConventionalNameTest {
 
+    /** The opt-in posture: a code base that states it follows the conventional vocabulary. */
+    private static final HexaGlueConfig CONVENTIONAL = with(ClassificationConfig.conventional());
+
     private static CodeModel wrapper(String qualifiedName) {
         return CodeModel.builder()
                 .addType(TypeNode.builder(TypeId.of(qualifiedName), TypeNature.RECORD)
@@ -77,7 +80,7 @@ class ConventionalNameTest {
     }
 
     private static Classification verdictOf(CodeModel code, String qualifiedName) {
-        return Classifier.classify(EngineContext.of(code, KnowledgePacks.embedded(), HexaGlueConfig.defaults()))
+        return Classifier.classify(EngineContext.of(code, KnowledgePacks.embedded(), CONVENTIONAL))
                 .verdict(TypeId.of(qualifiedName))
                 .orElseThrow();
     }
@@ -89,23 +92,24 @@ class ConventionalNameTest {
         @Test
         @DisplayName("recognizing a suffix the code base uses for a kind")
         void recognizingASuffix() {
-            assertThat(namesOf(bare("com.acme.OrderRepository", TypeNature.INTERFACE), HexaGlueConfig.defaults()))
+            assertThat(namesOf(bare("com.acme.OrderRepository", TypeNature.INTERFACE), CONVENTIONAL))
                     .containsExactly(ArchKind.DRIVEN_PORT);
         }
 
         @Test
         @DisplayName("reading the longest spelling only, so one name weighs once")
         void readingTheLongestSpellingOnly() {
-            assertThat(namesOf(bare("com.acme.OrderApplicationService", TypeNature.CLASS), HexaGlueConfig.defaults()))
+            assertThat(namesOf(bare("com.acme.OrderApplicationService", TypeNature.CLASS), CONVENTIONAL))
                     .containsExactly(ArchKind.APPLICATION_SERVICE);
         }
 
         @Test
         @DisplayName("and a convention the user removed really does stop applying")
         void aRemovedConventionStopsApplying() {
-            HexaGlueConfig silent = with(ClassificationConfig.silent());
+            HexaGlueConfig withoutPorts =
+                    with(new ClassificationConfig(Map.of(), Map.of(ArchKind.IDENTIFIER, List.of("Id", "Identifier"))));
 
-            assertThat(namesOf(bare("com.acme.OrderRepository", TypeNature.INTERFACE), silent))
+            assertThat(namesOf(bare("com.acme.OrderRepository", TypeNature.INTERFACE), withoutPorts))
                     .isEmpty();
         }
 
@@ -124,9 +128,18 @@ class ConventionalNameTest {
     class SaysNothing {
 
         @Test
+        @DisplayName("under the default posture, which states no vocabulary at all")
+        void underTheDefaultPosture() {
+            // Reading names is opted into, never inherited: a role is a position in a graph, and
+            // the most conventional name in the world says nothing about where a type sits.
+            assertThat(namesOf(bare("com.acme.OrderRepository", TypeNature.INTERFACE), HexaGlueConfig.defaults()))
+                    .isEmpty();
+        }
+
+        @Test
         @DisplayName("about a type whose whole name is the convention")
         void aboutATypeNamedAfterTheConventionItself() {
-            assertThat(namesOf(bare("com.acme.Event", TypeNature.RECORD), HexaGlueConfig.defaults()))
+            assertThat(namesOf(bare("com.acme.Event", TypeNature.RECORD), CONVENTIONAL))
                     .isEmpty();
         }
 
@@ -134,7 +147,7 @@ class ConventionalNameTest {
         @DisplayName("about a name that merely looks like a suffix in another case")
         void aboutANameThatOnlyLooksLikeASuffix() {
             // Grid ends in "id", not in "Id": a convention is a word, not a letter sequence.
-            assertThat(namesOf(bare("com.acme.Grid", TypeNature.CLASS), HexaGlueConfig.defaults()))
+            assertThat(namesOf(bare("com.acme.Grid", TypeNature.CLASS), CONVENTIONAL))
                     .isEmpty();
         }
     }
@@ -158,6 +171,19 @@ class ConventionalNameTest {
         void leavingAnUnnamedWrapperUndecided() {
             assertThat(verdictOf(wrapper("com.acme.Email"), "com.acme.Email").kind())
                     .isEqualTo(ArchKind.UNCLASSIFIED);
+        }
+
+        @Test
+        @DisplayName("but not under the default posture, where the same duel waits for a relation")
+        void notUnderTheDefaultPosture() {
+            // With no vocabulary stated, OrderId and Email are the same wrapper. What tells them
+            // apart is being the search key of a port, which no rule has read here.
+            Classification verdict = Classifier.classify(EngineContext.of(
+                            wrapper("com.acme.OrderId"), KnowledgePacks.embedded(), HexaGlueConfig.defaults()))
+                    .verdict(TypeId.of("com.acme.OrderId"))
+                    .orElseThrow();
+
+            assertThat(verdict.kind()).isEqualTo(ArchKind.UNCLASSIFIED);
         }
 
         @Test

@@ -18,8 +18,10 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.TypeId;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -99,6 +101,78 @@ class ClassificationConfigTest {
                     .isThrownBy(() -> new ClassificationConfig(declarations, Map.of()))
                     .withMessageContaining("com.shop.Order")
                     .withMessageContaining("UNCLASSIFIED");
+        }
+
+        @Test
+        @DisplayName("a blank suffix is rejected, naming the kind it was written for")
+        void aBlankSuffixIsRejected() {
+            Map<ArchKind, List<String>> vocabulary = Map.of(ArchKind.IDENTIFIER, List.of(" "));
+
+            assertThatIllegalArgumentException()
+                    .isThrownBy(() -> new ClassificationConfig(Map.of(), vocabulary))
+                    .withMessageContaining("IDENTIFIER");
+        }
+
+        @Test
+        @DisplayName("a suffix for the fallback kind is rejected")
+        void aSuffixForTheFallbackKindIsRejected() {
+            Map<ArchKind, List<String>> vocabulary = Map.of(ArchKind.UNCLASSIFIED, List.of("Thing"));
+
+            assertThatIllegalArgumentException()
+                    .isThrownBy(() -> new ClassificationConfig(Map.of(), vocabulary))
+                    .withMessageContaining("UNCLASSIFIED");
+        }
+
+        @Test
+        @DisplayName("the vocabulary is copied away from the caller")
+        void vocabularyIsCopiedFromTheCaller() {
+            List<String> suffixes = new ArrayList<>(List.of("Id"));
+            ClassificationConfig config = new ClassificationConfig(Map.of(), Map.of(ArchKind.IDENTIFIER, suffixes));
+
+            suffixes.add("Ref");
+
+            assertThat(config.suffixesFor(ArchKind.IDENTIFIER)).containsExactly("Id");
+        }
+    }
+
+    @Nested
+    @DisplayName("Naming vocabulary")
+    class NamingVocabulary {
+
+        @Test
+        @DisplayName("the default posture states no convention at all, so no name is ever read")
+        void theDefaultPostureStatesNoConvention() {
+            ClassificationConfig config = ClassificationConfig.defaults();
+
+            assertThat(config.namingSuffixes()).isEmpty();
+            assertThat(config.suffixesFor(ArchKind.IDENTIFIER)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("the conventional preset states the shipped vocabulary, and still declares nothing")
+        void theConventionalPresetStatesTheVocabulary() {
+            ClassificationConfig config = ClassificationConfig.conventional();
+
+            assertThat(config.explicit()).isEmpty();
+            assertThat(config.suffixesFor(ArchKind.IDENTIFIER)).containsExactly("Id", "Identifier");
+            assertThat(config.suffixesFor(ArchKind.DRIVEN_PORT)).containsExactly("Repository", "Gateway");
+        }
+
+        @Test
+        @DisplayName("the shipped vocabulary composes with declarations, for a code base that states both")
+        void theShippedVocabularyComposesWithDeclarations() {
+            ClassificationConfig config = new ClassificationConfig(
+                    Map.of(ORDER, ArchKind.AGGREGATE_ROOT), ClassificationConfig.conventionalNamingSuffixes());
+
+            assertThat(config.declaredKind(ORDER)).contains(ArchKind.AGGREGATE_ROOT);
+            assertThat(config.suffixesFor(ArchKind.DOMAIN_EVENT)).containsExactly("Event");
+        }
+
+        @Test
+        @DisplayName("a kind no suffix suggests answers no suffix")
+        void aKindNoSuffixSuggestsAnswersNone() {
+            assertThat(ClassificationConfig.conventional().suffixesFor(ArchKind.AGGREGATE_ROOT))
+                    .isEmpty();
         }
     }
 }

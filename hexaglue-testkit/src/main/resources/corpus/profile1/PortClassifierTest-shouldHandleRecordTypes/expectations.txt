@@ -6,9 +6,14 @@
 #
 #   assertThat(result.isUnclassified()).isTrue()
 
-# Reviewed, and DELIBERATELY DIFFERENT from the carriere. The legacy engine returned no
-# verdict; here an immutable single-value wrapper called OrderId is read as an identity by
-# shape and by name at once. B13's lesson is that a name must not decide alone against
-# structure, not that it must be ignored when structure agrees with it.
+# Reviewed, and agreeing with the carriere for a reason the carriere never had. An earlier
+# reading answered IDENTIFIER off shape and name together; with naming out of the default
+# posture, the shape is all that is left, and the shape is honestly ambiguous: an immutable
+# single-value wrapper is as much a value object as an identity. Both readings are kept as
+# candidates, and the verdict says so instead of picking.
+#
+# What separates the two is use, not form: an identity is the search key of a port managing
+# an aggregate. This fixture holds one record and no port, so the tie has nothing to break it
+# and stays. A scenario that wires the wrapper into a repository is where IDENTIFIER is owed.
 status: reviewed
-expect: com.example.OrderId = IDENTIFIER
+expect: com.example.OrderId = UNCLASSIFIED

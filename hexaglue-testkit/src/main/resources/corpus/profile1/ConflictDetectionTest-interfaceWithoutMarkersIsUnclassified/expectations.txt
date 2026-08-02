@@ -6,10 +6,14 @@
 #
 #   assertThat(result.isUnclassified()).isTrue()
 
-# Reviewed, and DELIBERATELY DIFFERENT from the carriere. The legacy test asserted that an
-# interface without markers stays unclassified; v7 reads the conventional name and answers
-# DRIVEN_PORT at MEDIUM confidence. A verdict a validation gate can refuse is more useful
-# than silence. Note the scenario also puts the type in a ports.in package, which the
-# topology sensor (S5) will contradict — that conflict is worth surfacing, not hiding.
+# Reviewed, and agreeing with the carriere for a reason the carriere never had. An earlier
+# reading answered DRIVEN_PORT off the conventional name; naming is no longer a default
+# posture, and nothing else here speaks. The fixture is one interface nobody implements,
+# calls or injects: a role is a position in a graph, and this type has no position. The
+# package says ports.in, which is a word in a name too, and would in any case contradict a
+# driven port rather than establish one.
+#
+# This is the anti-rule the corpus exists to pin: not every interface is a port. Widen the
+# perimeter to the code that uses it, or declare it, and the verdict follows.
 status: reviewed
-expect: com.example.ports.in.CustomerRepository = DRIVEN_PORT
+expect: com.example.ports.in.CustomerRepository = UNCLASSIFIED

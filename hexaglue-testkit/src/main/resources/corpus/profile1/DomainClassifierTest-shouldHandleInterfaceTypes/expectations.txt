@@ -6,8 +6,10 @@
 #
 #   assertThat(result.isUnclassified()).isTrue()
 
-# Reviewed, and DELIBERATELY DIFFERENT from the carriere, for the same reason as
-# ConflictDetectionTest-interfaceWithoutMarkersIsUnclassified: a conventional name yields a
-# verdict at MEDIUM rather than nothing.
+# Reviewed, and agreeing with the carriere for a reason the carriere never had, exactly as in
+# ConflictDetectionTest-interfaceWithoutMarkersIsUnclassified: an isolated interface holds no
+# position in any graph, and its name is not a substitute for one. An application service is
+# recognized by sitting between a driving port and the driven ports it consumes; this type
+# sits between nothing.
 status: reviewed
-expect: com.example.OrderService = APPLICATION_SERVICE
+expect: com.example.OrderService = UNCLASSIFIED

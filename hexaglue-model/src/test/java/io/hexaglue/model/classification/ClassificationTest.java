@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.PortDirection;
+import io.hexaglue.model.TypeId;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,8 @@ class ClassificationTest {
         Classification classification = Classification.builder(
                         ArchKind.AGGREGATE_ROOT, Confidence.HIGH, Basis.INFERRED, PROOF)
                 .evidences(List.of(evidence))
-                .remediations(List.of(RemediationHint.addAnnotation("AggregateRoot", ArchKind.AGGREGATE_ROOT)))
+                .remediations(List.of(RemediationHint.addAnnotation(
+                        TypeId.of("org.jmolecules.ddd.annotation.AggregateRoot"), ArchKind.AGGREGATE_ROOT)))
                 .build();
 
         assertThat(classification.kind()).isEqualTo(ArchKind.AGGREGATE_ROOT);
@@ -109,15 +111,50 @@ class ClassificationTest {
     @Test
     @DisplayName("remediation factories produce explicit impacts")
     void remediationFactoriesProduceExplicitImpacts() {
-        RemediationHint annotation = RemediationHint.addAnnotation("ValueObject", ArchKind.VALUE_OBJECT);
-        RemediationHint configuration = RemediationHint.configureExplicit("com.a.Money", ArchKind.VALUE_OBJECT);
+        RemediationHint annotation = RemediationHint.addAnnotation(
+                TypeId.of("org.jmolecules.ddd.annotation.ValueObject"), ArchKind.VALUE_OBJECT);
+        RemediationHint configuration =
+                RemediationHint.configureExplicit(TypeId.of("com.a.Money"), ArchKind.VALUE_OBJECT);
 
         assertThat(annotation.action()).isEqualTo(RemediationAction.ADD_ANNOTATION);
         assertThat(annotation.impact().resultingConfidence()).isEqualTo(Confidence.EXPLICIT);
-        assertThat(annotation.codeSnippet()).contains("@ValueObject");
         assertThat(configuration.action()).isEqualTo(RemediationAction.CONFIGURE_EXPLICIT);
         assertThat(configuration.description()).contains("com.a.Money");
         assertThat(RemediationImpact.improved(ArchKind.ENTITY, Confidence.HIGH).resultingConfidence())
                 .isEqualTo(Confidence.HIGH);
+    }
+
+    @Test
+    @DisplayName("an annotation hint names the annotation in full and pastes with its import")
+    void annotationHintNamesTheAnnotationInFull() {
+        RemediationHint hint = RemediationHint.addAnnotation(
+                TypeId.of("org.jmolecules.ddd.annotation.AggregateRoot"), ArchKind.AGGREGATE_ROOT);
+
+        assertThat(hint.description()).contains("org.jmolecules.ddd.annotation.AggregateRoot");
+        assertThat(hint.codeSnippet()).isPresent();
+        assertThat(hint.codeSnippet().orElseThrow())
+                .contains("import org.jmolecules.ddd.annotation.AggregateRoot;")
+                .contains("@AggregateRoot");
+    }
+
+    @Test
+    @DisplayName("a nested annotation is imported by its source name")
+    void nestedAnnotationIsImportedBySourceName() {
+        RemediationHint hint =
+                RemediationHint.addAnnotation(TypeId.of("com.acme.Intents$Aggregate"), ArchKind.AGGREGATE_ROOT);
+
+        assertThat(hint.codeSnippet().orElseThrow())
+                .contains("import com.acme.Intents.Aggregate;")
+                .contains("@Aggregate");
+    }
+
+    @Test
+    @DisplayName("an annotation named without its package is rejected")
+    void unqualifiedAnnotationIsRejected() {
+        TypeId unqualified = TypeId.of("Entity");
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> RemediationHint.addAnnotation(unqualified, ArchKind.ENTITY))
+                .withMessageContaining("qualified");
     }
 }

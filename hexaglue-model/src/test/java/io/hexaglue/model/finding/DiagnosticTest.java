@@ -53,7 +53,8 @@ class DiagnosticTest {
         @DisplayName("a full diagnostic localizes the problem and suggests the remediation")
         void fullDiagnosticLocalizesAndSuggests() {
             SourceLocation location = new SourceLocation("com/shop/Order.java", 12, 12);
-            RemediationHint remediation = RemediationHint.addAnnotation("AggregateRoot", ArchKind.AGGREGATE_ROOT);
+            RemediationHint remediation = RemediationHint.addAnnotation(
+                    TypeId.of("org.jmolecules.ddd.annotation.AggregateRoot"), ArchKind.AGGREGATE_ROOT);
 
             Diagnostic diagnostic = Diagnostic.builder(
                             CODE, DiagnosticSeverity.WARNING, "Generation refused: confidence below threshold")

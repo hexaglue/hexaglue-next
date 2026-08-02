@@ -14,6 +14,7 @@
 package io.hexaglue.model.classification;
 
 import io.hexaglue.model.ArchKind;
+import io.hexaglue.model.TypeId;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -44,31 +45,44 @@ public record RemediationHint(
     }
 
     /**
-     * Suggests adding an intent annotation.
+     * Suggests adding an intent annotation, named in full.
      *
-     * @param annotationSimpleName the annotation to add, without {@code @}
+     * <p>The qualified name is not decoration: a hint reading {@code Add @Entity} on a type that
+     * already carries {@code jakarta.persistence.Entity} would suggest what the reader believes is
+     * already done. The snippet carries the import for the same reason.</p>
+     *
+     * @param annotation the annotation to add, by qualified name
      * @param targetKind the kind the annotation declares
      * @return a new hint reaching EXPLICIT confidence
+     * @throws IllegalArgumentException when the annotation is named without its package
      */
-    public static RemediationHint addAnnotation(String annotationSimpleName, ArchKind targetKind) {
+    public static RemediationHint addAnnotation(TypeId annotation, ArchKind targetKind) {
+        Objects.requireNonNull(annotation, "annotation must not be null");
+        if (annotation.packageName().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "the annotation must be qualified to be unambiguous, got: " + annotation.qualifiedName());
+        }
+        String importedName = annotation.qualifiedName().replace('$', '.');
         return new RemediationHint(
                 RemediationAction.ADD_ANNOTATION,
-                "Add @" + annotationSimpleName + " on the type",
+                "Add @" + annotation.qualifiedName() + " on the type",
                 RemediationImpact.explicit(targetKind),
-                Optional.of("@" + annotationSimpleName));
+                Optional.of("import " + importedName + ";\n\n@" + annotation.simpleName()));
     }
 
     /**
      * Suggests declaring the kind in the explicit classification configuration.
      *
-     * @param qualifiedName the type to declare
+     * @param type the type to declare
      * @param targetKind the declared kind
      * @return a new hint reaching EXPLICIT confidence
      */
-    public static RemediationHint configureExplicit(String qualifiedName, ArchKind targetKind) {
+    public static RemediationHint configureExplicit(TypeId type, ArchKind targetKind) {
+        Objects.requireNonNull(type, "type must not be null");
         return new RemediationHint(
                 RemediationAction.CONFIGURE_EXPLICIT,
-                "Declare " + qualifiedName + " as " + targetKind + " in the explicit classification configuration",
+                "Declare " + type.qualifiedName() + " as " + targetKind
+                        + " in the explicit classification configuration",
                 RemediationImpact.explicit(targetKind),
                 Optional.empty());
     }

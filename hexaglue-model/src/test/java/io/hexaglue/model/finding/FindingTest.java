@@ -62,7 +62,8 @@ class FindingTest {
                     Confidence.HIGH,
                     "no repository signature uses com.shop.Order",
                     "an aggregate root is expected to be persisted through a driven port");
-            RemediationHint remediation = RemediationHint.addAnnotation("AggregateRoot", ArchKind.AGGREGATE_ROOT);
+            RemediationHint remediation = RemediationHint.addAnnotation(
+                    TypeId.of("org.jmolecules.ddd.annotation.AggregateRoot"), ArchKind.AGGREGATE_ROOT);
             SourceLocation location = new SourceLocation("com/shop/Order.java", 12, 12);
 
             Finding finding = Finding.builder(CODE, Severity.CRITICAL, "Aggregate without repository", ORDER)

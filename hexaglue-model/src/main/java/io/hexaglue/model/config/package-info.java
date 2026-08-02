@@ -14,8 +14,9 @@
 /**
  * The typed configuration contract: the shapes a strict loader binds, nothing more.
  *
- * <p>{@link io.hexaglue.model.config.HexaGlueConfig} composes the three blocks — the
+ * <p>{@link io.hexaglue.model.config.HexaGlueConfig} composes the four blocks — the
  * {@link io.hexaglue.model.config.AnalysisScope perimeter of the analysis}, the
+ * {@link io.hexaglue.model.config.ClassificationConfig declared kinds}, the
  * {@link io.hexaglue.model.config.ValidationConfig validation gates} and the
  * {@link io.hexaglue.model.config.GenerationConfig generation threshold}. Every record validates
  * its own coherence at construction; none carries behavior. Reading YAML into these shapes —

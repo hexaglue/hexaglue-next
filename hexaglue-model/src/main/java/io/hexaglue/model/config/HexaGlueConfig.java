@@ -16,36 +16,46 @@ package io.hexaglue.model.config;
 import java.util.Objects;
 
 /**
- * The typed configuration of an analysis: the perimeter, the validation gates and the generation
- * threshold. Plugin-specific options are not represented here — they reach each plugin through
- * the SPI, opaque to the model.
+ * The typed configuration of an analysis: the perimeter, the intent the user declares out of the
+ * code, the validation gates and the generation threshold. Plugin-specific options are not
+ * represented here — they reach each plugin through the SPI, opaque to the model.
  *
  * <p>This record is the shape the strict YAML binding will fill: an unknown key or a malformed
  * value is the loader's error, never a silently ignored entry.</p>
  *
  * @param analysis the perimeter of the analysis
+ * @param classification the kinds the user declares for their own types
  * @param validation the gates the validate goal applies
  * @param generation the certainty threshold of code generation
  * @since 7.0.0
  */
-public record HexaGlueConfig(AnalysisScope analysis, ValidationConfig validation, GenerationConfig generation) {
+public record HexaGlueConfig(
+        AnalysisScope analysis,
+        ClassificationConfig classification,
+        ValidationConfig validation,
+        GenerationConfig generation) {
 
     /**
-     * Validates the three blocks.
+     * Validates the four blocks.
      */
     public HexaGlueConfig {
         Objects.requireNonNull(analysis, "analysis must not be null");
+        Objects.requireNonNull(classification, "classification must not be null");
         Objects.requireNonNull(validation, "validation must not be null");
         Objects.requireNonNull(generation, "generation must not be null");
     }
 
     /**
-     * Returns the documented default posture: analyze everything, gate nothing, generate at HIGH
-     * confidence.
+     * Returns the documented default posture: analyze everything, declare nothing, gate nothing,
+     * generate at HIGH confidence.
      *
      * @return the default configuration
      */
     public static HexaGlueConfig defaults() {
-        return new HexaGlueConfig(AnalysisScope.everything(), ValidationConfig.defaults(), GenerationConfig.defaults());
+        return new HexaGlueConfig(
+                AnalysisScope.everything(),
+                ClassificationConfig.empty(),
+                ValidationConfig.defaults(),
+                GenerationConfig.defaults());
     }
 }

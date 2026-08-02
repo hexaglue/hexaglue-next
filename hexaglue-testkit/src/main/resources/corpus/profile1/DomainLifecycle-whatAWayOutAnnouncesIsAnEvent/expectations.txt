@@ -1,0 +1,16 @@
+# DomainLifecycle-whatAWayOutAnnouncesIsAnEvent
+#
+# Authored for the event reading, with its counter-case in the same fixture.
+
+# Every method of Wire goes one way and carries a value, which is how something is announced
+# rather than asked about. What travels that way and cannot change afterwards is what
+# happened: Sailing is the event.
+#
+# Notice travels the same way and says nothing. An interface holds no state, so there is
+# nothing about it that could have happened — which is the reading that keeps the three
+# marker interfaces of the inherited corpus from being read as events.
+status: reviewed
+expect: com.acme.hangar.core.Wire = DRIVEN_PORT
+expect: com.acme.hangar.core.Checkout = APPLICATION_SERVICE
+expect: com.acme.hangar.core.Sailing = DOMAIN_EVENT
+expect: com.acme.hangar.core.Notice = UNCLASSIFIED

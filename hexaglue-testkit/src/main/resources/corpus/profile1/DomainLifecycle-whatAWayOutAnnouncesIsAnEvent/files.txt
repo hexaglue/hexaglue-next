@@ -1,0 +1,4 @@
+com/acme/hangar/core/Sailing.java
+com/acme/hangar/core/Notice.java
+com/acme/hangar/core/Wire.java
+com/acme/hangar/core/Checkout.java

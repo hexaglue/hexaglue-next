@@ -1,0 +1,23 @@
+# DomainLifecycle-theSubjectAWayOutKeepsIsTheAggregate
+#
+# Authored for the fourth wave. The vocabulary is deliberately unconventional:
+# what makes a type an aggregate is the lifecycle something else gives it, never
+# the word its name ends with.
+
+# The four waves on one fixture, each step reading off a relation. The framework marks the
+# entry point; the entry point holding the contract the core answers makes that contract a
+# way in; the core calling an interface nothing inside implements makes that one a way out;
+# the type between the two is the application layer; the way out keeping one subject and
+# handing it back makes that subject the aggregate; and the value the way out is handed to
+# find it is the identity.
+#
+# Fleet also pins the replacement of a reading: on its own its state cannot change, so the
+# shape alone reads it as a value. The round that sees the way out storing it says something
+# stronger about the same declaration, and the earlier reading gives way.
+status: reviewed
+expect: com.acme.hangar.web.HangarDoor = DRIVING_ADAPTER
+expect: com.acme.hangar.core.Boarding = DRIVING_PORT
+expect: com.acme.hangar.core.Checkout = APPLICATION_SERVICE
+expect: com.acme.hangar.core.Ledger = DRIVEN_PORT
+expect: com.acme.hangar.core.Fleet = AGGREGATE_ROOT
+expect: com.acme.hangar.core.FleetTag = IDENTIFIER

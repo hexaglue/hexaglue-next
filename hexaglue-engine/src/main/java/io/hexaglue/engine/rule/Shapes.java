@@ -14,6 +14,7 @@
 package io.hexaglue.engine.rule;
 
 import io.hexaglue.model.Modifier;
+import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.code.TypeNode;
 import io.hexaglue.model.declaration.Field;
 import java.util.List;
@@ -21,9 +22,11 @@ import java.util.List;
 /**
  * What a declaration's own shape says, read once for every rule that needs it.
  *
- * <p>Two rules ask the same question for different reasons — one to read a value object, another to
- * tell an event a port publishes from a request it carries — and asking it twice would let the two
- * answers drift apart. There is one reading of immutability in the engine, and it is here.</p>
+ * <p>Several rules ask the same questions for different reasons — one to read a value object,
+ * another to tell an event a port publishes from a request it carries, a third to know which of an
+ * aggregate's fields it must not speak about — and asking them twice would let the answers drift
+ * apart. There is one reading of immutability in the engine, and one of the shape an identity is
+ * written in, and both are here.</p>
  *
  * @since 7.0.0
  */
@@ -64,5 +67,36 @@ final class Shapes {
             // declarations: neither has a shape that says what it is.
             case INTERFACE, ANNOTATION -> false;
         };
+    }
+
+    /**
+     * Returns whether a declaration is written the way an identity is: one value, wrapped, and
+     * unable to change. Nothing separates {@code FleetTag} from {@code Email} at this level, so the
+     * answer marks a candidate rather than a verdict — the rules that read composition stay silent
+     * on such a type and leave the duel to whoever can settle it from a relation.
+     *
+     * @param type the declaration to read
+     * @return true when the shape is the one an identity is written in
+     */
+    static boolean readsAsIdentity(TypeNode type) {
+        return isImmutable(type) && wrapsSingleValue(state(type));
+    }
+
+    /**
+     * Answers whether the declaration wraps exactly one value. A lone collection, map or optional
+     * field is a container of things rather than a value with a name.
+     *
+     * @param state the instance fields of the declaration
+     * @return true when the state is a single value
+     */
+    static boolean wrapsSingleValue(List<Field> state) {
+        if (state.size() != 1) {
+            return false;
+        }
+        TypeRef wrapped = state.get(0).type();
+        return !wrapped.isCollectionLike()
+                && !wrapped.isMapLike()
+                && !wrapped.isOptionalLike()
+                && !wrapped.isStreamLike();
     }
 }

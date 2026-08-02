@@ -111,6 +111,26 @@ class DomainCollaborationTest {
         }
 
         @Test
+        @DisplayName("even when an aggregate stands elsewhere in the perimeter, holding none of it")
+        void evenWhenAnAggregateStandsElsewhere() {
+            // What disqualifies a domain service is being part of an aggregate, not the existence
+            // of one: an aggregate that never holds it has nothing to say about it.
+            TypeNode elsewhere = TypeNode.builder(TypeId.of("com.acme.Fleetbook"), TypeNature.CLASS)
+                    .annotations(List.of(Annotation.of("org.jmolecules.ddd.annotation.AggregateRoot")))
+                    .fields(List.of(Field.of("reference", TypeRef.of("java.lang.String"))))
+                    .build();
+
+            assertThat(verdicts(
+                                    value(FLEET),
+                                    value(MANIFEST),
+                                    service(List.of(), over(FLEET, MANIFEST)),
+                                    caller(SERVICE),
+                                    elsewhere)
+                            .kindOf(SERVICE))
+                    .contains(ArchKind.DOMAIN_SERVICE);
+        }
+
+        @Test
         @DisplayName("even when it keeps something, as long as none of it can change")
         void evenWhenItKeepsSomethingThatCannotChange() {
             // What it keeps is a value of the domain rather than a way out, which is the whole
@@ -180,6 +200,26 @@ class DomainCollaborationTest {
             assertThat(verdicts(value(FLEET), value(MANIFEST), service(List.of(), over(FLEET, MANIFEST)))
                             .kindOf(SERVICE))
                     .contains(ArchKind.UNCLASSIFIED);
+        }
+
+        @Test
+        @DisplayName("about a type an aggregate is made of, whose caller is holding a part of itself")
+        void aboutATypeAnAggregateIsMadeOf() {
+            // An immutable part with two accessors has exactly the shape read here, and the field
+            // holding it is the same field composition reads. Which of the two ends is the
+            // aggregate is what tells a part from a collaborator.
+            TypeNode aggregate = TypeNode.builder(CALLER, TypeNature.CLASS)
+                    .annotations(List.of(Annotation.of("org.jmolecules.ddd.annotation.AggregateRoot")))
+                    .fields(List.of(Field.of("collaborator", TypeRef.of(SERVICE.qualifiedName()))))
+                    .build();
+            TypeNode part = TypeNode.builder(SERVICE, TypeNature.CLASS)
+                    .methods(List.of(
+                            Method.of("fleet", TypeRef.of(FLEET.qualifiedName())),
+                            Method.of("manifest", TypeRef.of(MANIFEST.qualifiedName()))))
+                    .build();
+
+            assertThat(verdicts(value(FLEET), value(MANIFEST), part, aggregate).kindOf(SERVICE))
+                    .contains(ArchKind.VALUE_OBJECT);
         }
     }
 }

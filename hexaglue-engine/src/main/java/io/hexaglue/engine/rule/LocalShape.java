@@ -18,12 +18,10 @@ import io.hexaglue.engine.KindEvidence;
 import io.hexaglue.engine.Predicate;
 import io.hexaglue.engine.Rule;
 import io.hexaglue.model.ArchKind;
-import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.classification.Evidence;
 import io.hexaglue.model.classification.EvidenceTier;
 import io.hexaglue.model.classification.RuleId;
 import io.hexaglue.model.code.TypeNode;
-import io.hexaglue.model.declaration.Field;
 import java.util.List;
 import java.util.Set;
 
@@ -68,20 +66,19 @@ public final class LocalShape implements Rule {
     @Override
     public void apply(Derivation derivation) {
         for (TypeNode type : derivation.perimeter().types()) {
-            List<Field> state = Shapes.state(type);
-            boolean immutable = Shapes.isImmutable(type);
-            if (immutable) {
+            if (Shapes.isImmutable(type)) {
                 speak(derivation, type, ArchKind.VALUE_OBJECT, "IMMUTABLE_SHAPE", reasonForImmutability(type));
             }
             // Only an immutable wrapper reads as an identity: something that can change is
             // neither a value nor the identity of anything.
-            if (immutable && wrapsSingleValue(state)) {
+            if (Shapes.readsAsIdentity(type)) {
                 speak(
                         derivation,
                         type,
                         ArchKind.IDENTIFIER,
                         "SINGLE_VALUE_WRAPPER",
-                        "it wraps exactly one value, " + state.get(0).type().toDisplayString()
+                        "it wraps exactly one value, "
+                                + Shapes.state(type).get(0).type().toDisplayString()
                                 + ", which is how an identity is written");
             }
         }
@@ -93,21 +90,6 @@ public final class LocalShape implements Rule {
             case ENUM -> "it is an enum, a closed set of values";
             default -> "every field it declares is final, so its state cannot change";
         };
-    }
-
-    /**
-     * Answers whether the declaration wraps exactly one value. A lone collection, map or optional
-     * field is a container of things rather than a value with a name.
-     */
-    private static boolean wrapsSingleValue(List<Field> state) {
-        if (state.size() != 1) {
-            return false;
-        }
-        TypeRef wrapped = state.get(0).type();
-        return !wrapped.isCollectionLike()
-                && !wrapped.isMapLike()
-                && !wrapped.isOptionalLike()
-                && !wrapped.isStreamLike();
     }
 
     private static void speak(Derivation derivation, TypeNode type, ArchKind kind, String fact, String why) {

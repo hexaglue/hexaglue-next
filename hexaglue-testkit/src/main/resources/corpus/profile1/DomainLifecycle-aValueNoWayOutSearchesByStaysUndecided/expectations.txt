@@ -1,0 +1,17 @@
+# DomainLifecycle-aValueNoWayOutSearchesByStaysUndecided
+#
+# Authored as the counter-case of the identity rule: the same declaration twice,
+# and only the position of one of them says what it is.
+
+# FleetTag and Berth are the same declaration — a record around one value — so the shape of
+# either reads as an identity and as a value at once. The way out searches by the first and
+# never by the second, so the first is settled and the second keeps both readings.
+#
+# Leaving Berth undecided is the point. The aggregate holds it, and calling it a value on
+# that ground would settle the duel by position, which is evidence of nothing.
+status: reviewed
+expect: com.acme.hangar.core.Ledger = DRIVEN_PORT
+expect: com.acme.hangar.core.Checkout = APPLICATION_SERVICE
+expect: com.acme.hangar.core.Fleet = AGGREGATE_ROOT
+expect: com.acme.hangar.core.FleetTag = IDENTIFIER
+expect: com.acme.hangar.core.Berth = UNCLASSIFIED

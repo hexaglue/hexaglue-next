@@ -28,11 +28,13 @@ import java.util.Set;
 /**
  * Reads behaviour the domain owns but no single type of it can hold as the domain service it is.
  *
- * <p>Four conditions, and each one removes a different neighbour. Nothing it keeps can change, or
+ * <p>Five conditions, and each one removes a different neighbour. Nothing it keeps can change, or
  * it remembers something and is an entity. It calls no way out, or it is the application layer
  * deciding when to reach outside. It spans at least two types of the domain, or the behaviour
- * belongs to the one type it works on and should be a method there. And something inside calls it,
- * or its position is not observable at all — a type nobody uses could be anything.</p>
+ * belongs to the one type it works on and should be a method there. Something inside calls it, or
+ * its position is not observable at all — a type nobody uses could be anything. And no aggregate is
+ * made of it: an immutable part with two accessors has exactly the shape read here, and the field
+ * that holds it is composition seen from the other end rather than a call.</p>
  *
  * <p>The strictness is the point. This kind was unreachable in the previous engine, which is worse
  * than rare: a whole family of domain code had nowhere to land and was reported as unclassified or,
@@ -79,7 +81,8 @@ public final class DomainCollaboration implements Rule {
         }
         List<TypeId> spanned = domainTypesOf(derivation, type);
         if (spanned.size() < COLLABORATION
-                || Contracts.holdersInTheCore(derivation, type.id()).isEmpty()) {
+                || Contracts.holdersInTheCore(derivation, type.id()).isEmpty()
+                || Lifecycle.isPartOfSomething(derivation, type.id())) {
             return;
         }
         Contracts.speak(

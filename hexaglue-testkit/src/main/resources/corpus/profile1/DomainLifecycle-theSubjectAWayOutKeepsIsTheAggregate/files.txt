@@ -1,0 +1,6 @@
+com/acme/hangar/core/FleetTag.java
+com/acme/hangar/core/Fleet.java
+com/acme/hangar/core/Ledger.java
+com/acme/hangar/core/Boarding.java
+com/acme/hangar/core/Checkout.java
+com/acme/hangar/web/HangarDoor.java

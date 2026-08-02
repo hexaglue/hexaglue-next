@@ -1,0 +1,21 @@
+# DomainLifecycle-whatCarriesAnIdentityOfItsOwnIsAnEntity
+#
+# Authored for the other half of composition: the part that can be told apart
+# from another one holding the same attributes.
+
+# Hull and Manifest sit at the same place in the composition, and only one of them carries
+# something the analysis reads as an identity. That is the whole difference between an entity
+# and a value inside an aggregate, and it is why the reading runs down one level further:
+# Manifest is read as a part of Hull once Hull is an entity.
+#
+# HullTag is declared, which is deliberate. A field that merely looks like an identity is the
+# duel this wave refuses to settle by position, so the entity reading needs an identity some
+# other rule has already established.
+status: reviewed
+expect: com.acme.hangar.core.Ledger = DRIVEN_PORT
+expect: com.acme.hangar.core.Checkout = APPLICATION_SERVICE
+expect: com.acme.hangar.core.Fleet = AGGREGATE_ROOT
+expect: com.acme.hangar.core.FleetTag = IDENTIFIER
+expect: com.acme.hangar.core.HullTag = IDENTIFIER
+expect: com.acme.hangar.core.Hull = ENTITY
+expect: com.acme.hangar.core.Manifest = VALUE_OBJECT

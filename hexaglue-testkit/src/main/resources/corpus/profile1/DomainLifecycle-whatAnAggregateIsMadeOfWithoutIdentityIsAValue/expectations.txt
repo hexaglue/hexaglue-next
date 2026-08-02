@@ -1,0 +1,19 @@
+# DomainLifecycle-whatAnAggregateIsMadeOfWithoutIdentityIsAValue
+#
+# Authored for composition. Once a way out has established the aggregate, what
+# the aggregate holds is part of it, whatever the parts are called.
+
+# Hull is held through a collection and Manifest through a plain field: holding many of a
+# part composes as much as holding one. Neither carries an identity of its own, so both read
+# as values.
+#
+# Hull is mutable, with a method that changes it, and it is a value all the same. What the
+# type is and what is wrong with it are two questions: refusing to identify a badly written
+# value object would leave the audit nothing to report on.
+status: reviewed
+expect: com.acme.hangar.core.Ledger = DRIVEN_PORT
+expect: com.acme.hangar.core.Checkout = APPLICATION_SERVICE
+expect: com.acme.hangar.core.Fleet = AGGREGATE_ROOT
+expect: com.acme.hangar.core.FleetTag = IDENTIFIER
+expect: com.acme.hangar.core.Hull = VALUE_OBJECT
+expect: com.acme.hangar.core.Manifest = VALUE_OBJECT

@@ -37,6 +37,9 @@ public final class EngineException extends RuntimeException {
     /** A rule derived a predicate it did not declare writing, which the scheduler relies on. */
     static final IssueCode UNDECLARED_PREDICATE = IssueCode.of("HG-ENGINE-002");
 
+    /** A type of the perimeter reached the model without a verdict, which cannot happen. */
+    static final IssueCode MISSING_VERDICT = IssueCode.of("HG-ENGINE-003");
+
     private final transient Diagnostic diagnostic;
 
     private EngineException(Diagnostic diagnostic) {

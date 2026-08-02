@@ -1,0 +1,16 @@
+# ApplicationLayer-aStereotypeNobodyReachesForSaysNothing
+#
+# Authored for the layer inside the boundary. The vocabulary is deliberately
+# unconventional: what makes a type the application is where it stands between
+# the ports and the ring, never the word its name ends with.
+
+# The counter-case that keeps the framework's word in its place. The same annotation as the
+# scenario above, and the same type doing the same work - but the only holder is an ordinary
+# class rather than an entry point, so nothing places it.
+#
+# A stereotype is a habit of the codebase, not a position in the architecture. Left to decide
+# on its own it would classify every annotated class in a Spring application, which is the
+# failure this engine exists to stop repeating.
+status: reviewed
+expect: com.acme.hangar.core.Dispatch = UNCLASSIFIED
+expect: com.acme.hangar.core.Manifest = UNCLASSIFIED

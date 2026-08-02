@@ -117,14 +117,11 @@ public final class PortSignatures implements Rule {
      * Returns the single type of the perimeter the signatures converge on, when there is one.
      */
     private static Optional<TypeId> subjectOf(Derivation derivation, TypeNode port) {
-        List<TypeId> returned = referenced(port.methods().stream().map(Method::returnType), derivation);
-        List<TypeId> taken = referenced(
-                port.methods().stream()
-                        .flatMap(method -> method.parameters().stream())
-                        .map(Parameter::type),
-                derivation);
-        List<TypeId> converging =
-                returned.stream().distinct().filter(taken::contains).toList();
+        List<TypeId> taken = Signatures.taken(derivation, port);
+        List<TypeId> converging = Signatures.returned(derivation, port).stream()
+                .distinct()
+                .filter(taken::contains)
+                .toList();
         return converging.size() == 1 ? Optional.of(converging.get(0)) : Optional.empty();
     }
 
@@ -148,20 +145,8 @@ public final class PortSignatures implements Rule {
                         .anyMatch(Shapes::isImmutable);
     }
 
-    /**
-     * Returns the types of the perimeter a reference names, unwrapping the containers a signature
-     * puts around them.
-     */
-    private static List<TypeId> referenced(Stream<TypeRef> references, Derivation derivation) {
-        return references
-                .map(TypeRef::unwrapElement)
-                .filter(TypeRef.Named.class::isInstance)
-                .map(reference -> TypeId.of(reference.qualifiedName()))
-                .filter(id -> derivation.perimeter().contains(id))
-                .toList();
-    }
-
     private static Stream<TypeNode> carried(TypeRef reference, Derivation derivation) {
-        return referenced(Stream.of(reference), derivation).stream().flatMap(id -> derivation.code().type(id).stream());
+        return Signatures.namedInPerimeter(derivation, Stream.of(reference)).stream()
+                .flatMap(id -> derivation.code().type(id).stream());
     }
 }

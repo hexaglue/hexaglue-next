@@ -8,9 +8,10 @@
 # way out is the position it holds: a type of the core keeps it as a collaborator, and no
 # implementation of it lives in the perimeter, so whatever answers those calls is outside.
 #
-# The caller itself stays undecided. Its single final field reads as a value and as an
-# identity at once, neither wins, and what would settle it - being the pivot between a port
-# and the domain - belongs to the wave after this one.
+# The caller is the application layer, and the reason is the port and nothing else: it holds
+# the one interface the core reaches outward through. Re-arbitrated when the third wave was
+# built - until then it read as an undecided value, its single final field being all the
+# shape had to say about it.
 status: reviewed
 expect: com.acme.hangar.core.Ledger = DRIVEN_PORT
-expect: com.acme.hangar.core.Checkout = UNCLASSIFIED
+expect: com.acme.hangar.core.Checkout = APPLICATION_SERVICE

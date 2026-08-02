@@ -105,6 +105,17 @@ class WavePropagationTest {
                     .extracting(Evidence::tier)
                     .containsExactlyInAnyOrder(EvidenceTier.FRAMEWORK_KNOWLEDGE, EvidenceTier.GRAPH_RELATION);
         }
+
+        @Test
+        @DisplayName("and on to the layer that calls the contract, once the contract is a way out")
+        void andOnToTheLayerThatCallsTheContract() {
+            // The third hop of the same chain: a tool places the ring, the ring frees the contract
+            // to be read as a port, and the port makes its caller the application layer. Not one
+            // of the three readings could have been made on the round before it.
+            Verdicts settled = verdicts(contract(), ringFulfillingTheContract(), coreHoldingTheContract());
+
+            assertThat(settled.kindOf(CORE)).contains(ArchKind.APPLICATION_SERVICE);
+        }
     }
 
     @Nested

@@ -117,6 +117,37 @@ final class Contracts {
     }
 
     /**
+     * Returns the types of the perimeter the given declaration keeps as collaborators — the
+     * reading of {@link #holdersOf} taken from the other end.
+     *
+     * @param derivation the derivation the rule is running under
+     * @param type the declaration to read
+     * @return the collaborators, in perimeter order
+     */
+    static List<TypeId> collaboratorsOf(Derivation derivation, TypeNode type) {
+        return derivation.perimeter().types().stream()
+                .map(TypeNode::id)
+                .filter(candidate -> holds(type, candidate))
+                .toList();
+    }
+
+    /**
+     * Returns the types of the perimeter the given declaration descends from, whatever their
+     * nature: what matters downstream is which of them a rule read as a port, and asking that
+     * question of a class costs nothing while refusing to ask it would hide a declared one.
+     *
+     * @param derivation the derivation the rule is running under
+     * @param type the declaration to read
+     * @return the fulfilled contracts, in perimeter order
+     */
+    static List<TypeId> contractsOf(Derivation derivation, TypeNode type) {
+        return derivation.perimeter().types().stream()
+                .map(TypeNode::id)
+                .filter(candidate -> fulfils(derivation.code(), type, candidate))
+                .toList();
+    }
+
+    /**
      * Returns whether the outer ring already claims the given type.
      *
      * @param derivation the derivation the rule is running under

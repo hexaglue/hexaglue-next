@@ -1,0 +1,2 @@
+com/acme/hangar/core/Dispatch.java
+com/acme/hangar/core/Manifest.java

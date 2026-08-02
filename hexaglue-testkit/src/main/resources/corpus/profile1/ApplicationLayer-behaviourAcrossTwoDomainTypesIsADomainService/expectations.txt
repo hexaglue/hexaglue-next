@@ -1,0 +1,18 @@
+# ApplicationLayer-behaviourAcrossTwoDomainTypesIsADomainService
+#
+# Authored for the layer inside the boundary. The vocabulary is deliberately
+# unconventional: what makes a type the application is where it stands between
+# the ports and the ring, never the word its name ends with.
+
+# A kind the previous engine could not reach at all. Four conditions have to hold together:
+# the type keeps nothing that can change, it calls no way out, its methods work across two
+# types the domain owns, and something inside the perimeter calls it.
+#
+# The two values are read from their shape alone (records with more than one component, so no
+# identity reading competes), and that is enough for the collaboration between them to be
+# read as belonging to the domain rather than to the application.
+status: reviewed
+expect: com.acme.hangar.core.Fleet = VALUE_OBJECT
+expect: com.acme.hangar.core.Manifest = VALUE_OBJECT
+expect: com.acme.hangar.core.Dispatch = DOMAIN_SERVICE
+expect: com.acme.hangar.core.Checkout = UNCLASSIFIED

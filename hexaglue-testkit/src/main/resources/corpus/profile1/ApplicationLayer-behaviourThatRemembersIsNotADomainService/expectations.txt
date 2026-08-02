@@ -1,0 +1,16 @@
+# ApplicationLayer-behaviourThatRemembersIsNotADomainService
+#
+# Authored for the layer inside the boundary. The vocabulary is deliberately
+# unconventional: what makes a type the application is where it stands between
+# the ports and the ring, never the word its name ends with.
+
+# One field apart from the scenario above, and that field is the whole difference. A type
+# holding something that can change between two calls remembers; remembering is what entities
+# do, and a service that does it is a service in name only.
+#
+# The caller stays undecided too: what it holds is no port, so it stands between nothing.
+status: reviewed
+expect: com.acme.hangar.core.Fleet = VALUE_OBJECT
+expect: com.acme.hangar.core.Manifest = VALUE_OBJECT
+expect: com.acme.hangar.core.Dispatch = UNCLASSIFIED
+expect: com.acme.hangar.core.Checkout = UNCLASSIFIED

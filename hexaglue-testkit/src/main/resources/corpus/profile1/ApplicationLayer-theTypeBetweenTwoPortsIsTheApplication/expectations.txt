@@ -1,0 +1,18 @@
+# ApplicationLayer-theTypeBetweenTwoPortsIsTheApplication
+#
+# Authored for the layer inside the boundary. The vocabulary is deliberately
+# unconventional: what makes a type the application is where it stands between
+# the ports and the ring, never the word its name ends with.
+
+# The whole chain in one fixture, and every step reads off a relation. The framework marks
+# the entry point; the entry point holding the contract the core answers makes that contract
+# a way in; the core calling an interface nothing inside implements makes that one a way out;
+# and the type between the two is the application layer.
+#
+# Not one of the four verdicts needs a name, a package or a stereotype. Reversing every
+# identifier in this file would change none of them.
+status: reviewed
+expect: com.acme.hangar.web.HangarDoor = DRIVING_ADAPTER
+expect: com.acme.hangar.core.Boarding = DRIVING_PORT
+expect: com.acme.hangar.core.Ledger = DRIVEN_PORT
+expect: com.acme.hangar.core.Checkout = APPLICATION_SERVICE

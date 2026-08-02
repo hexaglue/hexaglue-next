@@ -8,9 +8,9 @@
 # calls holds it, so the contract is how the world reaches in. Both halves are needed, and
 # the direction falls out of which side does which - no suffix, no package, no vocabulary.
 #
-# The type answering the port stays undecided: being the pivot of the application is read by
-# the wave after this one.
+# The type answering the port is the application layer: answering a way in is one of the two
+# halves that place a type there. Re-arbitrated when the third wave was built.
 status: reviewed
 expect: com.acme.hangar.web.HangarDoor = DRIVING_ADAPTER
 expect: com.acme.hangar.core.Assembly = DRIVING_PORT
-expect: com.acme.hangar.core.AssemblyLine = UNCLASSIFIED
+expect: com.acme.hangar.core.AssemblyLine = APPLICATION_SERVICE

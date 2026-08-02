@@ -1,0 +1,15 @@
+# ApplicationLayer-theTypeAnEntryPointHandsTheWorkToIsTheApplication
+#
+# Authored for the layer inside the boundary. The vocabulary is deliberately
+# unconventional: what makes a type the application is where it stands between
+# the ports and the ring, never the word its name ends with.
+
+# The migration reading. Nothing here has been turned into a port yet - the type does its own
+# work and calls nothing outward - but the framework marks the entry point, and what an entry
+# point hands the work to is the application layer.
+#
+# The stereotype completes the case and does not open it: see the scenario where the same
+# annotation, with nobody reaching for the type, says nothing at all.
+status: reviewed
+expect: com.acme.hangar.web.HangarDoor = DRIVING_ADAPTER
+expect: com.acme.hangar.core.Dispatch = APPLICATION_SERVICE

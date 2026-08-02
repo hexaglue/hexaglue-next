@@ -19,6 +19,10 @@ import io.hexaglue.frontend.TypeNodeMapper.MappedType;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.MethodBodyFacts;
 import io.hexaglue.model.code.TypeNode;
+import io.hexaglue.model.finding.Diagnostic;
+import io.hexaglue.model.finding.DiagnosticSeverity;
+import io.hexaglue.model.finding.IssueCode;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -49,6 +53,15 @@ import spoon.reflect.visitor.filter.TypeFilter;
 public final class SpoonFrontend {
 
     private static final Logger LOG = LoggerFactory.getLogger(SpoonFrontend.class);
+
+    /** The analysis was pointed at a source root it cannot read. */
+    private static final IssueCode SOURCE_ROOT_UNREADABLE = IssueCode.of("HG-FRONTEND-001");
+
+    /** The analysis was given a classpath entry that does not exist. */
+    private static final IssueCode CLASSPATH_ENTRY_MISSING = IssueCode.of("HG-FRONTEND-002");
+
+    /** The sources could not be parsed. */
+    private static final IssueCode PARSING_FAILED = IssueCode.of("HG-FRONTEND-003");
 
     private SpoonFrontend() {}
 
@@ -90,13 +103,50 @@ public final class SpoonFrontend {
         return model.build();
     }
 
+    // The parser signals every kind of setup and reading failure with unchecked exceptions of its
+    // own and of its compiler backend. They are caught wholesale and rethrown coded — nothing is
+    // swallowed, and no partial model escapes.
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private static CtModel parse(FrontendRequest request) {
+        checkInputs(request);
         Launcher launcher = new Launcher();
         configure(launcher.getEnvironment(), request);
         for (Path sourceRoot : request.sourceRoots()) {
             launcher.addInputResource(sourceRoot.toAbsolutePath().toString());
         }
-        return launcher.buildModel();
+        try {
+            return launcher.buildModel();
+        } catch (RuntimeException parseFailure) {
+            // Converted, not swallowed: the caller gets a coded failure instead of a model
+            // silently missing whatever could not be parsed.
+            throw new FrontendException(
+                    diagnostic(PARSING_FAILED, "Failed to parse the sources: " + parseFailure.getMessage()),
+                    parseFailure);
+        }
+    }
+
+    /**
+     * Checks what the caller pointed the analysis at, before any work: a missing source root or an
+     * absent classpath entry silently produces a smaller model, and a smaller model reads as a
+     * smaller code base rather than as a broken setup.
+     */
+    private static void checkInputs(FrontendRequest request) {
+        for (Path sourceRoot : request.sourceRoots()) {
+            if (!Files.isDirectory(sourceRoot)) {
+                throw new FrontendException(
+                        diagnostic(SOURCE_ROOT_UNREADABLE, "Source root is not a readable directory: " + sourceRoot));
+            }
+        }
+        for (Path entry : request.classpath()) {
+            if (!Files.exists(entry)) {
+                throw new FrontendException(
+                        diagnostic(CLASSPATH_ENTRY_MISSING, "Classpath entry does not exist: " + entry));
+            }
+        }
+    }
+
+    private static Diagnostic diagnostic(IssueCode code, String message) {
+        return Diagnostic.builder(code, DiagnosticSeverity.ERROR, message).build();
     }
 
     private static void configure(Environment environment, FrontendRequest request) {

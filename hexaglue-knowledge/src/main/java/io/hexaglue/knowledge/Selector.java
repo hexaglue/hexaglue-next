@@ -13,7 +13,13 @@
 
 package io.hexaglue.knowledge;
 
+import io.hexaglue.model.TypeId;
+import io.hexaglue.model.TypeRef;
+import io.hexaglue.model.code.CodeModel;
+import io.hexaglue.model.code.TypeNode;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * How a pack entry recognizes the symbol it knows about.
@@ -36,6 +42,16 @@ public sealed interface Selector {
     String symbol();
 
     /**
+     * Returns whether the given type bears this selector's symbol. Each shape knows what it looks
+     * at, so recognizing a symbol is one implementation and not a switch every reader repeats.
+     *
+     * @param model the code model the type belongs to, read for the supertype closure
+     * @param type the type under examination
+     * @return true when the symbol is borne
+     */
+    boolean matches(CodeModel model, TypeNode type);
+
+    /**
      * An annotation borne by the type, matched on its exact qualified name.
      *
      * @param qualifiedName the fully qualified annotation type name
@@ -53,6 +69,11 @@ public sealed interface Selector {
         @Override
         public String symbol() {
             return qualifiedName;
+        }
+
+        @Override
+        public boolean matches(CodeModel model, TypeNode type) {
+            return type.hasAnnotation(qualifiedName);
         }
     }
 
@@ -77,6 +98,32 @@ public sealed interface Selector {
         public String symbol() {
             return qualifiedName;
         }
+
+        @Override
+        public boolean matches(CodeModel model, TypeNode type) {
+            return model.supertypesOf(type.id()).contains(TypeId.of(qualifiedName));
+        }
+
+        /**
+         * Returns the supertype the type declares to reach this symbol: the reference written in
+         * the source, which is where the type arguments are — {@code JpaRepository<Order, OrderId>}
+         * on the way to {@code Repository}. The superclass is examined before the interfaces, and
+         * the first route wins, so a type reaching one symbol by two paths still captures once.
+         *
+         * @param model the code model, read for the closure behind each declared supertype
+         * @param type the type under examination
+         * @return the declared reference leading to this symbol, empty when none does
+         */
+        Optional<TypeRef> declaredRouteIn(CodeModel model, TypeNode type) {
+            return Stream.concat(type.superClass().stream(), type.interfaces().stream())
+                    .filter(declared -> leadsToSymbol(model, declared))
+                    .findFirst();
+        }
+
+        private boolean leadsToSymbol(CodeModel model, TypeRef declared) {
+            return declared.qualifiedName().equals(qualifiedName)
+                    || model.supertypesOf(TypeId.of(declared.qualifiedName())).contains(TypeId.of(qualifiedName));
+        }
     }
 
     /**
@@ -99,6 +146,11 @@ public sealed interface Selector {
         @Override
         public String symbol() {
             return qualifiedName;
+        }
+
+        @Override
+        public boolean matches(CodeModel model, TypeNode type) {
+            return type.id().qualifiedName().equals(qualifiedName);
         }
     }
 
@@ -124,6 +176,12 @@ public sealed interface Selector {
         @Override
         public String symbol() {
             return prefix;
+        }
+
+        @Override
+        public boolean matches(CodeModel model, TypeNode type) {
+            String qualifiedName = type.id().qualifiedName();
+            return qualifiedName.equals(prefix) || qualifiedName.startsWith(prefix + ".");
         }
     }
 

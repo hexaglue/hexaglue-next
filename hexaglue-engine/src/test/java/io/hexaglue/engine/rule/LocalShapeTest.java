@@ -159,6 +159,13 @@ class LocalShapeTest {
         }
 
         @Test
+        @DisplayName("but not when the value can still change, which no identity does")
+        void notWhenTheValueCanChange() {
+            assertThat(shapesOf(TypeNature.CLASS, List.of(field("value", "java.util.UUID"))))
+                    .isEmpty();
+        }
+
+        @Test
         @DisplayName("but not when the single field is a collection, which wraps nothing")
         void notWhenTheFieldIsACollection() {
             Field lines = Field.builder("lines", TypeRef.parameterized("java.util.List", TypeRef.of("com.acme.Line")))

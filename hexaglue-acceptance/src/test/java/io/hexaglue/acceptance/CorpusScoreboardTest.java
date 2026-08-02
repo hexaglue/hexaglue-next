@@ -68,14 +68,14 @@ class CorpusScoreboardTest {
         }
         int passing = reviewed.size() - failing.size();
 
-        assertThat(reviewed)
-                .as("Reviewed scenarios: raise profile1.reviewed in corpus-floor.properties to %d", reviewed.size())
-                .hasSize(number(floor, "profile1.reviewed"));
+        assertThat(reviewed.size())
+                .as("Reviewed scenarios: set profile1.reviewed in corpus-floor.properties to %d", reviewed.size())
+                .isEqualTo(number(floor, "profile1.reviewed"));
         assertThat(passing)
                 .as(
                         "%d of %d reviewed scenarios pass. Still failing:%n  %s%n"
                                 + "Below the floor means a regression; above it means the floor owes an update to %d.",
-                        passing, reviewed.size(), String.join("%n  ", failing), passing)
+                        passing, reviewed.size(), String.join(System.lineSeparator() + "  ", failing), passing)
                 .isEqualTo(number(floor, "profile1.passing"));
     }
 

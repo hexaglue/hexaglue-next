@@ -10,5 +10,7 @@
 #   assertThat(criteria.targetKind()).isEqualTo(ElementKind.ENTITY)
 #   assertThat(criteria.priority()).isEqualTo(70)
 
-status: draft
+# Reviewed: the expectation is right and the engine cannot reach it yet. It needs R3, which
+# reads what a confirmed aggregate holds.
+status: reviewed
 expect: com.example.OrderLine = ENTITY

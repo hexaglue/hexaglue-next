@@ -70,10 +70,13 @@ public final class LocalShape implements Rule {
     public void apply(Derivation derivation) {
         for (TypeNode type : derivation.perimeter().types()) {
             List<Field> state = stateOf(type);
-            if (isImmutable(type, state)) {
+            boolean immutable = isImmutable(type, state);
+            if (immutable) {
                 speak(derivation, type, ArchKind.VALUE_OBJECT, "IMMUTABLE_SHAPE", reasonForImmutability(type));
             }
-            if (wrapsSingleValue(state)) {
+            // Only an immutable wrapper reads as an identity: something that can change is
+            // neither a value nor the identity of anything.
+            if (immutable && wrapsSingleValue(state)) {
                 speak(
                         derivation,
                         type,

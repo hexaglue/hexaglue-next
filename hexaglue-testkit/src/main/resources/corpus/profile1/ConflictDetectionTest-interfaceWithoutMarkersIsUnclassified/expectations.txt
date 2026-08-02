@@ -6,5 +6,10 @@
 #
 #   assertThat(result.isUnclassified()).isTrue()
 
-status: draft
-expect: com.example.ports.in.CustomerRepository = UNCLASSIFIED
+# Reviewed, and DELIBERATELY DIFFERENT from the carriere. The legacy test asserted that an
+# interface without markers stays unclassified; v7 reads the conventional name and answers
+# DRIVEN_PORT at MEDIUM confidence. A verdict a validation gate can refuse is more useful
+# than silence. Note the scenario also puts the type in a ports.in package, which the
+# topology sensor (S5) will contradict — that conflict is worth surfacing, not hiding.
+status: reviewed
+expect: com.example.ports.in.CustomerRepository = DRIVEN_PORT

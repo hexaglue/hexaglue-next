@@ -6,5 +6,8 @@
 #
 #   assertThat(result.isUnclassified()).isTrue()
 
-status: draft
-expect: com.example.OrderService = UNCLASSIFIED
+# Reviewed, and DELIBERATELY DIFFERENT from the carriere, for the same reason as
+# ConflictDetectionTest-interfaceWithoutMarkersIsUnclassified: a conventional name yields a
+# verdict at MEDIUM rather than nothing.
+status: reviewed
+expect: com.example.OrderService = APPLICATION_SERVICE

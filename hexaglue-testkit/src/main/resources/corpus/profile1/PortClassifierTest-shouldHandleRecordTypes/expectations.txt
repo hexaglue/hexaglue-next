@@ -6,5 +6,9 @@
 #
 #   assertThat(result.isUnclassified()).isTrue()
 
-status: draft
-expect: com.example.OrderId = UNCLASSIFIED
+# Reviewed, and DELIBERATELY DIFFERENT from the carriere. The legacy engine returned no
+# verdict; here an immutable single-value wrapper called OrderId is read as an identity by
+# shape and by name at once. B13's lesson is that a name must not decide alone against
+# structure, not that it must be ignored when structure agrees with it.
+status: reviewed
+expect: com.example.OrderId = IDENTIFIER

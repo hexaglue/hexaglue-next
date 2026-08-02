@@ -11,5 +11,8 @@
 #   assertThat(criteria.targetKind()).isEqualTo(ElementKind.AGGREGATE_ROOT)
 #   assertThat(criteria.priority()).isEqualTo(80)
 
-status: draft
+# Reviewed: the expectation is right and the engine cannot reach it yet. A hand-written
+# repository interface is not a Spring Data one, so R1 says nothing; R4 (a port by the
+# signatures it exposes) is what will carry this.
+status: reviewed
 expect: com.example.Order = AGGREGATE_ROOT

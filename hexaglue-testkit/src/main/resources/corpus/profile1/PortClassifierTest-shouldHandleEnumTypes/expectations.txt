@@ -6,5 +6,8 @@
 #
 #   assertThat(result.isUnclassified()).isTrue()
 
-status: draft
-expect: com.example.OrderStatus = UNCLASSIFIED
+# Reviewed, and DELIBERATELY DIFFERENT from the carriere. The legacy engine returned no
+# verdict at all; v7 owes one to every type of the perimeter (A5). An enum is a closed set
+# of values, which is a value object — saying so beats saying nothing.
+status: reviewed
+expect: com.example.OrderStatus = VALUE_OBJECT

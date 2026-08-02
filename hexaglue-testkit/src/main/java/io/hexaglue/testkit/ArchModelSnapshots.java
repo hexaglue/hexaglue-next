@@ -27,6 +27,7 @@ import io.hexaglue.model.declaration.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -75,18 +76,35 @@ public final class ArchModelSnapshots {
         lines.add("    {");
         lines.addAll(verdictHeader(type, true));
         if (type instanceof AggregateRoot aggregate) {
-            lines.add("      \"identity\": {");
-            lines.add("        \"field\": " + quote(aggregate.identityField().name()) + ",");
-            lines.add("        \"type\": "
-                    + quote(aggregate.identityField().type().qualifiedName()));
-            lines.add("      },");
+            lines.addAll(identity(aggregate));
         }
         if (type instanceof Identifier identifier) {
-            lines.add("      \"wrappedType\": " + quote(identifier.wrappedType().qualifiedName()) + ",");
+            lines.add("      \"wrappedType\": "
+                    + identifier
+                            .wrappedType()
+                            .map(ref -> quote(ref.qualifiedName()))
+                            .orElse("null") + ",");
         }
         lines.addAll(propertyLines(type.structure().fields()));
         lines.add("    }");
         return String.join("\n", lines);
+    }
+
+    /**
+     * Renders the identity of an aggregate, or {@code null} when the engine could not name the
+     * field carrying it — an aggregate read from a repository declaration or from a declared
+     * intent has a kind before it has a named identity.
+     */
+    private static List<String> identity(AggregateRoot aggregate) {
+        Optional<Field> field = aggregate.identityField();
+        if (field.isEmpty()) {
+            return List.of("      \"identity\": null,");
+        }
+        return List.of(
+                "      \"identity\": {",
+                "        \"field\": " + quote(field.orElseThrow().name()) + ",",
+                "        \"type\": " + quote(field.orElseThrow().type().qualifiedName()),
+                "      },");
     }
 
     private static String applicationEntry(ApplicationType type) {

@@ -94,6 +94,26 @@ class CompositionIndexTest {
         }
 
         @Test
+        @DisplayName("an aggregate whose identity was never named answers empty, and indexes nothing")
+        void aggregateWithoutANamedIdentityIndexesNothing() {
+            AggregateRoot nameless = new AggregateRoot(
+                    TypeId.of("com.shop.Basket"),
+                    TypeStructure.builder(TypeNature.CLASS).build(),
+                    ShopModelFixtures.verdict(ArchKind.AGGREGATE_ROOT),
+                    Optional.empty(),
+                    Optional.empty(),
+                    List.of(),
+                    List.of(),
+                    List.of(),
+                    Optional.empty(),
+                    List.of());
+            CompositionIndex index =
+                    ArchModel.builder().addType(nameless).build().compositionIndex();
+
+            assertThat(index.identifierOf(nameless.id())).isEmpty();
+        }
+
+        @Test
         @DisplayName("a type that identifies no aggregate answers empty")
         void typeIdentifyingNoAggregateAnswersEmpty() {
             assertThat(compositions.aggregateOf(ShopModelFixtures.MONEY)).isEmpty();

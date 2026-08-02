@@ -86,8 +86,8 @@ final class ShopModelFixtures {
                 ORDER,
                 structure,
                 verdict(ArchKind.AGGREGATE_ROOT),
-                identity,
-                TypeRef.of("java.util.UUID"),
+                Optional.of(identity),
+                Optional.of(TypeRef.of("java.util.UUID")),
                 List.of(TypeRef.of("com.shop.OrderLine")),
                 List.of(TypeRef.of("com.shop.Money")),
                 List.of(TypeRef.of("com.shop.OrderPlaced")),
@@ -110,8 +110,8 @@ final class ShopModelFixtures {
                 CUSTOMER,
                 structure,
                 verdict(ArchKind.AGGREGATE_ROOT),
-                identity,
-                TypeRef.of("java.util.UUID"),
+                Optional.of(identity),
+                Optional.of(TypeRef.of("java.util.UUID")),
                 List.of(),
                 List.of(),
                 List.of(),
@@ -139,12 +139,18 @@ final class ShopModelFixtures {
 
     static Identifier orderId() {
         return new Identifier(
-                ORDER_ID, structure(TypeNature.RECORD), verdict(ArchKind.IDENTIFIER), TypeRef.of("java.util.UUID"));
+                ORDER_ID,
+                structure(TypeNature.RECORD),
+                verdict(ArchKind.IDENTIFIER),
+                Optional.of(TypeRef.of("java.util.UUID")));
     }
 
     static Identifier customerId() {
         return new Identifier(
-                CUSTOMER_ID, structure(TypeNature.RECORD), verdict(ArchKind.IDENTIFIER), TypeRef.of("java.util.UUID"));
+                CUSTOMER_ID,
+                structure(TypeNature.RECORD),
+                verdict(ArchKind.IDENTIFIER),
+                Optional.of(TypeRef.of("java.util.UUID")));
     }
 
     static DomainEvent orderPlaced() {

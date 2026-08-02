@@ -50,12 +50,13 @@ public final class CompositionIndex {
         typesById.values().stream()
                 .filter(AggregateRoot.class::isInstance)
                 .map(AggregateRoot.class::cast)
-                .forEach(aggregate -> byIdentifier.putIfAbsent(identifierTypeOf(aggregate), aggregate.id()));
+                .forEach(aggregate ->
+                        identifierTypeOf(aggregate).ifPresent(id -> byIdentifier.putIfAbsent(id, aggregate.id())));
         this.aggregateByIdentifier = Collections.unmodifiableSortedMap(byIdentifier);
     }
 
-    private static TypeId identifierTypeOf(AggregateRoot aggregate) {
-        return TypeId.of(aggregate.identityField().type().qualifiedName());
+    private static Optional<TypeId> identifierTypeOf(AggregateRoot aggregate) {
+        return aggregate.identityField().map(field -> TypeId.of(field.type().qualifiedName()));
     }
 
     /**
@@ -103,7 +104,7 @@ public final class CompositionIndex {
      */
     public Optional<TypeId> identifierOf(TypeId aggregateId) {
         Objects.requireNonNull(aggregateId, "aggregateId must not be null");
-        return aggregate(aggregateId).map(CompositionIndex::identifierTypeOf);
+        return aggregate(aggregateId).flatMap(CompositionIndex::identifierTypeOf);
     }
 
     /**

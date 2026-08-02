@@ -30,7 +30,7 @@ import java.util.Optional;
  * @param id the stable type identity
  * @param structure the structural description
  * @param classification the complete verdict, kind AGGREGATE_ROOT
- * @param identityField the field carrying the aggregate identity
+ * @param identityField the field carrying the aggregate identity, when the engine could name it
  * @param effectiveIdentityType the unwrapped identity type (e.g. {@code UUID} behind
  *     {@code OrderId})
  * @param entities the owned entities, in discovery order
@@ -44,8 +44,8 @@ public record AggregateRoot(
         TypeId id,
         TypeStructure structure,
         Classification classification,
-        Field identityField,
-        TypeRef effectiveIdentityType,
+        Optional<Field> identityField,
+        Optional<TypeRef> effectiveIdentityType,
         List<TypeRef> entities,
         List<TypeRef> valueObjects,
         List<TypeRef> domainEvents,
@@ -86,5 +86,14 @@ public record AggregateRoot(
      */
     public boolean hasComposition() {
         return !entities.isEmpty() || !valueObjects.isEmpty();
+    }
+
+    /**
+     * Returns whether the field carrying the identity was named.
+     *
+     * @return true when the identity field is present
+     */
+    public boolean hasIdentity() {
+        return identityField.isPresent();
     }
 }

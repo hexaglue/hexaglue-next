@@ -18,6 +18,7 @@ import io.hexaglue.model.TypeId;
 import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.classification.Classification;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * An identifier: a value object wrapping the identity of an entity or aggregate
@@ -26,10 +27,11 @@ import java.util.Objects;
  * @param id the stable type identity
  * @param structure the structural description
  * @param classification the complete verdict, kind IDENTIFIER
- * @param wrappedType the underlying identity type
+ * @param wrappedType the underlying identity type, when the identifier wraps a single value
  * @since 7.0.0
  */
-public record Identifier(TypeId id, TypeStructure structure, Classification classification, TypeRef wrappedType)
+public record Identifier(
+        TypeId id, TypeStructure structure, Classification classification, Optional<TypeRef> wrappedType)
         implements DomainType {
 
     /**
@@ -46,5 +48,15 @@ public record Identifier(TypeId id, TypeStructure structure, Classification clas
     @Override
     public ArchKind kind() {
         return ArchKind.IDENTIFIER;
+    }
+
+    /**
+     * Returns whether this identifier wraps a single underlying value. A composite key, or one
+     * whose underlying type the engine could not see, wraps none.
+     *
+     * @return true when the wrapped type is present
+     */
+    public boolean wrapsSingleValue() {
+        return wrappedType.isPresent();
     }
 }

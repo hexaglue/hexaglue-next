@@ -97,8 +97,8 @@ class ArchTypeHierarchyTest {
                     TypeId.of("com.a.Order"),
                     emptyStructure(TypeNature.CLASS),
                     verdict(ArchKind.AGGREGATE_ROOT),
-                    identity,
-                    TypeRef.of("java.util.UUID"),
+                    Optional.of(identity),
+                    Optional.of(TypeRef.of("java.util.UUID")),
                     List.of(TypeRef.of("com.a.OrderLine")),
                     List.of(TypeRef.of("com.a.Money")),
                     List.of(TypeRef.of("com.a.OrderPlaced")),
@@ -106,12 +106,53 @@ class ArchTypeHierarchyTest {
                     List.of(Invariant.of("validateTotal", "Total is never negative")));
 
             assertThat(aggregate.kind()).isEqualTo(ArchKind.AGGREGATE_ROOT);
-            assertThat(aggregate.identityField().isIdentity()).isTrue();
-            assertThat(aggregate.effectiveIdentityType().qualifiedName()).isEqualTo("java.util.UUID");
+            assertThat(aggregate.hasIdentity()).isTrue();
+            assertThat(aggregate.identityField())
+                    .get()
+                    .extracting(Field::isIdentity)
+                    .isEqualTo(true);
+            assertThat(aggregate.effectiveIdentityType())
+                    .map(TypeRef::qualifiedName)
+                    .contains("java.util.UUID");
             assertThat(aggregate.hasComposition()).isTrue();
             assertThat(aggregate.drivenPort()).isPresent();
             assertThat(aggregate.invariants()).hasSize(1);
             assertThat(aggregate.simpleName()).isEqualTo("Order");
+        }
+
+        @Test
+        @DisplayName("an aggregate the engine could not name an identity for is still an aggregate")
+        void aggregateWithoutANamedIdentity() {
+            // A repository declaration and a declared intent both name the kind before anything
+            // names the field carrying the identity. Refusing the kind for want of the field
+            // would lose the verdict; the gap is reported, not hidden.
+            AggregateRoot aggregate = new AggregateRoot(
+                    TypeId.of("com.a.Order"),
+                    emptyStructure(TypeNature.CLASS),
+                    verdict(ArchKind.AGGREGATE_ROOT),
+                    Optional.empty(),
+                    Optional.empty(),
+                    List.of(),
+                    List.of(),
+                    List.of(),
+                    Optional.empty(),
+                    List.of());
+
+            assertThat(aggregate.kind()).isEqualTo(ArchKind.AGGREGATE_ROOT);
+            assertThat(aggregate.hasIdentity()).isFalse();
+            assertThat(aggregate.effectiveIdentityType()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("an identifier wrapping no single value answers so")
+        void identifierWrappingNoSingleValue() {
+            Identifier composite = new Identifier(
+                    TypeId.of("com.a.CustomerKey"),
+                    emptyStructure(TypeNature.RECORD),
+                    verdict(ArchKind.IDENTIFIER),
+                    Optional.empty());
+
+            assertThat(composite.wrapsSingleValue()).isFalse();
         }
 
         @Test
@@ -135,8 +176,8 @@ class ArchTypeHierarchyTest {
                     TypeId.of("com.a.Config"),
                     emptyStructure(TypeNature.CLASS),
                     verdict(ArchKind.AGGREGATE_ROOT),
-                    Field.of("id", TypeRef.of("java.lang.Long")),
-                    TypeRef.of("java.lang.Long"),
+                    Optional.of(Field.of("id", TypeRef.of("java.lang.Long"))),
+                    Optional.of(TypeRef.of("java.lang.Long")),
                     List.of(),
                     List.of(),
                     List.of(),
@@ -194,9 +235,10 @@ class ArchTypeHierarchyTest {
                     TypeId.of("com.a.OrderId"),
                     emptyStructure(TypeNature.RECORD),
                     verdict(ArchKind.IDENTIFIER),
-                    TypeRef.of("java.util.UUID"));
+                    Optional.of(TypeRef.of("java.util.UUID")));
 
-            assertThat(identifier.wrappedType().qualifiedName()).isEqualTo("java.util.UUID");
+            assertThat(identifier.wrapsSingleValue()).isTrue();
+            assertThat(identifier.wrappedType()).map(TypeRef::qualifiedName).contains("java.util.UUID");
         }
 
         @Test

@@ -73,8 +73,8 @@ class ArchModelSnapshotsTest {
                         .fields(List.of(identity, lines))
                         .build(),
                 verdict(ArchKind.AGGREGATE_ROOT),
-                identity,
-                TypeRef.of("java.util.UUID"),
+                Optional.of(identity),
+                Optional.of(TypeRef.of("java.util.UUID")),
                 List.of(),
                 List.of(),
                 List.of(),
@@ -84,7 +84,7 @@ class ArchModelSnapshotsTest {
                 TypeId.of("com.shop.OrderId"),
                 TypeStructure.builder(TypeNature.RECORD).build(),
                 verdict(ArchKind.IDENTIFIER),
-                TypeRef.of("java.util.UUID"));
+                Optional.of(TypeRef.of("java.util.UUID")));
         ApplicationService checkout = new ApplicationService(
                 TypeId.of("com.shop.CheckoutService"),
                 TypeStructure.builder(TypeNature.CLASS).build(),

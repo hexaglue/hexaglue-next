@@ -1,0 +1,14 @@
+# DomainCriteriaTest#shouldMatchRecordWithoutIdentityReferencedByOtherType
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(result.matched()).isTrue()
+#   assertThat(result.confidence()).isEqualTo(ConfidenceLevel.MEDIUM)
+#   assertThat(result.justification()).contains("ShippingRate")
+#   assertThat(criteria.targetKind()).isEqualTo(ElementKind.VALUE_OBJECT)
+#   assertThat(criteria.priority()).isEqualTo(65)
+
+status: draft
+expect: com.example.ShippingRate = VALUE_OBJECT

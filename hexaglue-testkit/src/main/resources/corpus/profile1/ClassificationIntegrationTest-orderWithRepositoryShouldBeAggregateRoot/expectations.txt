@@ -1,0 +1,16 @@
+# ClassificationIntegrationTest#orderWithRepositoryShouldBeAggregateRoot
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(orderResult.isClassified()).isTrue()
+#   assertThat(orderResult.kind()).isEqualTo(ElementKind.AGGREGATE_ROOT.name())
+#   assertThat(orderResult.confidence()).isEqualTo(ConfidenceLevel.HIGH)
+#   assertThat(orderResult.matchedCriteria()).isEqualTo("repository-dominant")
+#   assertThat(orderResult.target()).isEqualTo(ClassificationTarget.DOMAIN)
+#   assertThat(orderResult.evidence()).isNotEmpty()
+#   assertThat(orderResult.justification()).containsIgnoringCase("repository")
+
+status: draft
+# the assertions name no single subject; decide by hand

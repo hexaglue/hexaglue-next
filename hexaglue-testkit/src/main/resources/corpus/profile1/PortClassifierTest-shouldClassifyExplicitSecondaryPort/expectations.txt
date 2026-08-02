@@ -1,0 +1,17 @@
+# PortClassifierTest#shouldClassifyExplicitSecondaryPort
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(result.isClassified()).isTrue()
+#   assertThat(result.kind()).isEqualTo("GATEWAY")
+#   assertThat(result.confidence()).isEqualTo(ConfidenceLevel.EXPLICIT)
+#   assertThat(result.portDirection()).isEqualTo(PortDirection.DRIVEN)
+
+# Reviewed: the legacy engine answered a port family (REPOSITORY, GATEWAY); v7 answers a kind,
+# and carries the family as an attribute of the port. DRIVEN_PORT is the same statement in
+# the v7 vocabulary, not a change of verdict.
+status: reviewed
+# legacy port family GATEWAY: v7 states the kind, the family is a port attribute
+expect: com.example.PaymentGateway = DRIVEN_PORT

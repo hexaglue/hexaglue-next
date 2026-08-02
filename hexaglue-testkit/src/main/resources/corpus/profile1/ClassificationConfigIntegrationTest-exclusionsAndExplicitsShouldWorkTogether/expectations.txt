@@ -1,0 +1,16 @@
+# ClassificationConfigIntegrationTest#exclusionsAndExplicitsShouldWorkTogether
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(results.get(NodeId.type("com.example.Order"))).isPresent()
+#   assertThat(results.get(NodeId.type("com.example.OrderCreatedException"))) .isEmpty()
+#   assertThat(orderIdResult).isPresent()
+#   assertThat(orderIdResult.get().kind()).isEqualTo("VALUE_OBJECT")
+#   assertThat(orderIdResult.get().matchedCriteria()).isEqualTo("ExplicitConfiguration")
+
+status: draft
+# CONDITIONAL: the legacy test configured the classifier, and the corpus does not
+# carry that configuration yet. The expectation below holds only under it.
+expect: com.example.Order = VALUE_OBJECT

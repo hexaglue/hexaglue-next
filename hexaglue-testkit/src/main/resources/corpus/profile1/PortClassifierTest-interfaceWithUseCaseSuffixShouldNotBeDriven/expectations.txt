@@ -1,0 +1,10 @@
+# PortClassifierTest#interfaceWithUseCaseSuffixShouldNotBeDriven
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(result.portDirection()) .as("UseCase interface should be DRIVING, not DRIVEN") .isNotEqualTo(PortDirection.DRIVEN)
+
+status: draft
+# the assertions name no single subject; decide by hand

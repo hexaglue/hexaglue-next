@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.hexaglue</groupId>
+        <artifactId>hexaglue-parent</artifactId>
+        <version>7.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>hexaglue-acceptance</artifactId>
+    <packaging>jar</packaging>
+
+    <name>HexaGlue Acceptance</name>
+    <description>Where the reference corpus meets the whole chain: sources through the frontend, the engine, and the reviewed expectations. The only module that sees both sides of the pipeline, so neither has to depend on the other.</description>
+
+    <properties>
+        <hexaglue.root>${project.basedir}/..</hexaglue.root>
+        <!-- Measurement, not contract: nothing here is published or covered. -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <jacoco.skip>true</jacoco.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-frontend</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-testkit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <!-- Spoon arrives here through the frontend, on the test classpath only.
+                         The ban exists to keep the parser out of the contract modules; this
+                         module is the harness that runs the whole chain. -->
+                    <execution>
+                        <id>enforce-module-boundaries</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>org.apache.maven:*</exclude>
+                                        <exclude>org.projectlombok:lombok</exclude>
+                                    </excludes>
+                                    <message>Module boundary violation: Maven APIs are allowed only in hexaglue-maven-plugin, Lombok nowhere.</message>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

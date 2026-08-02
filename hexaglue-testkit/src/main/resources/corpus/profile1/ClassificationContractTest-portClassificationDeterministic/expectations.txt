@@ -1,0 +1,12 @@
+# ClassificationContractTest#portClassificationDeterministic
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(result.kind()) .as("Run %d: kind should be identical", run) .isEqualTo(firstResult.kind())
+#   assertThat(result.matchedCriteria()) .as("Run %d: criteria should be identical", run) .isEqualTo(firstResult.matchedCriteria())
+#   assertThat(result.portDirection()) .as("Run %d: direction should be identical", run) .isEqualTo(firstResult.portDirection())
+
+status: draft
+# no expectation could be drafted; read the assertions above and decide by hand

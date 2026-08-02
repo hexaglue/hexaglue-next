@@ -1,0 +1,14 @@
+# DomainCriteriaTest#shouldMatchClassEndingWithEvent
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(result.matched()).isTrue()
+#   assertThat(result.confidence()).isEqualTo(ConfidenceLevel.MEDIUM)
+#   assertThat(result.justification()).contains("OrderCreatedEvent")
+#   assertThat(criteria.targetKind()).isEqualTo(ElementKind.DOMAIN_EVENT)
+#   assertThat(criteria.priority()).isEqualTo(68)
+
+status: draft
+expect: com.example.OrderCreatedEvent = DOMAIN_EVENT

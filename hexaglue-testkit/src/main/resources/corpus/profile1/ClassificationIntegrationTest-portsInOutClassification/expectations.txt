@@ -1,0 +1,18 @@
+# ClassificationIntegrationTest#portsInOutClassification
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(useCaseResult.kind()).isEqualTo(PortKind.USE_CASE.name())
+#   assertThat(useCaseResult.confidence()).isEqualTo(ConfidenceLevel.EXPLICIT)
+#   assertThat(useCaseResult.portDirection()).isEqualTo(PortDirection.DRIVING)
+#   assertThat(repoResult.kind()).isEqualTo(PortKind.REPOSITORY.name())
+#   assertThat(repoResult.confidence()).isEqualTo(ConfidenceLevel.EXPLICIT)
+#   assertThat(repoResult.portDirection()).isEqualTo(PortDirection.DRIVEN)
+#   assertThat(gatewayResult.kind()).isEqualTo(PortKind.GATEWAY.name())
+#   assertThat(gatewayResult.confidence()).isEqualTo(ConfidenceLevel.EXPLICIT)
+#   assertThat(gatewayResult.portDirection()).isEqualTo(PortDirection.DRIVEN)
+
+status: draft
+# the assertions name no single subject; decide by hand

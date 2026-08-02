@@ -1,0 +1,23 @@
+# ClassificationIntegrationTest#coffeeShopDomainClassification
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(orderResult.kind()).isEqualTo(ElementKind.AGGREGATE_ROOT.name())
+#   assertThat(orderResult.confidence()).isEqualTo(ConfidenceLevel.EXPLICIT)
+#   assertThat(orderResult.matchedCriteria()).isEqualTo("explicit-aggregate-root")
+#   assertThat(orderIdResult.kind()).isEqualTo(ElementKind.IDENTIFIER.name())
+#   assertThat(orderIdResult.matchedCriteria()).isEqualTo("record-single-id")
+#   assertThat(lineItemResult.kind()).isEqualTo(ElementKind.ENTITY.name())
+#   assertThat(lineItemResult.confidence()).isEqualTo(ConfidenceLevel.EXPLICIT)
+#   assertThat(lineItemResult.matchedCriteria()).isEqualTo("explicit-entity")
+#   assertThat(locationResult.kind()).isEqualTo(ElementKind.VALUE_OBJECT.name())
+#   assertThat(locationResult.confidence()).isEqualTo(ConfidenceLevel.EXPLICIT)
+#   assertThat(locationResult.matchedCriteria()).isEqualTo("explicit-value-object")
+#   assertThat(orderRepoResult.kind()).isEqualTo(PortKind.REPOSITORY.name())
+#   assertThat(orderRepoResult.confidence()).isEqualTo(ConfidenceLevel.EXPLICIT)
+#   assertThat(orderRepoResult.portDirection()).isEqualTo(PortDirection.DRIVEN)
+
+status: draft
+# the assertions name no single subject; decide by hand

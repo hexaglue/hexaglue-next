@@ -1,0 +1,17 @@
+# ClassificationConfigIntegrationTest#multipleExclusionPatternsShouldAllBeApplied
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(results.get(NodeId.type("com.example.Order"))).isPresent()
+#   assertThat(results.get(NodeId.type("com.example.OrderException"))).isEmpty()
+#   assertThat(results.get(NodeId.type("com.example.OrderCreatedEvent"))) .isEmpty()
+
+status: draft
+# CONDITIONAL: the legacy test configured the classifier, and the corpus does not
+# carry that configuration yet. The expectation below holds only under it.
+# the legacy engine returned no verdict at all on this type. v7 owes a verdict to
+# every type of the perimeter (A5), so the counterpart of absent is unclassified —
+# unless the type is out of scope, which is a different statement.
+expect: com.example.Order = UNCLASSIFIED

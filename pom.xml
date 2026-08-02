@@ -36,6 +36,7 @@
         <module>hexaglue-knowledge</module>
         <module>hexaglue-engine</module>
         <module>hexaglue-testkit</module>
+        <module>hexaglue-acceptance</module>
     </modules>
 
     <properties>

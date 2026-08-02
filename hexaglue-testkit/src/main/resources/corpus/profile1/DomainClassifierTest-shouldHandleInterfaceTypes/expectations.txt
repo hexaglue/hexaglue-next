@@ -1,0 +1,10 @@
+# DomainClassifierTest#shouldHandleInterfaceTypes
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(result.isUnclassified()).isTrue()
+
+status: draft
+expect: com.example.OrderService = UNCLASSIFIED

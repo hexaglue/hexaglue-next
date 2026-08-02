@@ -1,0 +1,13 @@
+# ClassificationContractTest#singlePassClassifierDeterministic
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(results.allClassifications().size()) .as("Run %d: result count should be identical", run) .isEqualTo(firstResults.allClassifications().size())
+#   assertThat(actual) .as("Run %d: result for %s", run, entry.getKey()) .isNotNull()
+#   assertThat(actual.kind()) .as("Run %d: kind for %s", run, entry.getKey()) .isEqualTo(expected.kind())
+#   assertThat(actual.matchedCriteria()) .as("Run %d: criteria for %s", run, entry.getKey()) .isEqualTo(expected.matchedCriteria())
+
+status: draft
+# the assertions name no single subject; decide by hand

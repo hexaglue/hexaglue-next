@@ -1,0 +1,16 @@
+# DomainClassifierTest#shouldClassifySubclassWhenParentIsRepositoryManaged
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(parentResult.isClassified()) .as("Parent should be classified as AGGREGATE_ROOT via repository") .isTrue()
+#   assertThat(parentResult.kind()).isEqualTo("AGGREGATE_ROOT")
+#   assertThat(parentResult.matchedCriteria()).isEqualTo("repository-dominant")
+#   assertThat(childResult.isClassified()) .as("Subclass should inherit AGGREGATE_ROOT classification from repository-managed parent") .isTrue()
+#   assertThat(childResult.kind()).isEqualTo("AGGREGATE_ROOT")
+#   assertThat(childResult.matchedCriteria()) .as("Should use inherited-classification criteria") .isEqualTo("inherited-classification")
+#   assertThat(childResult.confidence()).isEqualTo(ConfidenceLevel.HIGH)
+
+status: draft
+# the assertions name no single subject; decide by hand

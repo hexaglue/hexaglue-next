@@ -1,0 +1,14 @@
+# ClassificationContractTest#customCriteriaPriorityWins
+#
+# Drafted from the legacy assertions below. The legacy engine is an observation,
+# never an oracle: it carries confirmed bugs, and v7 doctrine (D7, D8) deliberately
+# changes some verdicts. Read, correct, then set status to reviewed.
+#
+#   assertThat(result.isClassified()).isTrue()
+#   assertThat(result.kind()).isEqualTo("ENTITY")
+#   assertThat(result.matchedPriority()).isEqualTo(100)
+#   assertThat(result.matchedCriteria()).isEqualTo("high-priority-low")
+#   assertThat(result.confidence()).isEqualTo(ConfidenceLevel.LOW)
+
+status: draft
+expect: com.example.TestType = ENTITY

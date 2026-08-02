@@ -34,6 +34,11 @@ public final class Catalogue {
      * @return the rules
      */
     public static List<Rule> all() {
-        return List.of(new AssertKnowledge(), new ConfiguredKind(), new DeclaredKind(), new RepositorySubject());
+        return List.of(
+                new AssertKnowledge(),
+                new ConfiguredKind(),
+                new DeclaredKind(),
+                new LocalShape(),
+                new RepositorySubject());
     }
 }

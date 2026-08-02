@@ -1,0 +1,16 @@
+# PortBoundary-contractOnlyTheRingCallsIsNotAPort
+#
+# Authored for the boundary of the hexagon. The vocabulary is deliberately
+# unconventional: what makes an interface a port is who writes it and who calls
+# it, never the word its name ends with or the package it sits in.
+
+# A port is the core reaching outward. Here the only caller is already outside - it holds a
+# persistence tool, so the first wave places it on the ring - and one part of the outside
+# calling another says nothing about where the hexagon ends.
+#
+# The reading is withdrawn rather than never made: on the first round nothing is placed yet
+# and the caller counts as core, so the contract does read as a way out. The round after, the
+# ring is known and the reading loses its ground.
+status: reviewed
+expect: com.acme.hangar.store.HangarBooks = DRIVEN_ADAPTER
+expect: com.acme.hangar.core.Ledger = UNCLASSIFIED

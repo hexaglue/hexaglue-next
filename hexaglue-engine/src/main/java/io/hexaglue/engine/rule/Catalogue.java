@@ -42,6 +42,10 @@ public final class Catalogue {
                 new LocalShape(),
                 new RepositorySubject(),
                 new FrameworkEntryPoint(),
-                new InfrastructureDependency());
+                new InfrastructureDependency(),
+                new PortImplementation(),
+                new ConsumedContract(),
+                new ExposedContract(),
+                new PortSignatures());
     }
 }

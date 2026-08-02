@@ -1,0 +1,3 @@
+com/acme/hangar/core/Assembly.java
+com/acme/hangar/core/AssemblyLine.java
+com/acme/hangar/web/HangarDoor.java

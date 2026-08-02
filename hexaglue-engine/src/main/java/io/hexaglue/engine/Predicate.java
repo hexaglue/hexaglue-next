@@ -32,7 +32,10 @@ public enum Predicate {
     EVIDENCE(KindEvidence.class),
 
     /** A tie between two types: which aggregate a port manages, what carries an identity. */
-    RELATION(Relation.class);
+    RELATION(Relation.class),
+
+    /** The trade a driven port plies: storage, publication, or a call to something else. */
+    PORT_ROLE(PortRole.class);
 
     // Class is immutable; the checker only sees a field of a non-final type.
     @SuppressWarnings("ImmutableEnumChecker")

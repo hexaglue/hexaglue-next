@@ -1,0 +1,16 @@
+# PortBoundary-contractTheCoreAlsoWritesIsNotAPort
+#
+# Authored for the boundary of the hexagon. The vocabulary is deliberately
+# unconventional: what makes an interface a port is who writes it and who calls
+# it, never the word its name ends with or the package it sits in.
+
+# The anti-rule, in a fixture. The wiring is one implementation away from the scenario above,
+# and that one difference is the whole difference: the core both calls this contract and
+# answers it, so it is a seam between two pieces of the core rather than a hole in its wall.
+#
+# The implementer carries no framework symbol, which is exactly why it cannot be read as the
+# far side of anything. Silence here is the correct verdict, not a gap waiting for a rule.
+status: reviewed
+expect: com.acme.hangar.core.Ledger = UNCLASSIFIED
+expect: com.acme.hangar.core.LedgerBook = UNCLASSIFIED
+expect: com.acme.hangar.core.Checkout = UNCLASSIFIED

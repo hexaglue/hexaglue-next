@@ -26,7 +26,7 @@ import io.hexaglue.model.classification.ProofNode;
  *
  * @since 7.0.0
  */
-public sealed interface Fact permits KnowledgeAssertion, KindEvidence, Relation {
+public sealed interface Fact permits KnowledgeAssertion, KindEvidence, PortRole, Relation {
 
     /**
      * Returns the predicate this fact belongs to. Rules declare the predicates they read and

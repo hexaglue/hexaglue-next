@@ -1,0 +1,16 @@
+# PortBoundary-contractTheCoreCallsIsADrivenPort
+#
+# Authored for the boundary of the hexagon. The vocabulary is deliberately
+# unconventional: what makes an interface a port is who writes it and who calls
+# it, never the word its name ends with or the package it sits in.
+
+# Nothing here declares anything and no framework symbol appears. What makes the interface a
+# way out is the position it holds: a type of the core keeps it as a collaborator, and no
+# implementation of it lives in the perimeter, so whatever answers those calls is outside.
+#
+# The caller itself stays undecided. Its single final field reads as a value and as an
+# identity at once, neither wins, and what would settle it - being the pivot between a port
+# and the domain - belongs to the wave after this one.
+status: reviewed
+expect: com.acme.hangar.core.Ledger = DRIVEN_PORT
+expect: com.acme.hangar.core.Checkout = UNCLASSIFIED

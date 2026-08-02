@@ -18,7 +18,6 @@ import io.hexaglue.engine.KindEvidence;
 import io.hexaglue.engine.Predicate;
 import io.hexaglue.engine.Rule;
 import io.hexaglue.model.ArchKind;
-import io.hexaglue.model.Modifier;
 import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.classification.Evidence;
 import io.hexaglue.model.classification.EvidenceTier;
@@ -69,8 +68,8 @@ public final class LocalShape implements Rule {
     @Override
     public void apply(Derivation derivation) {
         for (TypeNode type : derivation.perimeter().types()) {
-            List<Field> state = stateOf(type);
-            boolean immutable = isImmutable(type, state);
+            List<Field> state = Shapes.state(type);
+            boolean immutable = Shapes.isImmutable(type);
             if (immutable) {
                 speak(derivation, type, ArchKind.VALUE_OBJECT, "IMMUTABLE_SHAPE", reasonForImmutability(type));
             }
@@ -86,29 +85,6 @@ public final class LocalShape implements Rule {
                                 + ", which is how an identity is written");
             }
         }
-    }
-
-    /**
-     * The fields that make up the state of a declaration. A static field belongs to the type, not
-     * to its instances, and says nothing about what the instances are.
-     */
-    private static List<Field> stateOf(TypeNode type) {
-        return type.fields().stream()
-                .filter(field -> !field.modifiers().contains(Modifier.STATIC))
-                .toList();
-    }
-
-    private static boolean isImmutable(TypeNode type, List<Field> state) {
-        return switch (type.nature()) {
-            case RECORD -> !state.isEmpty();
-            case ENUM -> true;
-            case CLASS ->
-                !state.isEmpty()
-                        && state.stream().allMatch(field -> field.modifiers().contains(Modifier.FINAL));
-            // An interface holds no state and an annotation is a declaration about other
-            // declarations: neither has a shape that says what it is.
-            case INTERFACE, ANNOTATION -> false;
-        };
     }
 
     private static String reasonForImmutability(TypeNode type) {

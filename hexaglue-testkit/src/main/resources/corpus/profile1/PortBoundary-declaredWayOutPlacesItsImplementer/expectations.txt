@@ -1,0 +1,15 @@
+# PortBoundary-declaredWayOutPlacesItsImplementer
+#
+# Authored for the boundary of the hexagon. The vocabulary is deliberately
+# unconventional: what makes an interface a port is who writes it and who calls
+# it, never the word its name ends with or the package it sits in.
+
+# The wave read backwards. The author declared the contract a way out, and the type answering
+# it carries nothing at all - no annotation, no vendor tool, no name worth reading. What
+# places it on the ring is the port it fulfils, and nothing else.
+#
+# This is what a codebase already hexagonal offers: its adapters are plain Java, and the only
+# fact about their position is the boundary they sit against.
+status: reviewed
+expect: com.acme.hangar.core.Ledger = DRIVEN_PORT
+expect: com.acme.hangar.store.LedgerBook = DRIVEN_ADAPTER

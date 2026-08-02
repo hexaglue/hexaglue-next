@@ -106,6 +106,20 @@ class LocalShapeTest {
         }
 
         @Test
+        @DisplayName("as a value object, past a static field, which belongs to the type and not to its values")
+        void pastAStaticField() {
+            // A constant or a cached instance sits on the class; it is not part of what an
+            // instance is, and letting it count would make every type holding one mutable.
+            assertThat(shapesOf(
+                            TypeNature.CLASS,
+                            List.of(
+                                    field("cache", "java.lang.String", Modifier.STATIC),
+                                    finalField("amount", "long"),
+                                    finalField("currency", "java.lang.String"))))
+                    .containsExactly(ArchKind.VALUE_OBJECT);
+        }
+
+        @Test
         @DisplayName("as a value object, when the declaration is an enum")
         void anEnumIsAValueObject() {
             assertThat(shapesOf(TypeNature.ENUM, List.of())).containsExactly(ArchKind.VALUE_OBJECT);

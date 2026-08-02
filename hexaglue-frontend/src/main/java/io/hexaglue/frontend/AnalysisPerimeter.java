@@ -28,6 +28,13 @@ import spoon.reflect.declaration.CtType;
  * it the generator's conventions instead of the author's intent. Generated types are recognized
  * by the fully qualified name of their marker annotation, never by a name pattern.</p>
  *
+ * <p>Keeping generated code out here rather than judging it later is deliberate, and it was
+ * measured: a build tool hands an analysis every source root it compiles, generated ones included,
+ * so an emitted adapter would come back implementing the port its author wrote. The rules would
+ * then read that port as one the core implements — a seam rather than a boundary — and the port,
+ * along with the service calling it, would lose its reading on the second run over unchanged
+ * sources. What a generator wrote must not be able to change what its author's code means.</p>
+ *
  * <p>A type left out is not erased from the world: it still becomes an external stub when
  * something inside the perimeter refers to it.</p>
  */

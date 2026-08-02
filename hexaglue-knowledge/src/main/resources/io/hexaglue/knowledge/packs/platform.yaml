@@ -3,7 +3,9 @@
 pack: platform
 description: Code generators, logging and standalone HTTP clients, which nearly every classpath carries.
 entries:
-  # Written by a generator, and therefore nobody's declared intent.
+  # Written by a generator, and therefore nobody's declared intent. No analyzed type reaches
+  # these two entries: the reading frontend keeps generated code out of the model entirely, so
+  # the markers are named here only so that a report could one day count what was left out.
   - annotation: javax.annotation.processing.Generated
     emits: GENERATED_CODE
   - annotation: lombok.Generated

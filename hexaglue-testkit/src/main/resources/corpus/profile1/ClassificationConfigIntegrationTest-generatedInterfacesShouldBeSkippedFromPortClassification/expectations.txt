@@ -11,10 +11,13 @@
 # and owes it no verdict. Re-reading what a generator emitted would teach the tool the
 # generator's conventions instead of the author's intent.
 #
-# Worth noting as a divergence: the stated doctrine of the engine foresees generated code
-# as an UNCLASSIFIED carrying the GENERATED_CODE category, and the jakarta pack carries such
-# an entry, which no source type can trigger while the frontend filters first. It states
-# what is delivered; which of the two wins is still open.
+# This is settled doctrine, not an accident of the delivery. An emitted adapter handed back
+# to the analysis would implement the port its author wrote, and the rules would read that
+# port as a seam rather than a boundary: the port, and the service calling it, would lose
+# their reading on a second run over unchanged sources. Recognizing generated code is a
+# question of what is read, settled before any fact is stated. The GENERATED_CODE entries of
+# the packs stay declared without a possible subject, against the day a report has to say how
+# much was left out.
 #
 # The hand-written interface next to it is undecided for the ordinary reason: nobody
 # implements it and nobody consumes it.

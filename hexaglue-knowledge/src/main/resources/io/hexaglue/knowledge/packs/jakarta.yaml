@@ -53,7 +53,9 @@ entries:
   - package-prefix: javax.validation
     emits: NEUTRAL
 
-  # Written by a generator, and therefore nobody's declared intent.
+  # Written by a generator, and therefore nobody's declared intent. As in the platform pack, no
+  # analyzed type reaches these entries: generated code never enters the model. The markers are
+  # named so that a report could one day count what was left out.
   - annotation: jakarta.annotation.Generated
     emits: GENERATED_CODE
   - annotation: javax.annotation.Generated

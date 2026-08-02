@@ -70,7 +70,17 @@ public enum KnowledgeFact {
      */
     INFRA_DEPENDENCY(EvidenceTier.FRAMEWORK_KNOWLEDGE, List.of()),
 
-    /** The type was produced by a generator, and is nobody's architectural intent. */
+    /**
+     * The type was produced by a generator, and is nobody's architectural intent.
+     *
+     * <p>No type of an analysis carries this fact today, and that is deliberate rather than an
+     * oversight: what a generator emitted never enters the code model, because reading it back
+     * would let a tool's own output decide the reading of the code its author wrote. Recognizing
+     * generated code is therefore a question of what is analyzed, settled by the reading frontend
+     * before any fact is stated. The vocabulary is kept here for the day a report has to say how
+     * much was left out — the packs already name the markers, so answering that question would
+     * cost a scope, not a doctrine.</p>
+     */
     GENERATED_CODE(EvidenceTier.FRAMEWORK_KNOWLEDGE, List.of());
 
     private final EvidenceTier tier;

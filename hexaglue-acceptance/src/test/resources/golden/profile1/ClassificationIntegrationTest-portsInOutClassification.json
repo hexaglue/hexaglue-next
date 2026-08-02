@@ -1,0 +1,42 @@
+{
+  "domain": [],
+  "application": [],
+  "ports": [
+    {
+      "qualifiedName": "com.example.infrastructure.PaymentGateway",
+      "direction": "DRIVEN",
+      "portType": "GATEWAY",
+      "managedAggregate": null,
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "methods": ["charge"]
+    },
+    {
+      "qualifiedName": "com.example.ports.in.PlaceOrderUseCase",
+      "direction": "DRIVING",
+      "useCases": ["forOrder: COMMAND"],
+      "inputTypes": [],
+      "outputTypes": [],
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "methods": ["forOrder"]
+    },
+    {
+      "qualifiedName": "com.example.ports.out.OrderRepository",
+      "direction": "DRIVEN",
+      "portType": "GATEWAY",
+      "managedAggregate": null,
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "methods": ["findById", "save"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.example.domain.Order",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.example.Money",
+      "kind": "VALUE_OBJECT",
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "nature": "CLASS",
+      "properties": [
+        {
+          "name": "amount",
+          "type": "int",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "currency",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "id",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": []
+}

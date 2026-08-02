@@ -1,0 +1,13 @@
+{
+  "domain": [],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.example.Orphan",
+      "category": "AMBIGUOUS",
+      "reason": "two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "domain": [],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.example.Inventory",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    },
+    {
+      "qualifiedName": "com.example.StockMovement",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    }
+  ]
+}

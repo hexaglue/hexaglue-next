@@ -1,0 +1,27 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.example.PaymentReceivedEvent",
+      "kind": "VALUE_OBJECT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "properties": [
+        {
+          "name": "amount",
+          "type": "double",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "paymentId",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": []
+}

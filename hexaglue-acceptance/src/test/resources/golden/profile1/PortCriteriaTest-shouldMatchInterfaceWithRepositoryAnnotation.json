@@ -1,0 +1,17 @@
+{
+  "domain": [],
+  "application": [],
+  "ports": [
+    {
+      "qualifiedName": "com.example.OrderRepository",
+      "direction": "DRIVEN",
+      "portType": "GATEWAY",
+      "managedAggregate": null,
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "methods": ["save"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": []
+}

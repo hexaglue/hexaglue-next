@@ -13,51 +13,35 @@
 
 package io.hexaglue.acceptance;
 
-import io.hexaglue.engine.Classifier;
-import io.hexaglue.engine.EngineContext;
-import io.hexaglue.engine.Verdicts;
-import io.hexaglue.frontend.FrontendRequest;
-import io.hexaglue.frontend.SpoonFrontend;
-import io.hexaglue.knowledge.KnowledgePacks;
 import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.TypeId;
-import io.hexaglue.model.code.CodeModel;
-import io.hexaglue.model.config.AnalysisScope;
-import io.hexaglue.model.config.ClassificationConfig;
-import io.hexaglue.model.config.GenerationConfig;
-import io.hexaglue.model.config.HexaGlueConfig;
-import io.hexaglue.model.config.ValidationConfig;
+import io.hexaglue.model.arch.ArchModel;
+import io.hexaglue.model.arch.ArchType;
 import io.hexaglue.testkit.corpus.CorpusExpectations;
 import io.hexaglue.testkit.corpus.CorpusScenario;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * One corpus scenario run through the whole chain: sources on disk, the frontend, the engine, and
- * the verdicts compared to what the scenario is held to mean.
+ * One corpus scenario run through the whole chain, and what the scenario is held to mean compared
+ * to what came out.
  *
- * <p>This is the only place that wires the frontend to the engine. Neither depends on the other —
- * the boundary between them is the code model — so the harness that needs both lives outside both.
+ * <p>The comparison is made against the model rather than against the verdicts alone, so the
+ * scoreboard and the golden files score the same thing: a scenario cannot pass here while its
+ * snapshot says something else.</p>
  */
-record CorpusRun(CorpusScenario scenario, Verdicts verdicts) {
+record CorpusRun(CorpusScenario scenario, ArchModel model) {
 
     /**
      * Materializes the scenario, analyzes it and classifies it.
      *
      * @param scenario the scenario to run
      * @param workspace the directory receiving its sources
-     * @return the run, with the verdicts the engine reached
+     * @return the run, with the model the chain produced
      */
     static CorpusRun of(CorpusScenario scenario, Path workspace) {
-        Path sources = scenario.materialize(workspace);
-        AnalysisScope scope = new AnalysisScope(Optional.of(scenario.basePackage()), List.of(), List.of());
-        CodeModel code = SpoonFrontend.analyze(
-                FrontendRequest.builder().sourceRoot(sources).scope(scope).build());
-        HexaGlueConfig config = new HexaGlueConfig(
-                scope, ClassificationConfig.defaults(), ValidationConfig.defaults(), GenerationConfig.defaults());
-        return new CorpusRun(scenario, Classifier.classify(EngineContext.of(code, KnowledgePacks.embedded(), config)));
+        return new CorpusRun(scenario, AnalysisChain.modelOf(scenario.materialize(workspace), scenario.basePackage()));
     }
 
     /**
@@ -69,7 +53,8 @@ record CorpusRun(CorpusScenario scenario, Verdicts verdicts) {
         List<String> unmet = new ArrayList<>();
         for (CorpusExpectations.Claim claim :
                 CorpusExpectations.profile1(scenario.id()).claims()) {
-            String actual = verdicts.kindOf(TypeId.of(claim.qualifiedName()))
+            String actual = model.type(TypeId.of(claim.qualifiedName()))
+                    .map(ArchType::kind)
                     .map(ArchKind::name)
                     .orElse("NO VERDICT");
             if (!claim.isSatisfiedBy(actual)) {

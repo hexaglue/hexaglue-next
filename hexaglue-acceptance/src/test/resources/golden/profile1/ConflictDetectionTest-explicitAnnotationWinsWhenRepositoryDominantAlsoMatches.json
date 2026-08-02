@@ -1,0 +1,33 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.example.Customer",
+      "kind": "AGGREGATE_ROOT",
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "nature": "CLASS",
+      "identity": null,
+      "entities": [],
+      "valueObjects": [],
+      "domainEvents": [],
+      "drivenPort": null,
+      "properties": [
+        {
+          "name": "id",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.example.CustomerRepository",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    }
+  ]
+}

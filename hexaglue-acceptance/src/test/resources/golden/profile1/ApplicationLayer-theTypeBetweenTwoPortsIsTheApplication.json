@@ -1,0 +1,43 @@
+{
+  "domain": [],
+  "application": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Checkout",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Boarding",
+      "direction": "DRIVING",
+      "useCases": ["board: COMMAND"],
+      "inputTypes": [],
+      "outputTypes": [],
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["board"]
+    },
+    {
+      "qualifiedName": "com.acme.hangar.core.Ledger",
+      "direction": "DRIVEN",
+      "portType": "GATEWAY",
+      "managedAggregate": null,
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["locate"]
+    }
+  ],
+  "adapters": [
+    {
+      "qualifiedName": "com.acme.hangar.web.HangarDoor",
+      "direction": "DRIVING",
+      "ports": ["com.acme.hangar.core.Boarding"],
+      "confidence": "HIGH",
+      "basis": "INFERRED"
+    }
+  ],
+  "unclassified": []
+}

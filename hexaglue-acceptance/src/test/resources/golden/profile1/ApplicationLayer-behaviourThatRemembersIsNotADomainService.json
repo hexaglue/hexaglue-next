@@ -1,0 +1,57 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Fleet",
+      "kind": "VALUE_OBJECT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "properties": [
+        {
+          "name": "hulls",
+          "type": "int",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "reference",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.acme.hangar.core.Manifest",
+      "kind": "VALUE_OBJECT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "properties": [
+        {
+          "name": "code",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "weight",
+          "type": "int",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Checkout",
+      "category": "AMBIGUOUS",
+      "reason": "two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT"
+    },
+    {
+      "qualifiedName": "com.acme.hangar.core.Dispatch",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    }
+  ]
+}

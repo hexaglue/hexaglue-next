@@ -1,0 +1,75 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.example.order.domain.Order",
+      "kind": "AGGREGATE_ROOT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS",
+      "identity": {
+        "field": "id",
+        "type": "com.example.order.domain.OrderId",
+        "effectiveType": "java.util.UUID"
+      },
+      "entities": [],
+      "valueObjects": [],
+      "domainEvents": [],
+      "drivenPort": "com.example.order.ports.out.OrderRepository",
+      "properties": [
+        {
+          "name": "id",
+          "type": "com.example.order.domain.OrderId",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "product",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.example.order.domain.OrderId",
+      "kind": "IDENTIFIER",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "wrappedType": "java.util.UUID",
+      "properties": [
+        {
+          "name": "value",
+          "type": "java.util.UUID",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [
+    {
+      "qualifiedName": "com.example.order.application.OrderService",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
+    {
+      "qualifiedName": "com.example.order.ports.out.OrderRepository",
+      "direction": "DRIVEN",
+      "portType": "REPOSITORY",
+      "managedAggregate": "com.example.order.domain.Order",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["findById", "save"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.example.order.ports.in.OrderUseCases",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    }
+  ]
+}

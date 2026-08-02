@@ -1,0 +1,27 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.example.CompoundId",
+      "kind": "VALUE_OBJECT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "properties": [
+        {
+          "name": "id",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "tenant",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": []
+}

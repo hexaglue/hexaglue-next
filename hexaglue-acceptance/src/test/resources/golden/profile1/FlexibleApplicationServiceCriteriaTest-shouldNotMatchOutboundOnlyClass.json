@@ -1,0 +1,25 @@
+{
+  "domain": [],
+  "application": [
+    {
+      "qualifiedName": "com.example.application.BackgroundProcessor",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
+    {
+      "qualifiedName": "com.example.ports.out.NotificationGateway",
+      "direction": "DRIVEN",
+      "portType": "GATEWAY",
+      "managedAggregate": null,
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["send"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": []
+}

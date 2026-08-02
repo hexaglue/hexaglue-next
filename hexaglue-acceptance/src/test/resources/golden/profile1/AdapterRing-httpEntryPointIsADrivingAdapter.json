@@ -1,0 +1,21 @@
+{
+  "domain": [],
+  "application": [],
+  "ports": [],
+  "adapters": [
+    {
+      "qualifiedName": "com.acme.hangar.web.HangarDoor",
+      "direction": "DRIVING",
+      "ports": [],
+      "confidence": "HIGH",
+      "basis": "INFERRED"
+    }
+  ],
+  "unclassified": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Assembly",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    }
+  ]
+}

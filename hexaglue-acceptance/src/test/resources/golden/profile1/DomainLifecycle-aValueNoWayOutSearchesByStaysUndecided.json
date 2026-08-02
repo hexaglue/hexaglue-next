@@ -1,0 +1,80 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Fleet",
+      "kind": "AGGREGATE_ROOT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS",
+      "identity": {
+        "field": "tag",
+        "type": "com.acme.hangar.core.FleetTag",
+        "effectiveType": "java.lang.String"
+      },
+      "entities": [],
+      "valueObjects": [],
+      "domainEvents": [],
+      "drivenPort": "com.acme.hangar.core.Ledger",
+      "properties": [
+        {
+          "name": "berth",
+          "type": "com.acme.hangar.core.Berth",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "reference",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "tag",
+          "type": "com.acme.hangar.core.FleetTag",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.acme.hangar.core.FleetTag",
+      "kind": "IDENTIFIER",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "wrappedType": "java.lang.String",
+      "properties": [
+        {
+          "name": "value",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Checkout",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Ledger",
+      "direction": "DRIVEN",
+      "portType": "REPOSITORY",
+      "managedAggregate": "com.acme.hangar.core.Fleet",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["keep", "locate"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Berth",
+      "category": "AMBIGUOUS",
+      "reason": "two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.example.OrderId",
+      "kind": "IDENTIFIER",
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "nature": "RECORD",
+      "wrappedType": "java.lang.String",
+      "properties": [
+        {
+          "name": "value",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": []
+}

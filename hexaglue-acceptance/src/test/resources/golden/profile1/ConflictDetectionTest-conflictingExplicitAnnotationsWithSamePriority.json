@@ -1,0 +1,13 @@
+{
+  "domain": [],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.example.Ambiguous",
+      "category": "AMBIGUOUS",
+      "reason": "two readings were left standing with nothing between them: ENTITY and VALUE_OBJECT"
+    }
+  ]
+}

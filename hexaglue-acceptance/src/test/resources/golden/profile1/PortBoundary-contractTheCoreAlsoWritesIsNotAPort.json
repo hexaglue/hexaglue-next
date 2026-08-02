@@ -1,0 +1,23 @@
+{
+  "domain": [],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Checkout",
+      "category": "AMBIGUOUS",
+      "reason": "two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT"
+    },
+    {
+      "qualifiedName": "com.acme.hangar.core.Ledger",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    },
+    {
+      "qualifiedName": "com.acme.hangar.core.LedgerBook",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    }
+  ]
+}

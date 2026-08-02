@@ -1,0 +1,87 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Fleet",
+      "kind": "AGGREGATE_ROOT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS",
+      "identity": {
+        "field": "tag",
+        "type": "com.acme.hangar.core.FleetTag",
+        "effectiveType": "java.lang.String"
+      },
+      "entities": [],
+      "valueObjects": [],
+      "domainEvents": [],
+      "drivenPort": "com.acme.hangar.core.Ledger",
+      "properties": [
+        {
+          "name": "reference",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "tag",
+          "type": "com.acme.hangar.core.FleetTag",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.acme.hangar.core.FleetTag",
+      "kind": "IDENTIFIER",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "wrappedType": "java.lang.String",
+      "properties": [
+        {
+          "name": "value",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Checkout",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Boarding",
+      "direction": "DRIVING",
+      "useCases": ["board: COMMAND"],
+      "inputTypes": ["com.acme.hangar.core.FleetTag"],
+      "outputTypes": [],
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["board"]
+    },
+    {
+      "qualifiedName": "com.acme.hangar.core.Ledger",
+      "direction": "DRIVEN",
+      "portType": "REPOSITORY",
+      "managedAggregate": "com.acme.hangar.core.Fleet",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["keep", "locate"]
+    }
+  ],
+  "adapters": [
+    {
+      "qualifiedName": "com.acme.hangar.web.HangarDoor",
+      "direction": "DRIVING",
+      "ports": ["com.acme.hangar.core.Boarding"],
+      "confidence": "HIGH",
+      "basis": "INFERRED"
+    }
+  ],
+  "unclassified": []
+}

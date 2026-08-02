@@ -23,14 +23,18 @@ import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.arch.AggregateRoot;
 import io.hexaglue.model.arch.ApplicationService;
 import io.hexaglue.model.arch.ArchModel;
+import io.hexaglue.model.arch.DomainEvent;
+import io.hexaglue.model.arch.DomainService;
 import io.hexaglue.model.arch.DrivenAdapter;
 import io.hexaglue.model.arch.DrivenPort;
 import io.hexaglue.model.arch.DrivenPortType;
 import io.hexaglue.model.arch.DrivingAdapter;
 import io.hexaglue.model.arch.DrivingPort;
+import io.hexaglue.model.arch.Entity;
 import io.hexaglue.model.arch.Identifier;
 import io.hexaglue.model.arch.TypeStructure;
 import io.hexaglue.model.arch.UnclassifiedType;
+import io.hexaglue.model.arch.UseCase;
 import io.hexaglue.model.classification.Basis;
 import io.hexaglue.model.classification.Classification;
 import io.hexaglue.model.classification.Confidence;
@@ -75,11 +79,30 @@ class ArchModelSnapshotsTest {
                 verdict(ArchKind.AGGREGATE_ROOT),
                 Optional.of(identity),
                 Optional.of(TypeRef.of("java.util.UUID")),
-                List.of(),
-                List.of(),
-                List.of(),
+                List.of(TypeRef.of("com.shop.OrderLine")),
+                List.of(TypeRef.of("com.shop.Money")),
+                List.of(TypeRef.of("com.shop.OrderPlaced")),
                 Optional.of(TypeRef.of("com.shop.OrderRepository")),
                 List.of());
+        Entity orderLine = new Entity(
+                TypeId.of("com.shop.OrderLine"),
+                TypeStructure.builder(TypeNature.CLASS).build(),
+                verdict(ArchKind.ENTITY),
+                Optional.of(identity),
+                Optional.of(TypeRef.of("com.shop.Order")));
+        DomainEvent orderPlaced = new DomainEvent(
+                TypeId.of("com.shop.OrderPlaced"),
+                TypeStructure.builder(TypeNature.RECORD).build(),
+                verdict(ArchKind.DOMAIN_EVENT),
+                Optional.of(identity),
+                Optional.empty(),
+                Optional.of(TypeRef.of("com.shop.Order")));
+        DomainService pricing = new DomainService(
+                TypeId.of("com.shop.Pricing"),
+                TypeStructure.builder(TypeNature.CLASS).build(),
+                verdict(ArchKind.DOMAIN_SERVICE),
+                List.of(TypeRef.of("com.shop.OrderRepository")),
+                List.of(Method.of("quote", TypeRef.of("com.shop.Money"))));
         Identifier orderId = new Identifier(
                 TypeId.of("com.shop.OrderId"),
                 TypeStructure.builder(TypeNature.RECORD).build(),
@@ -99,15 +122,16 @@ class ArchModelSnapshotsTest {
                 verdict(ArchKind.DRIVEN_PORT),
                 DrivenPortType.REPOSITORY,
                 Optional.of(TypeRef.of("com.shop.Order")));
+        Method execute = Method.of("execute", TypeRef.of("com.shop.Order"));
         DrivingPort placeOrder = new DrivingPort(
                 TypeId.of("com.shop.PlaceOrder"),
                 TypeStructure.builder(TypeNature.INTERFACE)
-                        .methods(List.of(Method.of("execute", TypeRef.of("com.shop.Order"))))
+                        .methods(List.of(execute))
                         .build(),
                 verdict(ArchKind.DRIVING_PORT),
-                List.of(),
-                List.of(),
-                List.of());
+                List.of(new UseCase(execute, Optional.empty(), UseCase.UseCaseType.QUERY)),
+                List.of(TypeRef.of("com.shop.OrderId")),
+                List.of(TypeRef.of("com.shop.Order")));
         DrivenAdapter jpaRepository = new DrivenAdapter(
                 TypeId.of("com.shop.JpaOrderRepository"),
                 TypeStructure.builder(TypeNature.CLASS).build(),
@@ -123,9 +147,12 @@ class ArchModelSnapshotsTest {
                 TypeStructure.builder(TypeNature.CLASS).build(),
                 verdict(ArchKind.UNCLASSIFIED),
                 UnclassifiedType.UnclassifiedCategory.UTILITY,
-                Optional.empty());
+                Optional.of("nothing in the perimeter uses it"));
         return ArchModel.builder()
                 .addType(order)
+                .addType(orderLine)
+                .addType(orderPlaced)
+                .addType(pricing)
                 .addType(orderId)
                 .addType(checkout)
                 .addType(repository)
@@ -154,8 +181,13 @@ class ArchModelSnapshotsTest {
                           "nature": "CLASS",
                           "identity": {
                             "field": "id",
-                            "type": "com.shop.OrderId"
+                            "type": "com.shop.OrderId",
+                            "effectiveType": "java.util.UUID"
                           },
+                          "entities": ["com.shop.OrderLine"],
+                          "valueObjects": ["com.shop.Money"],
+                          "domainEvents": ["com.shop.OrderPlaced"],
+                          "drivenPort": "com.shop.OrderRepository",
                           "properties": [
                             {
                               "name": "id",
@@ -177,6 +209,41 @@ class ArchModelSnapshotsTest {
                           "nature": "RECORD",
                           "wrappedType": "java.util.UUID",
                           "properties": []
+                        },
+                        {
+                          "qualifiedName": "com.shop.OrderLine",
+                          "kind": "ENTITY",
+                          "confidence": "HIGH",
+                          "basis": "INFERRED",
+                          "nature": "CLASS",
+                          "identity": {
+                            "field": "id",
+                            "type": "com.shop.OrderId"
+                          },
+                          "owningAggregate": "com.shop.Order",
+                          "properties": []
+                        },
+                        {
+                          "qualifiedName": "com.shop.OrderPlaced",
+                          "kind": "DOMAIN_EVENT",
+                          "confidence": "HIGH",
+                          "basis": "INFERRED",
+                          "nature": "RECORD",
+                          "identity": {
+                            "field": "id",
+                            "type": "com.shop.OrderId"
+                          },
+                          "sourceAggregate": "com.shop.Order",
+                          "properties": []
+                        },
+                        {
+                          "qualifiedName": "com.shop.Pricing",
+                          "kind": "DOMAIN_SERVICE",
+                          "confidence": "HIGH",
+                          "basis": "INFERRED",
+                          "nature": "CLASS",
+                          "injectedPorts": ["com.shop.OrderRepository"],
+                          "properties": []
                         }
                       ],
                       "application": [
@@ -193,6 +260,7 @@ class ArchModelSnapshotsTest {
                           "qualifiedName": "com.shop.OrderRepository",
                           "direction": "DRIVEN",
                           "portType": "REPOSITORY",
+                          "managedAggregate": "com.shop.Order",
                           "confidence": "HIGH",
                           "basis": "INFERRED",
                           "methods": ["findById", "save"]
@@ -200,6 +268,9 @@ class ArchModelSnapshotsTest {
                         {
                           "qualifiedName": "com.shop.PlaceOrder",
                           "direction": "DRIVING",
+                          "useCases": ["execute: QUERY"],
+                          "inputTypes": ["com.shop.OrderId"],
+                          "outputTypes": ["com.shop.Order"],
                           "confidence": "HIGH",
                           "basis": "INFERRED",
                           "methods": ["execute"]
@@ -224,7 +295,8 @@ class ArchModelSnapshotsTest {
                       "unclassified": [
                         {
                           "qualifiedName": "com.shop.StringUtils",
-                          "category": "UTILITY"
+                          "category": "UTILITY",
+                          "reason": "nothing in the perimeter uses it"
                         }
                       ]
                     }

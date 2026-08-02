@@ -1,0 +1,28 @@
+{
+  "domain": [],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.example.domain.Task",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    },
+    {
+      "qualifiedName": "com.example.domain.TaskId",
+      "category": "AMBIGUOUS",
+      "reason": "two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT"
+    },
+    {
+      "qualifiedName": "com.example.ports.in.TaskUseCases",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    },
+    {
+      "qualifiedName": "com.example.ports.out.TaskRepository",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    }
+  ]
+}

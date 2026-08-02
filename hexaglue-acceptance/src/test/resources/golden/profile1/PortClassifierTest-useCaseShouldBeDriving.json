@@ -1,0 +1,18 @@
+{
+  "domain": [],
+  "application": [],
+  "ports": [
+    {
+      "qualifiedName": "com.example.PlaceOrderUseCase",
+      "direction": "DRIVING",
+      "useCases": ["execute: COMMAND"],
+      "inputTypes": [],
+      "outputTypes": [],
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "methods": ["execute"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": []
+}

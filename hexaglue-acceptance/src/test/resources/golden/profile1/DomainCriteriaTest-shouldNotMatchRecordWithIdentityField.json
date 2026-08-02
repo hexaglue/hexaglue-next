@@ -1,0 +1,38 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.example.OrderLine",
+      "kind": "VALUE_OBJECT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "properties": [
+        {
+          "name": "id",
+          "type": "java.lang.Long",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "product",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "quantity",
+          "type": "int",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.example.Order",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    }
+  ]
+}

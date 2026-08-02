@@ -1,0 +1,27 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.example.Order",
+      "kind": "AGGREGATE_ROOT",
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "nature": "CLASS",
+      "identity": null,
+      "entities": [],
+      "valueObjects": [],
+      "domainEvents": [],
+      "drivenPort": null,
+      "properties": [
+        {
+          "name": "id",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": []
+}

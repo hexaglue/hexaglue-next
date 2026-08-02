@@ -1,0 +1,25 @@
+{
+  "domain": [],
+  "application": [],
+  "ports": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Ledger",
+      "direction": "DRIVEN",
+      "portType": "GATEWAY",
+      "managedAggregate": null,
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "methods": ["locate"]
+    }
+  ],
+  "adapters": [
+    {
+      "qualifiedName": "com.acme.hangar.store.LedgerBook",
+      "direction": "DRIVEN",
+      "ports": ["com.acme.hangar.core.Ledger"],
+      "confidence": "HIGH",
+      "basis": "INFERRED"
+    }
+  ],
+  "unclassified": []
+}

@@ -1,0 +1,113 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.coffeeshop.domain.order.LineItem",
+      "kind": "VALUE_OBJECT",
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "nature": "RECORD",
+      "properties": [
+        {
+          "name": "productName",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "quantity",
+          "type": "int",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "unitPrice",
+          "type": "java.math.BigDecimal",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.coffeeshop.domain.order.Location",
+      "kind": "VALUE_OBJECT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "ENUM",
+      "properties": []
+    },
+    {
+      "qualifiedName": "com.coffeeshop.domain.order.Order",
+      "kind": "AGGREGATE_ROOT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS",
+      "identity": {
+        "field": "id",
+        "type": "com.coffeeshop.domain.order.OrderId",
+        "effectiveType": "java.util.UUID"
+      },
+      "entities": [],
+      "valueObjects": ["com.coffeeshop.domain.order.LineItem", "com.coffeeshop.domain.order.Location"],
+      "domainEvents": [],
+      "drivenPort": "com.coffeeshop.ports.out.OrderRepository",
+      "properties": [
+        {
+          "name": "customerName",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "id",
+          "type": "com.coffeeshop.domain.order.OrderId",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "items",
+          "type": "java.util.List",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "location",
+          "type": "com.coffeeshop.domain.order.Location",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.coffeeshop.domain.order.OrderId",
+      "kind": "IDENTIFIER",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "wrappedType": "java.util.UUID",
+      "properties": [
+        {
+          "name": "value",
+          "type": "java.util.UUID",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [],
+  "ports": [
+    {
+      "qualifiedName": "com.coffeeshop.ports.in.OrderingCoffee",
+      "direction": "DRIVING",
+      "useCases": ["createOrder: QUERY", "findOrder: QUERY"],
+      "inputTypes": ["com.coffeeshop.domain.order.Location", "com.coffeeshop.domain.order.OrderId"],
+      "outputTypes": ["com.coffeeshop.domain.order.Order"],
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "methods": ["createOrder", "findOrder"]
+    },
+    {
+      "qualifiedName": "com.coffeeshop.ports.out.OrderRepository",
+      "direction": "DRIVEN",
+      "portType": "REPOSITORY",
+      "managedAggregate": "com.coffeeshop.domain.order.Order",
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "methods": ["findById", "save"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": []
+}

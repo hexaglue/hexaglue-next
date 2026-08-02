@@ -1,0 +1,53 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Sailing",
+      "kind": "DOMAIN_EVENT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "identity": null,
+      "sourceAggregate": null,
+      "properties": [
+        {
+          "name": "moment",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "reference",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Checkout",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Wire",
+      "direction": "DRIVEN",
+      "portType": "EVENT_PUBLISHER",
+      "managedAggregate": null,
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["carry", "carry"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Notice",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    }
+  ]
+}

@@ -18,7 +18,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -59,5 +62,64 @@ class GoldenFilesTest {
         GoldenFiles.assertMatches(tempDir.resolve("nested/dir"), "snapshot.txt", "content-v1");
 
         assertThat(Files.readString(tempDir.resolve("nested/dir/snapshot.txt"))).isEqualTo("content-v1");
+    }
+
+    @Nested
+    @DisplayName("held to a golden that must already be there")
+    class HeldToAnExistingGolden {
+
+        private String recording;
+
+        /** The switch is a property of the whole run, so each case states which run it is. */
+        @BeforeEach
+        void rememberTheRun() {
+            recording = System.getProperty(GoldenFiles.REGENERATE_PROPERTY);
+            System.clearProperty(GoldenFiles.REGENERATE_PROPERTY);
+        }
+
+        @AfterEach
+        void restoreTheRun() {
+            if (recording == null) {
+                System.clearProperty(GoldenFiles.REGENERATE_PROPERTY);
+            } else {
+                System.setProperty(GoldenFiles.REGENERATE_PROPERTY, recording);
+            }
+        }
+
+        @Test
+        @DisplayName("passes when the snapshot is what the golden file records")
+        void passesOnIdenticalContent() throws Exception {
+            Files.writeString(tempDir.resolve("snapshot.txt"), "content-v1");
+
+            GoldenFiles.assertMatchesExisting(tempDir, "snapshot.txt", "content-v1");
+        }
+
+        @Test
+        @DisplayName("fails when the snapshot has moved away from it")
+        void failsOnDifferentContent() throws Exception {
+            Files.writeString(tempDir.resolve("snapshot.txt"), "content-v1");
+
+            assertThatThrownBy(() -> GoldenFiles.assertMatchesExisting(tempDir, "snapshot.txt", "content-v2"))
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageContaining("snapshot.txt");
+        }
+
+        @Test
+        @DisplayName("fails when there is no golden yet, rather than passing on one it just wrote")
+        void failsWhenTheGoldenIsMissing() {
+            assertThatThrownBy(() -> GoldenFiles.assertMatchesExisting(tempDir, "snapshot.txt", "content-v1"))
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageContaining(GoldenFiles.REGENERATE_PROPERTY);
+        }
+
+        @Test
+        @DisplayName("and records it when the run says outright that is what it is for")
+        void recordsItOnADeliberateRegeneration() throws Exception {
+            System.setProperty(GoldenFiles.REGENERATE_PROPERTY, "true");
+
+            GoldenFiles.assertMatchesExisting(tempDir, "snapshot.txt", "content-v1");
+
+            assertThat(Files.readString(tempDir.resolve("snapshot.txt"))).isEqualTo("content-v1");
+        }
     }
 }

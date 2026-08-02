@@ -1,0 +1,34 @@
+{
+  "domain": [],
+  "application": [
+    {
+      "qualifiedName": "com.acme.hangar.core.AssemblyLine",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Assembly",
+      "direction": "DRIVING",
+      "useCases": ["assemble: COMMAND"],
+      "inputTypes": [],
+      "outputTypes": [],
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["assemble"]
+    }
+  ],
+  "adapters": [
+    {
+      "qualifiedName": "com.acme.hangar.web.HangarDoor",
+      "direction": "DRIVING",
+      "ports": ["com.acme.hangar.core.Assembly"],
+      "confidence": "HIGH",
+      "basis": "INFERRED"
+    }
+  ],
+  "unclassified": []
+}

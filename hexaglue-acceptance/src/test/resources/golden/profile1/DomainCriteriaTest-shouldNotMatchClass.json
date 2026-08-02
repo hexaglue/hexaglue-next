@@ -1,0 +1,38 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.example.Money",
+      "kind": "VALUE_OBJECT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS",
+      "properties": [
+        {
+          "name": "amount",
+          "type": "double",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "currency",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.example.Order",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    },
+    {
+      "qualifiedName": "com.example.OrderId",
+      "category": "AMBIGUOUS",
+      "reason": "two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT"
+    }
+  ]
+}

@@ -13,16 +13,22 @@
 
 package io.hexaglue.testkit;
 
+import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.arch.AdapterType;
 import io.hexaglue.model.arch.AggregateRoot;
 import io.hexaglue.model.arch.ApplicationType;
 import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.arch.ArchType;
+import io.hexaglue.model.arch.DomainEvent;
+import io.hexaglue.model.arch.DomainService;
 import io.hexaglue.model.arch.DomainType;
 import io.hexaglue.model.arch.DrivenPort;
+import io.hexaglue.model.arch.DrivingPort;
+import io.hexaglue.model.arch.Entity;
 import io.hexaglue.model.arch.Identifier;
 import io.hexaglue.model.arch.PortType;
 import io.hexaglue.model.arch.UnclassifiedType;
+import io.hexaglue.model.arch.UseCase;
 import io.hexaglue.model.declaration.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -39,9 +45,15 @@ import java.util.stream.Stream;
  * classification is silently absent from a snapshot. The writer is hand-rolled on purpose — the
  * testkit stays free of JSON dependencies.</p>
  *
+ * <p>What each record was filled with is rendered too, not its kind alone. A snapshot showing
+ * verdicts and nothing else would go on matching while the links between types changed underneath
+ * it, and those links are most of what a generator reads.</p>
+ *
  * @since 7.0.0
  */
 public final class ArchModelSnapshots {
+
+    private static final String INDENT = "      ";
 
     private ArchModelSnapshots() {}
 
@@ -72,126 +84,156 @@ public final class ArchModelSnapshots {
     }
 
     private static String domainEntry(DomainType type) {
-        List<String> lines = new ArrayList<>();
-        lines.add("    {");
-        lines.addAll(verdictHeader(type, true));
+        List<String> members = verdictHeader(type);
         if (type instanceof AggregateRoot aggregate) {
-            lines.addAll(identity(aggregate));
+            members.add(identity(aggregate.identityField(), aggregate.effectiveIdentityType()));
+            members.add(list("entities", aggregate.entities()));
+            members.add(list("valueObjects", aggregate.valueObjects()));
+            members.add(list("domainEvents", aggregate.domainEvents()));
+            members.add(member("drivenPort", named(aggregate.drivenPort())));
+        }
+        if (type instanceof Entity entity) {
+            members.add(identity(entity.identityField(), Optional.empty()));
+            members.add(member("owningAggregate", named(entity.owningAggregate())));
         }
         if (type instanceof Identifier identifier) {
-            lines.add("      \"wrappedType\": "
-                    + identifier
-                            .wrappedType()
-                            .map(ref -> quote(ref.qualifiedName()))
-                            .orElse("null") + ",");
+            members.add(member("wrappedType", named(identifier.wrappedType())));
         }
-        lines.addAll(propertyLines(type.structure().fields()));
-        lines.add("    }");
-        return String.join("\n", lines);
+        if (type instanceof DomainEvent event) {
+            members.add(identity(event.aggregateIdField(), Optional.empty()));
+            members.add(member("sourceAggregate", named(event.sourceAggregate())));
+        }
+        if (type instanceof DomainService service) {
+            members.add(list("injectedPorts", service.injectedPorts()));
+        }
+        members.add(properties(type.structure().fields()));
+        return entry(members);
     }
 
     /**
-     * Renders the identity of an aggregate, or {@code null} when the engine could not name the
-     * field carrying it — an aggregate read from a repository declaration or from a declared
-     * intent has a kind before it has a named identity.
+     * Renders the identity a type carries, or {@code null} when the engine could not name the field
+     * carrying it — a type read from a repository declaration or from a declared intent has a kind
+     * before it has a named identity. The effective type is the value it is really stored under.
      */
-    private static List<String> identity(AggregateRoot aggregate) {
-        Optional<Field> field = aggregate.identityField();
+    private static String identity(Optional<Field> field, Optional<TypeRef> effective) {
         if (field.isEmpty()) {
-            return List.of("      \"identity\": null,");
+            return member("identity", "null");
         }
-        return List.of(
-                "      \"identity\": {",
-                "        \"field\": " + quote(field.orElseThrow().name()) + ",",
-                "        \"type\": " + quote(field.orElseThrow().type().qualifiedName()),
-                "      },");
+        List<String> members = new ArrayList<>(List.of(
+                nested("field", quote(field.orElseThrow().name())),
+                nested("type", quote(field.orElseThrow().type().qualifiedName()))));
+        effective.ifPresent(type -> members.add(nested("effectiveType", quote(type.qualifiedName()))));
+        return member("identity", "{\n" + String.join(",\n", members) + "\n" + INDENT + "}");
     }
 
     private static String applicationEntry(ApplicationType type) {
-        List<String> lines = new ArrayList<>();
-        lines.add("    {");
-        lines.addAll(verdictHeader(type, false));
-        lines.add("    }");
-        return String.join("\n", lines);
+        return entry(verdictHeader(type));
     }
 
     private static String portEntry(PortType port) {
-        List<String> lines = new ArrayList<>();
-        lines.add("    {");
-        lines.add("      \"qualifiedName\": " + quote(port.qualifiedName()) + ",");
-        lines.add("      \"direction\": " + quote(port.direction().name()) + ",");
+        List<String> members = new ArrayList<>();
+        members.add(member("qualifiedName", quote(port.qualifiedName())));
+        members.add(member("direction", quote(port.direction().name())));
         if (port instanceof DrivenPort driven) {
-            lines.add("      \"portType\": " + quote(driven.portType().name()) + ",");
+            members.add(member("portType", quote(driven.portType().name())));
+            members.add(member("managedAggregate", named(driven.managedAggregate())));
         }
-        lines.add("      \"confidence\": "
-                + quote(port.classification().confidence().name()) + ",");
-        lines.add("      \"basis\": " + quote(port.classification().basis().name()) + ",");
-        List<String> methods = port.structure().methods().stream()
-                .map(method -> quote(method.name()))
-                .sorted()
-                .toList();
-        lines.add("      \"methods\": [" + String.join(", ", methods) + "]");
-        lines.add("    }");
-        return String.join("\n", lines);
+        if (port instanceof DrivingPort driving) {
+            members.add(inline("useCases", driving.useCases().stream().map(ArchModelSnapshots::useCase)));
+            members.add(list("inputTypes", driving.inputTypes()));
+            members.add(list("outputTypes", driving.outputTypes()));
+        }
+        members.add(
+                member("confidence", quote(port.classification().confidence().name())));
+        members.add(member("basis", quote(port.classification().basis().name())));
+        members.add(inline(
+                "methods",
+                port.structure().methods().stream()
+                        .map(method -> quote(method.name()))
+                        .sorted()));
+        return entry(members);
+    }
+
+    private static String useCase(UseCase useCase) {
+        return quote(useCase.method().name() + ": " + useCase.type().name());
     }
 
     private static String adapterEntry(AdapterType adapter) {
-        List<String> lines = new ArrayList<>();
-        lines.add("    {");
-        lines.add("      \"qualifiedName\": " + quote(adapter.qualifiedName()) + ",");
-        lines.add("      \"direction\": " + quote(adapter.direction().name()) + ",");
-        List<String> ports = adapter.ports().stream()
-                .map(port -> quote(port.qualifiedName()))
-                .sorted()
-                .toList();
-        lines.add("      \"ports\": [" + String.join(", ", ports) + "],");
-        lines.add("      \"confidence\": "
-                + quote(adapter.classification().confidence().name()) + ",");
-        lines.add("      \"basis\": " + quote(adapter.classification().basis().name()));
-        lines.add("    }");
-        return String.join("\n", lines);
+        return entry(new ArrayList<>(List.of(
+                member("qualifiedName", quote(adapter.qualifiedName())),
+                member("direction", quote(adapter.direction().name())),
+                inline(
+                        "ports",
+                        adapter.ports().stream()
+                                .map(port -> quote(port.qualifiedName()))
+                                .sorted()),
+                member("confidence", quote(adapter.classification().confidence().name())),
+                member("basis", quote(adapter.classification().basis().name())))));
     }
 
     private static String unclassifiedEntry(UnclassifiedType type) {
-        List<String> lines = new ArrayList<>();
-        lines.add("    {");
-        lines.add("      \"qualifiedName\": " + quote(type.qualifiedName()) + ",");
-        lines.add("      \"category\": " + quote(type.category().name()));
-        lines.add("    }");
-        return String.join("\n", lines);
+        return entry(new ArrayList<>(List.of(
+                member("qualifiedName", quote(type.qualifiedName())),
+                member("category", quote(type.category().name())),
+                member("reason", type.reason().map(ArchModelSnapshots::quote).orElse("null")))));
     }
 
-    private static List<String> verdictHeader(ArchType type, boolean continued) {
-        List<String> lines = new ArrayList<>();
-        lines.add("      \"qualifiedName\": " + quote(type.qualifiedName()) + ",");
-        lines.add("      \"kind\": " + quote(type.kind().name()) + ",");
-        lines.add("      \"confidence\": "
-                + quote(type.classification().confidence().name()) + ",");
-        lines.add("      \"basis\": " + quote(type.classification().basis().name()) + ",");
-        lines.add("      \"nature\": " + quote(type.structure().nature().name()) + (continued ? "," : ""));
-        return lines;
+    private static List<String> verdictHeader(ArchType type) {
+        return new ArrayList<>(List.of(
+                member("qualifiedName", quote(type.qualifiedName())),
+                member("kind", quote(type.kind().name())),
+                member("confidence", quote(type.classification().confidence().name())),
+                member("basis", quote(type.classification().basis().name())),
+                member("nature", quote(type.structure().nature().name()))));
     }
 
-    private static List<String> propertyLines(List<Field> fields) {
+    private static String properties(List<Field> fields) {
         List<Field> sorted =
                 fields.stream().sorted(Comparator.comparing(Field::name)).toList();
-        List<String> lines = new ArrayList<>();
         if (sorted.isEmpty()) {
-            lines.add("      \"properties\": []");
-            return lines;
+            return member("properties", "[]");
         }
-        lines.add("      \"properties\": [");
-        for (int i = 0; i < sorted.size(); i++) {
-            Field field = sorted.get(i);
-            String cardinality = field.elementType().isPresent() ? "COLLECTION" : "SINGLE";
-            lines.add("        {");
-            lines.add("          \"name\": " + quote(field.name()) + ",");
-            lines.add("          \"type\": " + quote(field.type().qualifiedName()) + ",");
-            lines.add("          \"cardinality\": " + quote(cardinality));
-            lines.add(i < sorted.size() - 1 ? "        }," : "        }");
-        }
-        lines.add("      ]");
-        return lines;
+        List<String> entries = sorted.stream()
+                .map(field -> "        {\n"
+                        + String.join(
+                                ",\n",
+                                List.of(
+                                        "          " + quote("name") + ": " + quote(field.name()),
+                                        "          " + quote("type") + ": "
+                                                + quote(field.type().qualifiedName()),
+                                        "          " + quote("cardinality") + ": " + quote(cardinality(field))))
+                        + "\n        }")
+                .toList();
+        return member("properties", "[\n" + String.join(",\n", entries) + "\n" + INDENT + "]");
+    }
+
+    private static String cardinality(Field field) {
+        return field.elementType().isPresent() ? "COLLECTION" : "SINGLE";
+    }
+
+    private static String entry(List<String> members) {
+        return "    {\n" + String.join(",\n", members) + "\n    }";
+    }
+
+    private static String member(String name, String value) {
+        return INDENT + quote(name) + ": " + value;
+    }
+
+    private static String nested(String name, String value) {
+        return INDENT + "  " + quote(name) + ": " + value;
+    }
+
+    /** A short array kept on one line, which is what makes a diff of a hundred of them readable. */
+    private static String inline(String name, Stream<String> values) {
+        return member(name, "[" + String.join(", ", values.toList()) + "]");
+    }
+
+    private static String list(String name, List<TypeRef> references) {
+        return inline(name, references.stream().map(reference -> quote(reference.qualifiedName())));
+    }
+
+    private static String named(Optional<TypeRef> reference) {
+        return reference.map(type -> quote(type.qualifiedName())).orElse("null");
     }
 
     private static String quote(String value) {

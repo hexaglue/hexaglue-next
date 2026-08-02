@@ -1,0 +1,131 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.example.banking.domain.Account",
+      "kind": "AGGREGATE_ROOT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS",
+      "identity": {
+        "field": "id",
+        "type": "com.example.banking.domain.AccountId",
+        "effectiveType": "java.util.UUID"
+      },
+      "entities": ["com.example.banking.domain.Transaction"],
+      "valueObjects": ["com.example.banking.domain.Money"],
+      "domainEvents": [],
+      "drivenPort": "com.example.banking.ports.out.AccountRepository",
+      "properties": [
+        {
+          "name": "balance",
+          "type": "com.example.banking.domain.Money",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "id",
+          "type": "com.example.banking.domain.AccountId",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "ownerName",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "transactions",
+          "type": "java.util.List",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.example.banking.domain.AccountId",
+      "kind": "IDENTIFIER",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "wrappedType": "java.util.UUID",
+      "properties": [
+        {
+          "name": "value",
+          "type": "java.util.UUID",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.example.banking.domain.Money",
+      "kind": "VALUE_OBJECT",
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "nature": "RECORD",
+      "properties": [
+        {
+          "name": "amount",
+          "type": "java.math.BigDecimal",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "currency",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.example.banking.domain.Transaction",
+      "kind": "ENTITY",
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "nature": "CLASS",
+      "identity": null,
+      "owningAggregate": "com.example.banking.domain.Account",
+      "properties": [
+        {
+          "name": "amount",
+          "type": "com.example.banking.domain.Money",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "description",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "id",
+          "type": "java.util.UUID",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "timestamp",
+          "type": "java.time.Instant",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [],
+  "ports": [
+    {
+      "qualifiedName": "com.example.banking.ports.in.TransferUseCase",
+      "direction": "DRIVING",
+      "useCases": ["transfer: COMMAND"],
+      "inputTypes": ["com.example.banking.domain.AccountId", "com.example.banking.domain.Money"],
+      "outputTypes": [],
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "methods": ["transfer"]
+    },
+    {
+      "qualifiedName": "com.example.banking.ports.out.AccountRepository",
+      "direction": "DRIVEN",
+      "portType": "REPOSITORY",
+      "managedAggregate": "com.example.banking.domain.Account",
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "methods": ["delete", "findById", "save"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": []
+}

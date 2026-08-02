@@ -1,0 +1,24 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.example.LineItem",
+      "kind": "ENTITY",
+      "confidence": "EXPLICIT",
+      "basis": "DECLARED",
+      "nature": "CLASS",
+      "identity": null,
+      "owningAggregate": null,
+      "properties": [
+        {
+          "name": "id",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": []
+}

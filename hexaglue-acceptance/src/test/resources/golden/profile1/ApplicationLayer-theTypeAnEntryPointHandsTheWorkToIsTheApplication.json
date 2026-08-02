@@ -1,0 +1,23 @@
+{
+  "domain": [],
+  "application": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Dispatch",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [],
+  "adapters": [
+    {
+      "qualifiedName": "com.acme.hangar.web.HangarDoor",
+      "direction": "DRIVING",
+      "ports": [],
+      "confidence": "HIGH",
+      "basis": "INFERRED"
+    }
+  ],
+  "unclassified": []
+}

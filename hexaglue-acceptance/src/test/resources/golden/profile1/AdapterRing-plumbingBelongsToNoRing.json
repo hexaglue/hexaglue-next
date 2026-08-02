@@ -1,0 +1,18 @@
+{
+  "domain": [],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.acme.hangar.Launcher",
+      "category": "TECHNICAL",
+      "reason": "a framework claims it as plumbing, which belongs to no ring of the hexagon"
+    },
+    {
+      "qualifiedName": "com.acme.hangar.Wiring",
+      "category": "TECHNICAL",
+      "reason": "a framework claims it as plumbing, which belongs to no ring of the hexagon"
+    }
+  ]
+}

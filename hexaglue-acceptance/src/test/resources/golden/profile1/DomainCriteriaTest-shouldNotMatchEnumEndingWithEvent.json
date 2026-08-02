@@ -1,0 +1,16 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.example.SystemEvent",
+      "kind": "VALUE_OBJECT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "ENUM",
+      "properties": []
+    }
+  ],
+  "application": [],
+  "ports": [],
+  "adapters": [],
+  "unclassified": []
+}

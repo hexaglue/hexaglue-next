@@ -1,0 +1,112 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Fleet",
+      "kind": "AGGREGATE_ROOT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS",
+      "identity": {
+        "field": "tag",
+        "type": "com.acme.hangar.core.FleetTag",
+        "effectiveType": "java.lang.String"
+      },
+      "entities": [],
+      "valueObjects": ["com.acme.hangar.core.Hull", "com.acme.hangar.core.Manifest"],
+      "domainEvents": [],
+      "drivenPort": "com.acme.hangar.core.Ledger",
+      "properties": [
+        {
+          "name": "hulls",
+          "type": "java.util.List",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "manifest",
+          "type": "com.acme.hangar.core.Manifest",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "tag",
+          "type": "com.acme.hangar.core.FleetTag",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.acme.hangar.core.FleetTag",
+      "kind": "IDENTIFIER",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "wrappedType": "java.lang.String",
+      "properties": [
+        {
+          "name": "value",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.acme.hangar.core.Hull",
+      "kind": "VALUE_OBJECT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS",
+      "properties": [
+        {
+          "name": "capacity",
+          "type": "int",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "code",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.acme.hangar.core.Manifest",
+      "kind": "VALUE_OBJECT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "properties": [
+        {
+          "name": "code",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "weight",
+          "type": "int",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Checkout",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
+    {
+      "qualifiedName": "com.acme.hangar.core.Ledger",
+      "direction": "DRIVEN",
+      "portType": "REPOSITORY",
+      "managedAggregate": "com.acme.hangar.core.Fleet",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["keep", "locate"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": []
+}

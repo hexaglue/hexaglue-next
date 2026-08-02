@@ -54,7 +54,7 @@ public record HexaGlueConfig(
     public static HexaGlueConfig defaults() {
         return new HexaGlueConfig(
                 AnalysisScope.everything(),
-                ClassificationConfig.empty(),
+                ClassificationConfig.defaults(),
                 ValidationConfig.defaults(),
                 GenerationConfig.defaults());
     }

@@ -56,7 +56,7 @@ record CorpusRun(CorpusScenario scenario, Verdicts verdicts) {
         CodeModel code = SpoonFrontend.analyze(
                 FrontendRequest.builder().sourceRoot(sources).scope(scope).build());
         HexaGlueConfig config = new HexaGlueConfig(
-                scope, ClassificationConfig.empty(), ValidationConfig.defaults(), GenerationConfig.defaults());
+                scope, ClassificationConfig.defaults(), ValidationConfig.defaults(), GenerationConfig.defaults());
         return new CorpusRun(scenario, Classifier.classify(EngineContext.of(code, KnowledgePacks.embedded(), config)));
     }
 

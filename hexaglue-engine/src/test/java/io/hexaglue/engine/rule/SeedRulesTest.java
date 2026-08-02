@@ -170,7 +170,7 @@ class SeedRulesTest {
         void whenTheConfigurationDeclaresTheKind() {
             HexaGlueConfig config = new HexaGlueConfig(
                     AnalysisScope.everything(),
-                    new ClassificationConfig(Map.of(ORDER, ArchKind.AGGREGATE_ROOT)),
+                    new ClassificationConfig(Map.of(ORDER, ArchKind.AGGREGATE_ROOT), Map.of()),
                     ValidationConfig.defaults(),
                     GenerationConfig.defaults());
             CodeModel code = CodeModel.builder()
@@ -191,7 +191,7 @@ class SeedRulesTest {
         void neverAboutATypeTheScopeLeavesOut() {
             HexaGlueConfig config = new HexaGlueConfig(
                     new AnalysisScope(Optional.of("com.other"), List.of(), List.of()),
-                    new ClassificationConfig(Map.of(ORDER, ArchKind.AGGREGATE_ROOT)),
+                    new ClassificationConfig(Map.of(ORDER, ArchKind.AGGREGATE_ROOT), Map.of()),
                     ValidationConfig.defaults(),
                     GenerationConfig.defaults());
             CodeModel code = CodeModel.builder()

@@ -52,7 +52,7 @@ class HexaGlueConfigTest {
         void customConfigurationComposesBlocks() {
             AnalysisScope scope = new AnalysisScope(Optional.of("com.shop"), List.of(), List.of());
             ClassificationConfig classification =
-                    new ClassificationConfig(Map.of(TypeId.of("com.shop.Order"), ArchKind.AGGREGATE_ROOT));
+                    new ClassificationConfig(Map.of(TypeId.of("com.shop.Order"), ArchKind.AGGREGATE_ROOT), Map.of());
             ValidationConfig validation =
                     ValidationConfig.builder().failOnUnclassified(true).build();
             GenerationConfig generation = new GenerationConfig(Confidence.EXPLICIT);

@@ -38,6 +38,7 @@ public final class Catalogue {
                 new AssertKnowledge(),
                 new ConfiguredKind(),
                 new DeclaredKind(),
+                new ConventionalName(),
                 new LocalShape(),
                 new RepositorySubject());
     }

@@ -37,7 +37,7 @@ class ClassificationConfigTest {
         @Test
         @DisplayName("a declared type answers its kind")
         void declaredTypeAnswersItsKind() {
-            ClassificationConfig config = new ClassificationConfig(Map.of(ORDER, ArchKind.AGGREGATE_ROOT));
+            ClassificationConfig config = new ClassificationConfig(Map.of(ORDER, ArchKind.AGGREGATE_ROOT), Map.of());
 
             assertThat(config.declaredKind(ORDER)).contains(ArchKind.AGGREGATE_ROOT);
         }
@@ -45,7 +45,7 @@ class ClassificationConfigTest {
         @Test
         @DisplayName("an undeclared type answers empty")
         void undeclaredTypeAnswersEmpty() {
-            ClassificationConfig config = new ClassificationConfig(Map.of(ORDER, ArchKind.AGGREGATE_ROOT));
+            ClassificationConfig config = new ClassificationConfig(Map.of(ORDER, ArchKind.AGGREGATE_ROOT), Map.of());
 
             assertThat(config.declaredKind(TypeId.of("com.shop.Unknown"))).isEmpty();
         }
@@ -53,7 +53,7 @@ class ClassificationConfigTest {
         @Test
         @DisplayName("the empty configuration declares nothing")
         void emptyConfigurationDeclaresNothing() {
-            ClassificationConfig config = ClassificationConfig.empty();
+            ClassificationConfig config = ClassificationConfig.defaults();
 
             assertThat(config.explicit()).isEmpty();
             assertThat(config.declaredKind(ORDER)).isEmpty();
@@ -71,7 +71,7 @@ class ClassificationConfigTest {
             unordered.put(ORDER_REPOSITORY, ArchKind.DRIVEN_PORT);
             unordered.put(ORDER, ArchKind.AGGREGATE_ROOT);
 
-            ClassificationConfig config = new ClassificationConfig(unordered);
+            ClassificationConfig config = new ClassificationConfig(unordered, Map.of());
 
             assertThat(config.explicit().keySet())
                     .extracting(TypeId::qualifiedName)
@@ -83,7 +83,7 @@ class ClassificationConfigTest {
         void declarationsAreCopiedFromTheCaller() {
             Map<TypeId, ArchKind> source = new HashMap<>();
             source.put(ORDER, ArchKind.AGGREGATE_ROOT);
-            ClassificationConfig config = new ClassificationConfig(source);
+            ClassificationConfig config = new ClassificationConfig(source, Map.of());
 
             source.put(ORDER_REPOSITORY, ArchKind.DRIVEN_PORT);
 
@@ -96,7 +96,7 @@ class ClassificationConfigTest {
             Map<TypeId, ArchKind> declarations = Map.of(ORDER, ArchKind.UNCLASSIFIED);
 
             assertThatIllegalArgumentException()
-                    .isThrownBy(() -> new ClassificationConfig(declarations))
+                    .isThrownBy(() -> new ClassificationConfig(declarations, Map.of()))
                     .withMessageContaining("com.shop.Order")
                     .withMessageContaining("UNCLASSIFIED");
         }

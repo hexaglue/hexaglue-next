@@ -26,7 +26,7 @@ import java.util.Optional;
  * audit reports it, generation thresholds on it.
  *
  * @param kind the decided kind
- * @param direction the port direction, present only for port kinds
+ * @param direction the side of the hexagon boundary, present only for ports and adapters
  * @param confidence the confidence of the decision
  * @param basis whether the kind was declared or inferred
  * @param evidences the evidences supporting the decision, in tier order
@@ -46,8 +46,8 @@ public record Classification(
         List<RemediationHint> remediations) {
 
     /**
-     * Validates the coherence of the verdict — a direction only makes sense on a port — and
-     * copies every collection.
+     * Validates the coherence of the verdict — a direction only makes sense on the boundary of the
+     * hexagon, that is on a port or on an adapter — and copies every collection.
      */
     public Classification {
         Objects.requireNonNull(kind, "kind must not be null");
@@ -58,8 +58,8 @@ public record Classification(
         Objects.requireNonNull(candidates, "candidates must not be null");
         Objects.requireNonNull(proof, "proof must not be null");
         Objects.requireNonNull(remediations, "remediations must not be null");
-        if (direction.isPresent() && !kind.isPort()) {
-            throw new IllegalArgumentException("direction is only meaningful for port kinds, got " + kind);
+        if (direction.isPresent() && !kind.isPort() && !kind.isAdapter()) {
+            throw new IllegalArgumentException("direction is only meaningful for port and adapter kinds, got " + kind);
         }
         evidences = List.copyOf(evidences);
         candidates = List.copyOf(candidates);

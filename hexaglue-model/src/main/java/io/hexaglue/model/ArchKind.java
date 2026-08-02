@@ -17,7 +17,9 @@ package io.hexaglue.model;
  * The architectural kinds a type can be classified as, in a DDD / hexagonal reading.
  *
  * <p>Every type of the analysis scope receives a verdict: one of these kinds, with
- * {@code UNCLASSIFIED} as the categorized fallback — never a silent disappearance.</p>
+ * {@code UNCLASSIFIED} as the categorized fallback — never a silent disappearance. The kinds cover
+ * the hexagon and the adapters that surround it, so that an audit of an application under
+ * migration describes every type it reads instead of leaving the outer ring to be guessed.</p>
  *
  * @since 7.0.0
  */
@@ -56,6 +58,12 @@ public enum ArchKind {
     /** A query handler: answers a question without mutating state. */
     QUERY_HANDLER,
 
+    /** A driving adapter: the entry point through which the outside world reaches a driving port. */
+    DRIVING_ADAPTER,
+
+    /** A driven adapter: the implementation through which a driven port reaches the outside world. */
+    DRIVEN_ADAPTER,
+
     /** The categorized fallback: no kind reached sufficient confidence. */
     UNCLASSIFIED;
 
@@ -91,5 +99,16 @@ public enum ArchKind {
             case APPLICATION_SERVICE, COMMAND_HANDLER, QUERY_HANDLER -> true;
             default -> false;
         };
+    }
+
+    /**
+     * Returns whether this kind is an adapter read from the analyzed sources. Such an adapter is
+     * classified so that audit and migration cover the whole perimeter; an adapter produced by a
+     * generation plugin is an output of the pipeline and never an input of classification.
+     *
+     * @return true for driving and driven adapters
+     */
+    public boolean isAdapter() {
+        return this == DRIVING_ADAPTER || this == DRIVEN_ADAPTER;
     }
 }

@@ -33,8 +33,8 @@ class ModelVocabularyTest {
     }
 
     @Test
-    @DisplayName("architectural kinds cover the hexagon and the categorized fallback")
-    void archKindsCoverHexagonAndFallback() {
+    @DisplayName("architectural kinds cover the hexagon, the adapters around it and the categorized fallback")
+    void archKindsCoverHexagonAdaptersAndFallback() {
         assertThat(ArchKind.values())
                 .extracting(Enum::name)
                 .containsExactly(
@@ -49,13 +49,28 @@ class ModelVocabularyTest {
                         "APPLICATION_SERVICE",
                         "COMMAND_HANDLER",
                         "QUERY_HANDLER",
+                        "DRIVING_ADAPTER",
+                        "DRIVEN_ADAPTER",
                         "UNCLASSIFIED");
         assertThat(ArchKind.AGGREGATE_ROOT.isDomain()).isTrue();
         assertThat(ArchKind.DRIVEN_PORT.isPort()).isTrue();
         assertThat(ArchKind.APPLICATION_SERVICE.isApplication()).isTrue();
+        assertThat(ArchKind.DRIVING_ADAPTER.isAdapter()).isTrue();
+        assertThat(ArchKind.DRIVEN_ADAPTER.isAdapter()).isTrue();
         assertThat(ArchKind.UNCLASSIFIED.isDomain()).isFalse();
         assertThat(ArchKind.UNCLASSIFIED.isPort()).isFalse();
         assertThat(ArchKind.UNCLASSIFIED.isApplication()).isFalse();
+        assertThat(ArchKind.UNCLASSIFIED.isAdapter()).isFalse();
+    }
+
+    @Test
+    @DisplayName("an adapter is neither a port nor part of the hexagon")
+    void adapterIsNeitherPortNorHexagon() {
+        assertThat(ArchKind.DRIVING_ADAPTER.isPort()).isFalse();
+        assertThat(ArchKind.DRIVEN_ADAPTER.isPort()).isFalse();
+        assertThat(ArchKind.DRIVEN_ADAPTER.isDomain()).isFalse();
+        assertThat(ArchKind.DRIVEN_ADAPTER.isApplication()).isFalse();
+        assertThat(ArchKind.DRIVEN_PORT.isAdapter()).isFalse();
     }
 
     @Test

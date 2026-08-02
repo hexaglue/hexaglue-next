@@ -23,8 +23,10 @@ import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.arch.AggregateRoot;
 import io.hexaglue.model.arch.ApplicationService;
 import io.hexaglue.model.arch.ArchModel;
+import io.hexaglue.model.arch.DrivenAdapter;
 import io.hexaglue.model.arch.DrivenPort;
 import io.hexaglue.model.arch.DrivenPortType;
+import io.hexaglue.model.arch.DrivingAdapter;
 import io.hexaglue.model.arch.DrivingPort;
 import io.hexaglue.model.arch.Identifier;
 import io.hexaglue.model.arch.TypeStructure;
@@ -48,10 +50,10 @@ class ArchModelSnapshotsTest {
     private static Classification verdict(ArchKind kind) {
         Classification.Builder builder =
                 Classification.builder(kind, Confidence.HIGH, Basis.INFERRED, ProofNode.fact(kind + " by fixture"));
-        if (kind == ArchKind.DRIVING_PORT) {
+        if (kind == ArchKind.DRIVING_PORT || kind == ArchKind.DRIVING_ADAPTER) {
             builder.direction(PortDirection.DRIVING);
         }
-        if (kind == ArchKind.DRIVEN_PORT) {
+        if (kind == ArchKind.DRIVEN_PORT || kind == ArchKind.DRIVEN_ADAPTER) {
             builder.direction(PortDirection.DRIVEN);
         }
         return builder.build();
@@ -106,6 +108,16 @@ class ArchModelSnapshotsTest {
                 List.of(),
                 List.of(),
                 List.of());
+        DrivenAdapter jpaRepository = new DrivenAdapter(
+                TypeId.of("com.shop.JpaOrderRepository"),
+                TypeStructure.builder(TypeNature.CLASS).build(),
+                verdict(ArchKind.DRIVEN_ADAPTER),
+                List.of(TypeRef.of("com.shop.OrderRepository")));
+        DrivingAdapter restController = new DrivingAdapter(
+                TypeId.of("com.shop.OrderRestController"),
+                TypeStructure.builder(TypeNature.CLASS).build(),
+                verdict(ArchKind.DRIVING_ADAPTER),
+                List.of(TypeRef.of("com.shop.PlaceOrder")));
         UnclassifiedType utils = new UnclassifiedType(
                 TypeId.of("com.shop.StringUtils"),
                 TypeStructure.builder(TypeNature.CLASS).build(),
@@ -118,6 +130,8 @@ class ArchModelSnapshotsTest {
                 .addType(checkout)
                 .addType(repository)
                 .addType(placeOrder)
+                .addType(jpaRepository)
+                .addType(restController)
                 .addType(utils)
                 .build();
     }
@@ -191,6 +205,22 @@ class ArchModelSnapshotsTest {
                           "methods": ["execute"]
                         }
                       ],
+                      "adapters": [
+                        {
+                          "qualifiedName": "com.shop.JpaOrderRepository",
+                          "direction": "DRIVEN",
+                          "ports": ["com.shop.OrderRepository"],
+                          "confidence": "HIGH",
+                          "basis": "INFERRED"
+                        },
+                        {
+                          "qualifiedName": "com.shop.OrderRestController",
+                          "direction": "DRIVING",
+                          "ports": ["com.shop.PlaceOrder"],
+                          "confidence": "HIGH",
+                          "basis": "INFERRED"
+                        }
+                      ],
                       "unclassified": [
                         {
                           "qualifiedName": "com.shop.StringUtils",
@@ -211,6 +241,7 @@ class ArchModelSnapshotsTest {
                       "domain": [],
                       "application": [],
                       "ports": [],
+                      "adapters": [],
                       "unclassified": []
                     }
                     """;

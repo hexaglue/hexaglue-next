@@ -31,7 +31,8 @@ import java.util.Set;
 /**
  * A small classified shop domain shared by the container and index tests: two aggregates (Order
  * composing an entity and a value object, Customer referencing orders by identifier), their
- * identifiers, one event, three ports, application and domain services, and a utility fallback.
+ * identifiers, one event, three ports, the two adapters wired to them, application and domain
+ * services, and a utility fallback.
  */
 final class ShopModelFixtures {
 
@@ -45,6 +46,8 @@ final class ShopModelFixtures {
     static final TypeId PLACE_ORDER = TypeId.of("com.shop.PlaceOrder");
     static final TypeId CUSTOMER = TypeId.of("com.shop.Customer");
     static final TypeId CUSTOMER_ID = TypeId.of("com.shop.CustomerId");
+    static final TypeId ORDER_REST_CONTROLLER = TypeId.of("com.shop.OrderRestController");
+    static final TypeId JPA_ORDER_REPOSITORY = TypeId.of("com.shop.JpaOrderRepository");
     static final TypeId CHECKOUT_SERVICE = TypeId.of("com.shop.CheckoutService");
     static final TypeId PRICING_SERVICE = TypeId.of("com.shop.PricingService");
     static final TypeId STRING_UTILS = TypeId.of("com.shop.StringUtils");
@@ -54,10 +57,10 @@ final class ShopModelFixtures {
     static Classification verdict(ArchKind kind) {
         Classification.Builder builder =
                 Classification.builder(kind, Confidence.HIGH, Basis.INFERRED, ProofNode.fact(kind + " by fixture"));
-        if (kind == ArchKind.DRIVING_PORT) {
+        if (kind == ArchKind.DRIVING_PORT || kind == ArchKind.DRIVING_ADAPTER) {
             builder.direction(PortDirection.DRIVING);
         }
-        if (kind == ArchKind.DRIVEN_PORT) {
+        if (kind == ArchKind.DRIVEN_PORT || kind == ArchKind.DRIVEN_ADAPTER) {
             builder.direction(PortDirection.DRIVEN);
         }
         return builder.build();
@@ -176,6 +179,22 @@ final class ShopModelFixtures {
                 List.of());
     }
 
+    static DrivingAdapter orderRestController() {
+        return new DrivingAdapter(
+                ORDER_REST_CONTROLLER,
+                structure(TypeNature.CLASS),
+                verdict(ArchKind.DRIVING_ADAPTER),
+                List.of(TypeRef.of("com.shop.PlaceOrder")));
+    }
+
+    static DrivenAdapter jpaOrderRepository() {
+        return new DrivenAdapter(
+                JPA_ORDER_REPOSITORY,
+                structure(TypeNature.CLASS),
+                verdict(ArchKind.DRIVEN_ADAPTER),
+                List.of(TypeRef.of("com.shop.OrderRepository")));
+    }
+
     static ApplicationService checkoutService() {
         return new ApplicationService(
                 CHECKOUT_SERVICE, structure(TypeNature.CLASS), verdict(ArchKind.APPLICATION_SERVICE));
@@ -215,6 +234,8 @@ final class ShopModelFixtures {
                 .addType(orderRepository())
                 .addType(paymentGateway())
                 .addType(placeOrder())
+                .addType(orderRestController())
+                .addType(jpaOrderRepository())
                 .addType(customer())
                 .addType(customerId())
                 .addType(checkoutService())

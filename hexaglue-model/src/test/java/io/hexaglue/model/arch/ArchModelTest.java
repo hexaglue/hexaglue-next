@@ -39,12 +39,14 @@ class ArchModelTest {
                             "com.shop.CheckoutService",
                             "com.shop.Customer",
                             "com.shop.CustomerId",
+                            "com.shop.JpaOrderRepository",
                             "com.shop.Money",
                             "com.shop.Order",
                             "com.shop.OrderId",
                             "com.shop.OrderLine",
                             "com.shop.OrderPlaced",
                             "com.shop.OrderRepository",
+                            "com.shop.OrderRestController",
                             "com.shop.PaymentGateway",
                             "com.shop.PlaceOrder",
                             "com.shop.PricingService",
@@ -79,6 +81,9 @@ class ArchModelTest {
         void allMatchesSealedBranches() {
             assertThat(ShopModelFixtures.shopModel().all(DomainType.class)).hasSize(8);
             assertThat(ShopModelFixtures.shopModel().all(PortType.class)).hasSize(3);
+            assertThat(ShopModelFixtures.shopModel().all(AdapterType.class))
+                    .extracting(AdapterType::qualifiedName)
+                    .containsExactly("com.shop.JpaOrderRepository", "com.shop.OrderRestController");
         }
     }
 

@@ -15,8 +15,8 @@
  * The architectural model: the classified intermediate representation the plugins consume.
  *
  * <p>The sealed {@link io.hexaglue.model.arch.ArchType} hierarchy covers the hexagon — domain,
- * ports, application — plus the categorized {@code UnclassifiedType} fallback, so pattern matching
- * over a model is exhaustive. Every type carries its {@code TypeStructure} and its complete
+ * ports, application — the adapters read around it, plus the categorized {@code UnclassifiedType}
+ * fallback, so pattern matching over a model is exhaustive. Every type carries its {@code TypeStructure} and its complete
  * {@link io.hexaglue.model.classification.Classification}; construction rejects a verdict whose
  * kind does not match the record that carries it.</p>
  *

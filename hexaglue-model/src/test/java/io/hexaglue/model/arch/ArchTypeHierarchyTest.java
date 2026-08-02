@@ -40,10 +40,10 @@ class ArchTypeHierarchyTest {
     private static Classification verdict(ArchKind kind) {
         Classification.Builder builder =
                 Classification.builder(kind, Confidence.HIGH, Basis.INFERRED, ProofNode.fact("test verdict"));
-        if (kind == ArchKind.DRIVING_PORT) {
+        if (kind == ArchKind.DRIVING_PORT || kind == ArchKind.DRIVING_ADAPTER) {
             builder.direction(PortDirection.DRIVING);
         }
-        if (kind == ArchKind.DRIVEN_PORT) {
+        if (kind == ArchKind.DRIVEN_PORT || kind == ArchKind.DRIVEN_ADAPTER) {
             builder.direction(PortDirection.DRIVEN);
         }
         return builder.build();
@@ -285,6 +285,71 @@ class ArchTypeHierarchyTest {
             assertThat(UseCase.UseCaseType.QUERY.isQuery()).isTrue();
             assertThat(UseCase.UseCaseType.COMMAND_QUERY.isCommand()).isTrue();
             assertThat(UseCase.UseCaseType.COMMAND_QUERY.isQuery()).isTrue();
+        }
+    }
+
+    @Nested
+    @DisplayName("Adapters")
+    class Adapters {
+
+        @Test
+        @DisplayName("a driving adapter exposes its direction and the ports it calls into")
+        void drivingAdapterExposesDirectionAndPorts() {
+            DrivingAdapter controller = new DrivingAdapter(
+                    TypeId.of("com.a.OrderRestController"),
+                    emptyStructure(TypeNature.CLASS),
+                    verdict(ArchKind.DRIVING_ADAPTER),
+                    List.of(TypeRef.of("com.a.PlaceOrderUseCase")));
+
+            assertThat(controller.kind()).isEqualTo(ArchKind.DRIVING_ADAPTER);
+            assertThat(controller.direction()).isEqualTo(PortDirection.DRIVING);
+            assertThat(controller.drivingPorts()).hasSize(1);
+            assertThat(controller.isConnected()).isTrue();
+        }
+
+        @Test
+        @DisplayName("a driven adapter exposes its direction and the ports it implements")
+        void drivenAdapterExposesDirectionAndPorts() {
+            DrivenAdapter repository = new DrivenAdapter(
+                    TypeId.of("com.a.JpaOrderRepository"),
+                    emptyStructure(TypeNature.CLASS),
+                    verdict(ArchKind.DRIVEN_ADAPTER),
+                    List.of(TypeRef.of("com.a.OrderRepository")));
+
+            assertThat(repository.kind()).isEqualTo(ArchKind.DRIVEN_ADAPTER);
+            assertThat(repository.direction()).isEqualTo(PortDirection.DRIVEN);
+            assertThat(repository.implementedPorts()).hasSize(1);
+            assertThat(repository.isConnected()).isTrue();
+        }
+
+        @Test
+        @DisplayName("an adapter wired to no port of the model answers negatively")
+        void adapterWithoutPortAnswersNegatively() {
+            DrivingAdapter orphan = new DrivingAdapter(
+                    TypeId.of("com.a.LegacyServlet"),
+                    emptyStructure(TypeNature.CLASS),
+                    verdict(ArchKind.DRIVING_ADAPTER),
+                    List.of());
+            DrivenAdapter direct = new DrivenAdapter(
+                    TypeId.of("com.a.JdbcOrderDao"),
+                    emptyStructure(TypeNature.CLASS),
+                    verdict(ArchKind.DRIVEN_ADAPTER),
+                    List.of());
+
+            assertThat(orphan.isConnected()).isFalse();
+            assertThat(direct.isConnected()).isFalse();
+        }
+
+        @Test
+        @DisplayName("an adapter record refuses a verdict of another kind")
+        void adapterRecordRefusesForeignVerdict() {
+            assertThatIllegalArgumentException()
+                    .isThrownBy(() -> new DrivenAdapter(
+                            TypeId.of("com.a.JpaOrderRepository"),
+                            emptyStructure(TypeNature.CLASS),
+                            verdict(ArchKind.DRIVEN_PORT),
+                            List.of()))
+                    .withMessageContaining("DRIVEN_PORT verdict in a DRIVEN_ADAPTER record");
         }
     }
 

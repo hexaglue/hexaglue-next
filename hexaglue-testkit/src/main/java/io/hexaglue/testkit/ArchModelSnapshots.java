@@ -13,6 +13,7 @@
 
 package io.hexaglue.testkit;
 
+import io.hexaglue.model.arch.AdapterType;
 import io.hexaglue.model.arch.AggregateRoot;
 import io.hexaglue.model.arch.ApplicationType;
 import io.hexaglue.model.arch.ArchModel;
@@ -32,8 +33,8 @@ import java.util.stream.Stream;
  * Renders an {@link ArchModel} to its canonical JSON snapshot for golden-file comparison.
  *
  * <p>The rendering is deterministic by construction: sections always appear in the same order
- * (domain, application, ports, unclassified), types follow the model's identity order, fields and
- * methods are sorted by name. Every sealed branch of the model has its section, so no
+ * (domain, application, ports, adapters, unclassified), types follow the model's identity order,
+ * fields and methods are sorted by name. Every sealed branch of the model has its section, so no
  * classification is silently absent from a snapshot. The writer is hand-rolled on purpose — the
  * testkit stays free of JSON dependencies.</p>
  *
@@ -55,6 +56,7 @@ public final class ArchModelSnapshots {
                 + section(
                         "application", model.all(ApplicationType.class).map(ArchModelSnapshots::applicationEntry), ",")
                 + section("ports", model.all(PortType.class).map(ArchModelSnapshots::portEntry), ",")
+                + section("adapters", model.all(AdapterType.class).map(ArchModelSnapshots::adapterEntry), ",")
                 + section(
                         "unclassified",
                         model.all(UnclassifiedType.class).map(ArchModelSnapshots::unclassifiedEntry),
@@ -111,6 +113,23 @@ public final class ArchModelSnapshots {
                 .sorted()
                 .toList();
         lines.add("      \"methods\": [" + String.join(", ", methods) + "]");
+        lines.add("    }");
+        return String.join("\n", lines);
+    }
+
+    private static String adapterEntry(AdapterType adapter) {
+        List<String> lines = new ArrayList<>();
+        lines.add("    {");
+        lines.add("      \"qualifiedName\": " + quote(adapter.qualifiedName()) + ",");
+        lines.add("      \"direction\": " + quote(adapter.direction().name()) + ",");
+        List<String> ports = adapter.ports().stream()
+                .map(port -> quote(port.qualifiedName()))
+                .sorted()
+                .toList();
+        lines.add("      \"ports\": [" + String.join(", ", ports) + "],");
+        lines.add("      \"confidence\": "
+                + quote(adapter.classification().confidence().name()) + ",");
+        lines.add("      \"basis\": " + quote(adapter.classification().basis().name()));
         lines.add("    }");
         return String.join("\n", lines);
     }

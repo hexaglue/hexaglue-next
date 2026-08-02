@@ -22,12 +22,12 @@ import io.hexaglue.model.classification.Classification;
  *
  * <p>Every ArchType carries a stable {@link TypeId} that survives reclassification, its
  * {@link ArchKind}, its structure, and the complete {@link Classification} that explains the
- * verdict. The hierarchy is sealed — domain, ports, application, categorized fallback — so
- * consumers can match exhaustively.</p>
+ * verdict. The hierarchy is sealed — domain, ports, application, adapters, categorized fallback —
+ * so consumers can match exhaustively.</p>
  *
  * @since 7.0.0
  */
-public sealed interface ArchType permits DomainType, PortType, ApplicationType, UnclassifiedType {
+public sealed interface ArchType permits DomainType, PortType, ApplicationType, AdapterType, UnclassifiedType {
 
     /**
      * Returns the stable identity of this type, independent of its classification.

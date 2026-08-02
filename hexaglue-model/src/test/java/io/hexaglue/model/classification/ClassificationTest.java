@@ -62,7 +62,18 @@ class ClassificationTest {
     }
 
     @Test
-    @DisplayName("a direction on a non-port kind is rejected")
+    @DisplayName("an adapter verdict carries its direction too")
+    void adapterVerdictCarriesDirection() {
+        Classification adapter = Classification.builder(
+                        ArchKind.DRIVING_ADAPTER, Confidence.HIGH, Basis.INFERRED, PROOF)
+                .direction(PortDirection.DRIVING)
+                .build();
+
+        assertThat(adapter.direction()).contains(PortDirection.DRIVING);
+    }
+
+    @Test
+    @DisplayName("a direction on a kind that sits on no hexagon boundary is rejected")
     void directionOnNonPortKindIsRejected() {
         Classification.Builder builder = Classification.builder(
                         ArchKind.VALUE_OBJECT, Confidence.HIGH, Basis.INFERRED, PROOF)

@@ -21,6 +21,13 @@
     </properties>
 
     <dependencies>
+        <!-- The contract a backend answers to. It brings the model with it: the
+             classified types are the only thing this plugin reads. -->
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-spi</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

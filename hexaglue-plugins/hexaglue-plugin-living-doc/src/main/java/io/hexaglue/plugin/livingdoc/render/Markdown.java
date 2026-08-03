@@ -189,6 +189,21 @@ public final class Markdown {
     }
 
     /**
+     * Adds an anchor a link can target.
+     *
+     * <p>Markdown derives an anchor from the text of a heading, so two headings reading the same
+     * get anchors that differ by a number nobody can predict from the model. A stated anchor is
+     * the way a link stays right whatever the headings say.</p>
+     *
+     * @param name the anchor name
+     * @return this document
+     */
+    public Markdown anchor(String name) {
+        Objects.requireNonNull(name, "name must not be null");
+        return line("<a id=\"" + name + "\"></a>");
+    }
+
+    /**
      * Adds a horizontal rule.
      *
      * @return this document

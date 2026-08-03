@@ -124,6 +124,39 @@ public final class Explanation {
     }
 
     /**
+     * Renders what the gates refused: the count, then each type once with the conditions it failed
+     * under it and the remediation that would unblock it.
+     *
+     * <p>Grouped by type although the refusals are gate by gate: the gates are independent
+     * conditions, but a reader fixing a code base works one type at a time, and repeating what to
+     * do about a type under each of its refusals would say the same thing three times.</p>
+     *
+     * @param validation what the gates made of the model
+     * @return the lines, in a stable order, never empty
+     */
+    public static List<String> of(Validation validation) {
+        if (validation.passed()) {
+            return List.of("validation passed");
+        }
+        Map<ArchType, List<Validation.Refusal>> byType = new LinkedHashMap<>();
+        for (Validation.Refusal refusal : validation.refusals()) {
+            byType.computeIfAbsent(refusal.subject(), subject -> new ArrayList<>()).add(refusal);
+        }
+        List<String> lines = new ArrayList<>();
+        lines.add("validation refused " + byType.size() + (byType.size() == 1 ? " type" : " types"));
+        byType.forEach((subject, refusals) -> {
+            lines.add(REASON_INDENT + subject.id().qualifiedName());
+            for (Validation.Refusal refusal : refusals) {
+                lines.add(DETAIL_INDENT + "[" + refusal.gate() + "] " + refusal.reason());
+            }
+            for (RemediationHint hint : subject.classification().remediations()) {
+                lines.add(DETAIL_INDENT + "to make it explicit: " + hint.description());
+            }
+        });
+        return List.copyOf(lines);
+    }
+
+    /**
      * Renders the verdict and, under it, the tree of rules and facts the decision was derived
      * from — what a reader contesting a verdict needs and a reader accepting it does not.
      *

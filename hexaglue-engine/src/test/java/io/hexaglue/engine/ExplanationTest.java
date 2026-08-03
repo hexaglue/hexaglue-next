@@ -36,6 +36,7 @@ import io.hexaglue.model.classification.RuleId;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.TypeNode;
 import io.hexaglue.model.config.AnalysisScope;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -327,6 +328,45 @@ class ExplanationTest {
                     .build();
 
             assertThat(Explanation.withDerivation(aggregate(observed))).noneMatch(line -> line.contains("rules cited"));
+        }
+    }
+
+    @Nested
+    @DisplayName("says what the gates refused")
+    class SaysWhatTheGatesRefused {
+
+        private static Validation refusing(Gate... gates) {
+            Classification silent = Classification.builder(
+                            ArchKind.UNCLASSIFIED, Confidence.LOW, Basis.INFERRED, ProofNode.fact("no signal"))
+                    .remediations(List.of(RemediationHint.configureExplicit(ORDER, ArchKind.AGGREGATE_ROOT)))
+                    .build();
+            ArchType subject = unclassified(silent, UnclassifiedCategory.UNKNOWN, null);
+            return new Validation(Arrays.stream(gates)
+                    .map(gate -> new Validation.Refusal(subject, gate, "because " + gate))
+                    .toList());
+        }
+
+        @Test
+        @DisplayName("saying so plainly when nothing was refused")
+        void sayingSoPlainlyWhenNothingWasRefused() {
+            assertThat(Explanation.of(new Validation(List.of()))).containsExactly("validation passed");
+        }
+
+        @Test
+        @DisplayName("counting the types refused, then naming each of them once")
+        void countingTheTypesRefusedThenNamingEachOfThemOnce() {
+            List<String> lines = Explanation.of(refusing(Gate.UNCLASSIFIED, Gate.CONFIDENCE));
+
+            // Grouped under the type: the gates are independent conditions, but a reader fixing a
+            // code base works type by type, and the way to unblock the build is stated once.
+            assertThat(lines)
+                    .containsExactly(
+                            "validation refused 1 type",
+                            "  com.acme.Order",
+                            "    [UNCLASSIFIED] because UNCLASSIFIED",
+                            "    [CONFIDENCE] because CONFIDENCE",
+                            "    to make it explicit: Declare com.acme.Order as AGGREGATE_ROOT in the explicit"
+                                    + " classification configuration");
         }
     }
 

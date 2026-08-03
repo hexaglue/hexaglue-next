@@ -36,16 +36,28 @@ tree of rules it was derived from, and the engine renders both:
 
 ```
 com.acme.clinic.owner.Owner: AGGREGATE_ROOT (HIGH, inferred)
-  [S2] com.acme.clinic.owner.Owner is a AGGREGATE_ROOT because a repository stores and retrieves it (org.springframework.data.repository.Repository)
+  signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+  [framework knowledge] com.acme.clinic.owner.Owner is a AGGREGATE_ROOT because a repository stores and retrieves it (org.springframework.data.repository.Repository)
     involving com.acme.clinic.owner.OwnerRepository
-  [S3] com.acme.clinic.owner.Owner is a AGGREGATE_ROOT because OwnerRepository keeps it and hands it back, which is a lifecycle of its own
+  [graph relation] com.acme.clinic.owner.Owner is a AGGREGATE_ROOT because OwnerRepository keeps it and hands it back, which is a lifecycle of its own
     involving com.acme.clinic.owner.OwnerRepository
   derivation:
-    [S3-DECISION] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [decided on 1 signal at S2, 1 at S3]
-      [R1] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [S2 SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) d0]
+    [DECISION] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [decided on 1 signal of framework knowledge, 1 of graph relation]
+      [R1] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [framework knowledge: SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository)]
         SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) [spring:org.springframework.data.repository.Repository]
-      [R1b] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [S3 MANAGED_BY(com.acme.clinic.owner.OwnerRepository) d0]
+      [R1b] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [graph relation: MANAGED_BY(com.acme.clinic.owner.OwnerRepository)]
+  rules cited:
+    DECISION: weighs every signal held about a type and commits to one kind
+    R1: reads a Spring Data repository declaration for everything it says
+    R1b: reads the type a way out stores and retrieves as the aggregate it is
 ```
+
+Nothing there asks the reader to learn a private notation first. Signals are
+named by what they are rather than by an internal code, their pecking order is
+stated wherever it decided something, and every rule the derivation cites says
+what it concludes. The identifiers remain — they are how a rule is looked up in
+the reference and compared by a consumer — but they are never the only thing on
+offer.
 
 A type that reached no kind says so with the same detail — its category, the
 reason, the candidates that could not be separated, and what would settle the

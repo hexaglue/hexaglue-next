@@ -165,9 +165,8 @@ class ModulesTest {
                     .read()
                     .topology();
 
-            assertThat(topology.domainCandidates())
-                    .extracting(ModuleDescriptor::name)
-                    .containsExactly("shop-domain");
+            assertThat(topology.isDomainCandidate("shop-domain")).isTrue();
+            assertThat(topology.isDomainCandidate("shop-infra")).isFalse();
         }
 
         @Test
@@ -178,7 +177,7 @@ class ModulesTest {
                     .read("com.shop.Order")
                     .topology();
 
-            assertThat(topology.domainCandidates()).isEmpty();
+            assertThat(topology.isDomainCandidate("shop-domain")).isFalse();
         }
 
         @Test
@@ -192,7 +191,7 @@ class ModulesTest {
                     .read()
                     .topology();
 
-            assertThat(topology.domainCandidates()).isEmpty();
+            assertThat(topology.isDomainCandidate("shop-domain")).isFalse();
         }
     }
 

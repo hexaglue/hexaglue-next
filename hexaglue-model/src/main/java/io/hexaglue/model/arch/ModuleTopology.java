@@ -25,7 +25,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 /**
  * The architectural reading of the build layout: the modules of the analyzed reactor with their
@@ -123,17 +122,6 @@ public final class ModuleTopology {
     }
 
     /**
-     * Returns the modules carrying the given role, in declaration order.
-     *
-     * @param role the architectural role to filter by
-     * @return the immutable list of matching descriptors, possibly empty
-     */
-    public List<ModuleDescriptor> modulesByRole(ModuleRole role) {
-        Objects.requireNonNull(role, "role must not be null");
-        return modules.stream().filter(module -> module.role() == role).toList();
-    }
-
-    /**
      * Returns the module the given type is assigned to.
      *
      * @param typeId the type id
@@ -167,32 +155,6 @@ public final class ModuleTopology {
     public Set<String> dependenciesOf(String moduleName) {
         Objects.requireNonNull(moduleName, "moduleName must not be null");
         return dependencies.getOrDefault(moduleName, Collections.emptySortedSet());
-    }
-
-    /**
-     * Returns the modules depending on the given module, in name order.
-     *
-     * @param moduleName the module name
-     * @return the immutable set of module names, empty when nothing depends on it
-     */
-    public Set<String> dependentsOf(String moduleName) {
-        Objects.requireNonNull(moduleName, "moduleName must not be null");
-        return dependencies.entrySet().stream()
-                .filter(entry -> entry.getValue().contains(moduleName))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toCollection(TreeSet::new));
-    }
-
-    /**
-     * Returns the modules read as holding a domain: they depend on no other module of the reactor
-     * and reach no infrastructure.
-     *
-     * @return the immutable list of descriptors, in declaration order, possibly empty
-     */
-    public List<ModuleDescriptor> domainCandidates() {
-        return modules.stream()
-                .filter(module -> domainCandidates.contains(module.name()))
-                .toList();
     }
 
     /**

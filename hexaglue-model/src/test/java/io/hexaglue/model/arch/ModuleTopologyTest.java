@@ -51,14 +51,6 @@ class ModuleTopologyTest {
         }
 
         @Test
-        @DisplayName("modules are filtered by role")
-        void modulesAreFilteredByRole() {
-            assertThat(ShopModelFixtures.topology().modulesByRole(ModuleRole.INFRASTRUCTURE))
-                    .extracting(ModuleDescriptor::name)
-                    .containsExactly("shop-infra");
-        }
-
-        @Test
         @DisplayName("the module of a type is resolved")
         void moduleOfTypeIsResolved() {
             assertThat(ShopModelFixtures.topology()
@@ -130,24 +122,14 @@ class ModuleTopologyTest {
         }
 
         @Test
-        @DisplayName("a module names the modules depending on it")
-        void namesTheModulesDependingOnIt() {
-            assertThat(reactor().dependentsOf("shop-domain")).containsExactly("shop-app", "shop-infra");
-        }
-
-        @Test
         @DisplayName("a module nobody read has no dependency to answer")
         void unknownModuleHasNoDependency() {
             assertThat(reactor().dependenciesOf("shop-api")).isEmpty();
-            assertThat(reactor().dependentsOf("shop-api")).isEmpty();
         }
 
         @Test
-        @DisplayName("the modules read as domain candidates are listed in declaration order")
+        @DisplayName("a module reads as holding a domain, or does not")
         void listsTheDomainCandidates() {
-            assertThat(reactor().domainCandidates())
-                    .extracting(ModuleDescriptor::name)
-                    .containsExactly("shop-domain");
             assertThat(reactor().isDomainCandidate("shop-domain")).isTrue();
             assertThat(reactor().isDomainCandidate("shop-infra")).isFalse();
         }
@@ -190,7 +172,7 @@ class ModuleTopologyTest {
         @Test
         @DisplayName("the empty topology reads as a single-module project")
         void emptyTopologyReadsAsSingleModule() {
-            assertThat(ModuleTopology.empty().domainCandidates()).isEmpty();
+            assertThat(ModuleTopology.empty().isDomainCandidate("shop-domain")).isFalse();
             assertThat(ModuleTopology.empty().dependenciesOf("shop-domain")).isEmpty();
         }
     }

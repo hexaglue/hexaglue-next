@@ -21,6 +21,7 @@
     </properties>
 
     <modules>
+        <module>hexaglue-plugin-audit</module>
         <module>hexaglue-plugin-living-doc</module>
     </modules>
 </project>

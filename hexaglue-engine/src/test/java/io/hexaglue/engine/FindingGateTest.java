@@ -124,8 +124,8 @@ class FindingGateTest {
         @Test
         @DisplayName("says nothing on the default configuration, which arms nothing")
         void staysSilentByDefault() {
-            Validation validation = Validation.of(
-                    model(), List.of(finding(ARMED, Severity.BLOCKER)), ValidationConfig.defaults());
+            Validation validation =
+                    Validation.of(model(), List.of(finding(ARMED, Severity.BLOCKER)), ValidationConfig.defaults());
 
             assertThat(validation.passed()).isTrue();
         }

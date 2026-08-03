@@ -11,7 +11,7 @@
  * Contact: info@hexaglue.io
  */
 
-package io.hexaglue.engine;
+package io.hexaglue.model.arch;
 
 import java.util.Objects;
 
@@ -58,7 +58,7 @@ public record Stability(
      * @param totalTypes how many types it holds
      * @return the measure
      */
-    static Stability of(String packageName, int efferent, int afferent, int abstractTypes, int totalTypes) {
+    public static Stability of(String packageName, int efferent, int afferent, int abstractTypes, int totalTypes) {
         int coupling = efferent + afferent;
         double instability = coupling == 0 ? 0.0 : (double) efferent / coupling;
         double abstractness = totalTypes == 0 ? 0.0 : (double) abstractTypes / totalTypes;

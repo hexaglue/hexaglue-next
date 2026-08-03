@@ -72,8 +72,7 @@ final class ProjectAnalysis {
      * @param diagnostics what was left out, by the reading then by the perimeter of the verdicts
      * @param validation what the gates made of the model and of the findings
      */
-    record Result(
-            ArchModel model, List<Finding> findings, List<Diagnostic> diagnostics, Validation validation) {
+    record Result(ArchModel model, List<Finding> findings, List<Diagnostic> diagnostics, Validation validation) {
 
         /**
          * Validates and copies the components.

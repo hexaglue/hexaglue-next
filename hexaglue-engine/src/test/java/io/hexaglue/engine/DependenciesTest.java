@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.within;
 import io.hexaglue.model.Modifier;
 import io.hexaglue.model.TypeId;
 import io.hexaglue.model.TypeNature;
+import io.hexaglue.model.arch.Stability;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.Edge;
 import io.hexaglue.model.code.EdgeKind;

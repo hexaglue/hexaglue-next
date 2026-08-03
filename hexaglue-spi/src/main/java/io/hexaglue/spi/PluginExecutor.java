@@ -69,7 +69,7 @@ public final class PluginExecutor {
      */
     public static PluginRun run(
             List<HexaGluePlugin> plugins, ArchModel model, Map<String, Map<String, String>> options) {
-        return run(plugins, model, List.of(), options);
+        return run(plugins, model, List.of(), Measurements.none(), options);
     }
 
     /**
@@ -78,6 +78,7 @@ public final class PluginExecutor {
      * @param plugins the discovered plugins, in discovery order
      * @param model the classified model they all read
      * @param findings what the checks made of that model
+     * @param measurements what was measured about the shape of the codebase
      * @param options the stated options, by plugin identifier
      * @return what the run produced and what it refused
      */
@@ -85,10 +86,12 @@ public final class PluginExecutor {
             List<HexaGluePlugin> plugins,
             ArchModel model,
             List<Finding> findings,
+            Measurements measurements,
             Map<String, Map<String, String>> options) {
         Objects.requireNonNull(plugins, "plugins must not be null");
         Objects.requireNonNull(model, "model must not be null");
         Objects.requireNonNull(findings, "findings must not be null");
+        Objects.requireNonNull(measurements, "measurements must not be null");
         Objects.requireNonNull(options, "options must not be null");
 
         List<Diagnostic> diagnostics = new ArrayList<>();
@@ -113,7 +116,7 @@ public final class PluginExecutor {
             // The schedule was built from these very manifests, so the plugin is always there.
             HexaGluePlugin plugin = Objects.requireNonNull(byId.get(pluginId), pluginId);
             Optional<Diagnostic> refusal =
-                    contribute(plugin, model, findings, options, documents, writtenBy, diagnostics);
+                    contribute(plugin, model, findings, measurements, options, documents, writtenBy, diagnostics);
             if (refusal.isEmpty()) {
                 executed.add(pluginId);
             } else {
@@ -160,6 +163,7 @@ public final class PluginExecutor {
             HexaGluePlugin plugin,
             ArchModel model,
             List<Finding> findings,
+            Measurements measurements,
             Map<String, Map<String, String>> options,
             List<Document> documents,
             Map<String, String> writtenBy,
@@ -181,7 +185,7 @@ public final class PluginExecutor {
         List<Document> emitted = new ArrayList<>();
         try {
             plugin.contribute(new Contribution(
-                    model, findings, PluginConfig.of(manifest.id(), stated), new Sinks(emitted::add)));
+                    model, findings, measurements, PluginConfig.of(manifest.id(), stated), new Sinks(emitted::add)));
         } catch (PluginConfigException malformed) {
             return Optional.of(malformed.diagnostic());
         }

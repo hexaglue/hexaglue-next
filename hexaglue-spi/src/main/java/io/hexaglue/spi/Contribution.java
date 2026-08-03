@@ -29,11 +29,13 @@ import java.util.Objects;
  *
  * @param model the classified model, complete and immutable
  * @param findings what the checks made of it, in a stable order
+ * @param measurements what was measured about the shape of the codebase
  * @param config the options stated for this plugin, opaque to every other stage
  * @param sinks where the contribution goes
  * @since 7.0.0
  */
-public record Contribution(ArchModel model, List<Finding> findings, PluginConfig config, Sinks sinks) {
+public record Contribution(
+        ArchModel model, List<Finding> findings, Measurements measurements, PluginConfig config, Sinks sinks) {
 
     /**
      * Validates every component and copies the findings.
@@ -41,6 +43,7 @@ public record Contribution(ArchModel model, List<Finding> findings, PluginConfig
     public Contribution {
         Objects.requireNonNull(model, "model must not be null");
         Objects.requireNonNull(findings, "findings must not be null");
+        Objects.requireNonNull(measurements, "measurements must not be null");
         Objects.requireNonNull(config, "config must not be null");
         Objects.requireNonNull(sinks, "sinks must not be null");
         findings = List.copyOf(findings);

@@ -36,6 +36,7 @@ import io.hexaglue.model.arch.DrivingAdapter;
 import io.hexaglue.model.arch.DrivingPort;
 import io.hexaglue.model.arch.Entity;
 import io.hexaglue.model.arch.Identifier;
+import io.hexaglue.model.arch.ModuleTopology;
 import io.hexaglue.model.arch.UnclassifiedType;
 import io.hexaglue.model.arch.UnclassifiedType.UnclassifiedCategory;
 import io.hexaglue.model.arch.UseCase;
@@ -544,7 +545,7 @@ class AnalysisTest {
             Verdicts verdicts = Classifier.classify(context);
             FactBase facts = Saturation.saturate(RuleSet.standard(), context.withVerdicts(verdicts));
             facts.add(extra);
-            return Assembly.assemble(context, facts, verdicts);
+            return Assembly.assemble(context, facts, verdicts, ModuleTopology.empty());
         }
 
         @Test
@@ -565,7 +566,7 @@ class AnalysisTest {
             EngineContext context = EngineContext.of(hexagon(), KnowledgePacks.embedded(), HexaGlueConfig.defaults());
             FactBase facts = Saturation.saturate(RuleSet.standard(), context);
 
-            assertThatThrownBy(() -> Assembly.assemble(context, facts, Verdicts.none()))
+            assertThatThrownBy(() -> Assembly.assemble(context, facts, Verdicts.none(), ModuleTopology.empty()))
                     .isInstanceOf(EngineException.class)
                     .hasMessageContaining("no verdict was reached on");
         }

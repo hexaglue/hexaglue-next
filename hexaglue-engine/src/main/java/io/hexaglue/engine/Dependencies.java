@@ -92,6 +92,18 @@ public final class Dependencies {
     }
 
     /**
+     * Returns the edge kinds that count as one thing depending on another.
+     *
+     * <p>Shared rather than restated where modules are folded: two readings of what a dependency is
+     * would answer differently the day one of them changed.</p>
+     *
+     * @return the immutable set of coupling edge kinds
+     */
+    static Set<EdgeKind> coupling() {
+        return COUPLING;
+    }
+
+    /**
      * Builds the package graph of an analysis.
      *
      * @param code the code model holding the edges

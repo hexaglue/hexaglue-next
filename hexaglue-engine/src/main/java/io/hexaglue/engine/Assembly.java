@@ -22,6 +22,7 @@ import io.hexaglue.model.arch.DrivenAdapter;
 import io.hexaglue.model.arch.DrivenPort;
 import io.hexaglue.model.arch.DrivingAdapter;
 import io.hexaglue.model.arch.DrivingPort;
+import io.hexaglue.model.arch.ModuleTopology;
 import io.hexaglue.model.arch.QueryHandler;
 import io.hexaglue.model.arch.TypeStructure;
 import io.hexaglue.model.arch.UseCase;
@@ -55,11 +56,12 @@ final class Assembly {
      * @param context what was analyzed
      * @param facts the facts held once the verdicts had settled
      * @param verdicts the settled verdicts
+     * @param topology the build layout the reading placed the types in
      * @return the classified model, one entry per type of the perimeter
      */
-    static ArchModel assemble(EngineContext context, FactBase facts, Verdicts verdicts) {
+    static ArchModel assemble(EngineContext context, FactBase facts, Verdicts verdicts, ModuleTopology topology) {
         Assembly assembly = new Assembly(context, facts, verdicts);
-        ArchModel.Builder model = ArchModel.builder();
+        ArchModel.Builder model = ArchModel.builder().moduleTopology(topology);
         for (TypeNode type : context.perimeter().types()) {
             model.addType(assembly.classified(type, facts, verdicts));
         }

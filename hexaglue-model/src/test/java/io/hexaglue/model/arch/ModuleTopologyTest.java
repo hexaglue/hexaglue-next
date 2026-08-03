@@ -108,6 +108,94 @@ class ModuleTopologyTest {
     }
 
     @Nested
+    @DisplayName("The shape of the reactor")
+    class ShapeOfTheReactor {
+
+        private ModuleTopology reactor() {
+            return ModuleTopology.builder()
+                    .addModule(ModuleDescriptor.of("shop-domain", ModuleRole.DOMAIN))
+                    .addModule(ModuleDescriptor.of("shop-infra", ModuleRole.INFRASTRUCTURE))
+                    .addModule(ModuleDescriptor.of("shop-app", ModuleRole.APPLICATION))
+                    .dependency("shop-infra", "shop-domain")
+                    .dependency("shop-app", "shop-domain")
+                    .domainCandidate("shop-domain")
+                    .build();
+        }
+
+        @Test
+        @DisplayName("a module names the modules it depends on, in name order")
+        void namesTheModulesItDependsOn() {
+            assertThat(reactor().dependenciesOf("shop-infra")).containsExactly("shop-domain");
+            assertThat(reactor().dependenciesOf("shop-domain")).isEmpty();
+        }
+
+        @Test
+        @DisplayName("a module names the modules depending on it")
+        void namesTheModulesDependingOnIt() {
+            assertThat(reactor().dependentsOf("shop-domain")).containsExactly("shop-app", "shop-infra");
+        }
+
+        @Test
+        @DisplayName("a module nobody read has no dependency to answer")
+        void unknownModuleHasNoDependency() {
+            assertThat(reactor().dependenciesOf("shop-api")).isEmpty();
+            assertThat(reactor().dependentsOf("shop-api")).isEmpty();
+        }
+
+        @Test
+        @DisplayName("the modules read as domain candidates are listed in declaration order")
+        void listsTheDomainCandidates() {
+            assertThat(reactor().domainCandidates())
+                    .extracting(ModuleDescriptor::name)
+                    .containsExactly("shop-domain");
+            assertThat(reactor().isDomainCandidate("shop-domain")).isTrue();
+            assertThat(reactor().isDomainCandidate("shop-infra")).isFalse();
+        }
+
+        @Test
+        @DisplayName("a dependency on an unregistered module fails at build")
+        void dependencyOnUnregisteredModuleFailsAtBuild() {
+            ModuleTopology.Builder builder = ModuleTopology.builder()
+                    .addModule(ModuleDescriptor.of("shop-infra", ModuleRole.INFRASTRUCTURE))
+                    .dependency("shop-infra", "shop-domain");
+
+            assertThatIllegalArgumentException()
+                    .isThrownBy(builder::build)
+                    .withMessageContaining("unknown module")
+                    .withMessageContaining("shop-domain");
+        }
+
+        @Test
+        @DisplayName("a module cannot be a domain candidate without being registered")
+        void domainCandidateMustBeRegistered() {
+            ModuleTopology.Builder builder = ModuleTopology.builder().domainCandidate("shop-domain");
+
+            assertThatIllegalArgumentException()
+                    .isThrownBy(builder::build)
+                    .withMessageContaining("unknown module")
+                    .withMessageContaining("shop-domain");
+        }
+
+        @Test
+        @DisplayName("a module does not depend on itself, whatever its types reference")
+        void aModuleDoesNotDependOnItself() {
+            ModuleTopology.Builder builder =
+                    ModuleTopology.builder().addModule(ModuleDescriptor.of("shop-domain", ModuleRole.DOMAIN));
+
+            assertThatIllegalArgumentException()
+                    .isThrownBy(() -> builder.dependency("shop-domain", "shop-domain"))
+                    .withMessageContaining("shop-domain");
+        }
+
+        @Test
+        @DisplayName("the empty topology reads as a single-module project")
+        void emptyTopologyReadsAsSingleModule() {
+            assertThat(ModuleTopology.empty().domainCandidates()).isEmpty();
+            assertThat(ModuleTopology.empty().dependenciesOf("shop-domain")).isEmpty();
+        }
+    }
+
+    @Nested
     @DisplayName("Construction")
     class Construction {
 

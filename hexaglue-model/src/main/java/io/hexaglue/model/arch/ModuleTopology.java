@@ -20,17 +20,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * The architectural reading of the build layout: the modules of the analyzed reactor with their
- * roles, and the assignment of each analyzed type to its module. Empty on a single-module project.
+ * roles, which module depends on which, which of them read as holding a domain, and the assignment
+ * of each analyzed type to its module. Empty on a single-module project.
  *
  * <p>Modules keep their declaration order, type assignments iterate in identity order, and
- * construction fails loudly on a duplicate module name, a doubly assigned type or an assignment to
- * an unregistered module. The topology may assign types beyond the classified perimeter — the
- * frontend describes the whole reactor, the perimeter is an engine concern.</p>
+ * construction fails loudly on a duplicate module name, a doubly assigned type or a reference to an
+ * unregistered module. The topology may assign types beyond the classified perimeter — the frontend
+ * describes the whole reactor, the perimeter is an engine concern.</p>
+ *
+ * <p>A domain candidate is a module that depends on no other module of the reactor and reaches no
+ * infrastructure. Whether that is so takes more than this layout — it takes what the knowledge
+ * packs recognized on the types — so the reading is made by the engine and recorded here, like
+ * everything else in this model.</p>
  *
  * @since 7.0.0
  */
@@ -41,16 +51,37 @@ public final class ModuleTopology {
     private final List<ModuleDescriptor> modules;
     private final Map<String, ModuleDescriptor> modulesByName;
     private final SortedMap<TypeId, String> assignments;
+    private final SortedMap<String, SortedSet<String>> dependencies;
+    private final SortedSet<String> domainCandidates;
 
     private ModuleTopology(Builder builder) {
         this.modules = List.copyOf(builder.modulesByName.values());
         this.modulesByName = Collections.unmodifiableMap(new LinkedHashMap<>(builder.modulesByName));
         this.assignments = Collections.unmodifiableSortedMap(new TreeMap<>(builder.assignments));
+        this.dependencies = copyEdges(builder.dependencies);
+        this.domainCandidates = Collections.unmodifiableSortedSet(new TreeSet<>(builder.domainCandidates));
         this.assignments.forEach((typeId, moduleName) -> {
             if (!modulesByName.containsKey(moduleName)) {
                 throw new IllegalArgumentException(typeId + " is assigned to unknown module " + moduleName);
             }
         });
+        this.dependencies.forEach((from, targets) -> {
+            requireRegistered(from, "depends on something");
+            targets.forEach(to -> requireRegistered(to, "is depended on by " + from));
+        });
+        this.domainCandidates.forEach(name -> requireRegistered(name, "reads as a domain candidate"));
+    }
+
+    private void requireRegistered(String moduleName, String what) {
+        if (!modulesByName.containsKey(moduleName)) {
+            throw new IllegalArgumentException("unknown module " + moduleName + " " + what);
+        }
+    }
+
+    private static SortedMap<String, SortedSet<String>> copyEdges(Map<String, SortedSet<String>> edges) {
+        SortedMap<String, SortedSet<String>> copy = new TreeMap<>();
+        edges.forEach((from, targets) -> copy.put(from, Collections.unmodifiableSortedSet(new TreeSet<>(targets))));
+        return Collections.unmodifiableSortedMap(copy);
     }
 
     /**
@@ -128,6 +159,54 @@ public final class ModuleTopology {
     }
 
     /**
+     * Returns the modules the given module depends on, in name order.
+     *
+     * @param moduleName the module name
+     * @return the immutable set of module names, empty when it depends on none
+     */
+    public Set<String> dependenciesOf(String moduleName) {
+        Objects.requireNonNull(moduleName, "moduleName must not be null");
+        return dependencies.getOrDefault(moduleName, Collections.emptySortedSet());
+    }
+
+    /**
+     * Returns the modules depending on the given module, in name order.
+     *
+     * @param moduleName the module name
+     * @return the immutable set of module names, empty when nothing depends on it
+     */
+    public Set<String> dependentsOf(String moduleName) {
+        Objects.requireNonNull(moduleName, "moduleName must not be null");
+        return dependencies.entrySet().stream()
+                .filter(entry -> entry.getValue().contains(moduleName))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    /**
+     * Returns the modules read as holding a domain: they depend on no other module of the reactor
+     * and reach no infrastructure.
+     *
+     * @return the immutable list of descriptors, in declaration order, possibly empty
+     */
+    public List<ModuleDescriptor> domainCandidates() {
+        return modules.stream()
+                .filter(module -> domainCandidates.contains(module.name()))
+                .toList();
+    }
+
+    /**
+     * Returns whether the given module reads as holding a domain.
+     *
+     * @param moduleName the module name
+     * @return true when the module is a domain candidate
+     */
+    public boolean isDomainCandidate(String moduleName) {
+        Objects.requireNonNull(moduleName, "moduleName must not be null");
+        return domainCandidates.contains(moduleName);
+    }
+
+    /**
      * Returns the number of registered modules.
      *
      * @return the module count
@@ -154,6 +233,8 @@ public final class ModuleTopology {
 
         private final Map<String, ModuleDescriptor> modulesByName = new LinkedHashMap<>();
         private final Map<TypeId, String> assignments = new LinkedHashMap<>();
+        private final Map<String, SortedSet<String>> dependencies = new LinkedHashMap<>();
+        private final Set<String> domainCandidates = new TreeSet<>();
 
         private Builder() {}
 
@@ -193,10 +274,43 @@ public final class ModuleTopology {
         }
 
         /**
+         * Records that one module depends on another. Both may be registered later; membership is
+         * verified at build time.
+         *
+         * @param from the depending module
+         * @param on the module it depends on
+         * @return this builder
+         * @throws IllegalArgumentException if a module is said to depend on itself
+         */
+        public Builder dependency(String from, String on) {
+            Objects.requireNonNull(from, "from must not be null");
+            Objects.requireNonNull(on, "on must not be null");
+            if (from.equals(on)) {
+                throw new IllegalArgumentException(from + " cannot depend on itself: a module is one unit of build");
+            }
+            dependencies.computeIfAbsent(from, name -> new TreeSet<>()).add(on);
+            return this;
+        }
+
+        /**
+         * Records that a module reads as holding a domain. The module may be registered later;
+         * membership is verified at build time.
+         *
+         * @param moduleName the name of the module
+         * @return this builder
+         */
+        public Builder domainCandidate(String moduleName) {
+            Objects.requireNonNull(moduleName, "moduleName must not be null");
+            domainCandidates.add(moduleName);
+            return this;
+        }
+
+        /**
          * Builds the topology.
          *
          * @return a new ModuleTopology
-         * @throws IllegalArgumentException if an assignment points to an unregistered module
+         * @throws IllegalArgumentException if an assignment, a dependency or a candidacy points to
+         *     an unregistered module
          */
         public ModuleTopology build() {
             return new ModuleTopology(this);

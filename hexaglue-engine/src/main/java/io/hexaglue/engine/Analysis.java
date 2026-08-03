@@ -65,12 +65,15 @@ public final class Analysis {
         Objects.requireNonNull(context, "context must not be null");
         Verdicts verdicts = Classifier.classify(rules, context);
         FactBase facts = Saturation.saturate(rules, context.withVerdicts(verdicts));
-        ArchModel model = Assembly.assemble(context, facts, verdicts);
+        Modules modules = Modules.read(context.code(), context.config().modules(), facts);
+        ArchModel model = Assembly.assemble(context, facts, verdicts, modules.topology());
         List<Finding> findings = Findings.of(
                 model,
                 Dependencies.of(context.code(), context.perimeter()),
                 context.config().classification());
-        return new AnalysisResult(model, findings, leftUnclassified(context));
+        List<Diagnostic> diagnostics = new ArrayList<>(modules.diagnostics());
+        diagnostics.addAll(leftUnclassified(context));
+        return new AnalysisResult(model, findings, diagnostics);
     }
 
     /**

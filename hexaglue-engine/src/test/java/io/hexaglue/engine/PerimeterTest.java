@@ -110,6 +110,42 @@ class PerimeterTest {
     }
 
     @Nested
+    @DisplayName("says what it left out")
+    class SaysWhatItLeftOut {
+
+        private static List<String> excluded(AnalysisScope scope) {
+            return Perimeter.of(MODEL, scope).excluded().stream()
+                    .map(exclusion -> exclusion.type().qualifiedName())
+                    .toList();
+        }
+
+        @Test
+        @DisplayName("naming a type the base package does not cover, and why")
+        void namingATypeTheBasePackageDoesNotCover() {
+            AnalysisScope scope = new AnalysisScope(Optional.of("com.acme"), List.of(), List.of());
+
+            // A type read and then denied a verdict vanishes from the model: nothing downstream
+            // can tell it from a type that was never written.
+            assertThat(excluded(scope)).containsExactly("com.acmetools.Reporting", "com.other.Invoice");
+            assertThat(Perimeter.of(MODEL, scope).excluded().get(0).reason()).contains("com.acme");
+        }
+
+        @Test
+        @DisplayName("naming a type an exclusion sent out")
+        void namingATypeAnExclusionSentOut() {
+            AnalysisScope scope = new AnalysisScope(Optional.empty(), List.of(), List.of("com.acme.internal"));
+
+            assertThat(excluded(scope)).containsExactly("com.acme.internal.OrderLine");
+        }
+
+        @Test
+        @DisplayName("keeping quiet about a classpath stub, which is not the user's code")
+        void keepingQuietAboutAClasspathStub() {
+            assertThat(excluded(AnalysisScope.everything())).isEmpty();
+        }
+    }
+
+    @Nested
     @DisplayName("is derived once")
     class IsDerivedOnce {
 

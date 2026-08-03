@@ -91,6 +91,29 @@ class ProjectAnalysisTest {
     }
 
     @Test
+    @DisplayName("accounts for a type it read and did not classify, which no reading can report")
+    void accountsForATypeReadButNotClassified() {
+        MavenProject project = projectWith("com/acme/Order.java", "package com.acme; public class Order {}");
+        Path outside = projectDir.resolve("src/main/java/com/other/Tool.java");
+        try {
+            Files.createDirectories(outside.getParent());
+            Files.writeString(outside, "package com.other; public class Tool {}");
+        } catch (IOException unwritable) {
+            throw new UncheckedIOException("Failed to write " + outside, unwritable);
+        }
+
+        ProjectAnalysis.Result result =
+                ProjectAnalysis.run(project, ValidateMojo.configuration(HexaGlueConfig.defaults(), "com.acme", false));
+
+        // Read on purpose — what it says about its neighbours counts — and then left without a
+        // verdict. The frontend cannot report it: from where it stands, the type was read.
+        assertThat(result.model().type(TypeId.of("com.other.Tool"))).isEmpty();
+        assertThat(result.diagnostics())
+                .singleElement()
+                .satisfies(diagnostic -> assertThat(diagnostic.subject()).contains(TypeId.of("com.other.Tool")));
+    }
+
+    @Test
     @DisplayName("accounts for what the reading left out, rather than losing it silently")
     void accountsForWhatTheReadingLeftOut() {
         MavenProject project = projectWith("com/acme/OrderAdapter.java", """

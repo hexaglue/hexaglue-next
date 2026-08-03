@@ -75,7 +75,8 @@ public final class AnalysisChain implements AnalysisRunner {
                 .code();
         HexaGlueConfig config =
                 new HexaGlueConfig(scope, classification, ValidationConfig.defaults(), GenerationConfig.defaults());
-        return Analysis.analyze(EngineContext.of(code, KnowledgePacks.embedded(), config));
+        return Analysis.analyze(EngineContext.of(code, KnowledgePacks.embedded(), config))
+                .model();
     }
 
     @Override

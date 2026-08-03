@@ -214,7 +214,8 @@ class AnalysisTest {
     }
 
     private static ArchModel modelOf(CodeModel code) {
-        return Analysis.analyze(EngineContext.of(code, KnowledgePacks.embedded(), HexaGlueConfig.defaults()));
+        return Analysis.analyze(EngineContext.of(code, KnowledgePacks.embedded(), HexaGlueConfig.defaults()))
+                .model();
     }
 
     private static <T extends ArchType> T read(ArchModel model, TypeId id, Class<T> shape) {

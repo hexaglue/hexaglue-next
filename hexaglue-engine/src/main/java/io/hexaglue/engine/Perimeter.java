@@ -17,9 +17,11 @@ import io.hexaglue.model.TypeId;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.TypeNode;
 import io.hexaglue.model.config.AnalysisScope;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -39,16 +41,39 @@ public final class Perimeter {
 
     private final List<TypeNode> types;
     private final Set<TypeId> ids;
+    private final List<Exclusion> excluded;
 
-    private Perimeter(List<TypeNode> types) {
+    private Perimeter(List<TypeNode> types, List<Exclusion> excluded) {
         this.types = List.copyOf(types);
         Set<TypeId> collected = new LinkedHashSet<>();
         types.forEach(type -> collected.add(type.id()));
         this.ids = Set.copyOf(collected);
+        this.excluded = List.copyOf(excluded);
     }
 
     /**
-     * Determines which types of the model the given scope covers.
+     * Why a type the sources declare is owed no verdict.
+     *
+     * <p>Only the user's own code is accounted for: a classpath stub was never a candidate, and
+     * counting it would drown the ones that were.</p>
+     *
+     * @param type the type left out
+     * @param reason what to say after "the type was read but not classified:"
+     * @since 7.0.0
+     */
+    public record Exclusion(TypeId type, String reason) {
+
+        /**
+         * Validates that an exclusion names what it is about.
+         */
+        public Exclusion {
+            Objects.requireNonNull(type, "type must not be null");
+            Objects.requireNonNull(reason, "reason must not be null");
+        }
+    }
+
+    /**
+     * Determines which types of the model the given scope covers, and why the others do not.
      *
      * @param model the analyzed code model
      * @param scope the configured analysis scope
@@ -57,21 +82,37 @@ public final class Perimeter {
     public static Perimeter of(CodeModel model, AnalysisScope scope) {
         Objects.requireNonNull(model, "model must not be null");
         Objects.requireNonNull(scope, "scope must not be null");
-        return new Perimeter(model.types().stream()
-                .filter(type -> !type.external())
-                .filter(type -> covers(scope, type.id()))
-                .toList());
+        List<TypeNode> covered = new ArrayList<>();
+        List<Exclusion> excluded = new ArrayList<>();
+        for (TypeNode type : model.types()) {
+            if (type.external()) {
+                continue;
+            }
+            exclusionOf(scope, type.id())
+                    .ifPresentOrElse(reason -> excluded.add(new Exclusion(type.id(), reason)), () -> covered.add(type));
+        }
+        return new Perimeter(covered, excluded);
     }
 
-    private static boolean covers(AnalysisScope scope, TypeId id) {
+    /**
+     * Returns why the scope owes a type no verdict, or empty when it does.
+     *
+     * <p>The scope is read in the order a user states it: the base package first, then what was
+     * asked for, then what was sent away.</p>
+     */
+    private static Optional<String> exclusionOf(AnalysisScope scope, TypeId id) {
         if (scope.basePackage().isPresent() && !under(scope.basePackage().orElseThrow(), id)) {
-            return false;
+            return Optional.of("it is outside the configured base package "
+                    + scope.basePackage().orElseThrow());
         }
         if (!scope.includePackages().isEmpty()
                 && scope.includePackages().stream().noneMatch(prefix -> under(prefix, id))) {
-            return false;
+            return Optional.of("its package is none of those the analysis includes: " + scope.includePackages());
         }
-        return scope.excludePackages().stream().noneMatch(prefix -> under(prefix, id));
+        return scope.excludePackages().stream()
+                .filter(prefix -> under(prefix, id))
+                .findFirst()
+                .map(prefix -> "its package is excluded from the analysis by " + prefix);
     }
 
     /**
@@ -101,5 +142,14 @@ public final class Perimeter {
     public boolean contains(TypeId id) {
         Objects.requireNonNull(id, "id must not be null");
         return ids.contains(id);
+    }
+
+    /**
+     * Returns the analyzed types the scope leaves without a verdict, in identity order.
+     *
+     * @return the immutable list of exclusions
+     */
+    public List<Exclusion> excluded() {
+        return excluded;
     }
 }

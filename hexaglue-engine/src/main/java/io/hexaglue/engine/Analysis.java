@@ -13,11 +13,16 @@
 
 package io.hexaglue.engine;
 
-import io.hexaglue.model.arch.ArchModel;
+import io.hexaglue.model.finding.Diagnostic;
+import io.hexaglue.model.finding.DiagnosticSeverity;
+import io.hexaglue.model.finding.IssueCode;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
- * The whole engine in one call: a code model in, the classified model out.
+ * The whole engine in one call: a code model in, the classified model out — with what it read
+ * and did not classify said rather than left to be noticed.
  *
  * <p>Three steps, in this order and no other. The verdicts settle first, because a rule reading a
  * neighbour's kind has to read the final one. The facts are then derived once more against those
@@ -28,16 +33,19 @@ import java.util.Objects;
  */
 public final class Analysis {
 
+    /** A type was read and left without a verdict, the configured scope not covering it. */
+    private static final IssueCode NOT_CLASSIFIED = IssueCode.of("HG-ENGINE-003");
+
     private Analysis() {}
 
     /**
      * Analyzes the given context with the standard rules.
      *
      * @param context what the rules may read
-     * @return the classified model, one entry per type of the perimeter
+     * @return the classified model, and what was read without being classified
      * @throws EngineException when the verdicts have not settled within the round ceiling
      */
-    public static ArchModel analyze(EngineContext context) {
+    public static AnalysisResult analyze(EngineContext context) {
         return analyze(RuleSet.standard(), context);
     }
 
@@ -46,14 +54,31 @@ public final class Analysis {
      *
      * @param rules the rules to run
      * @param context what the rules may read
-     * @return the classified model, one entry per type of the perimeter
+     * @return the classified model, and what was read without being classified
      * @throws EngineException when the verdicts have not settled within the round ceiling
      */
-    public static ArchModel analyze(RuleSet rules, EngineContext context) {
+    public static AnalysisResult analyze(RuleSet rules, EngineContext context) {
         Objects.requireNonNull(rules, "rules must not be null");
         Objects.requireNonNull(context, "context must not be null");
         Verdicts verdicts = Classifier.classify(rules, context);
         FactBase facts = Saturation.saturate(rules, context.withVerdicts(verdicts));
-        return Assembly.assemble(context, facts, verdicts);
+        return new AnalysisResult(Assembly.assemble(context, facts, verdicts), leftUnclassified(context));
+    }
+
+    /**
+     * Words what the scope read without classifying. The message says the type was not classified,
+     * never that it does not exist: it was read, and what it says about its neighbours counted.
+     */
+    private static List<Diagnostic> leftUnclassified(EngineContext context) {
+        List<Diagnostic> diagnostics = new ArrayList<>();
+        for (Perimeter.Exclusion exclusion : context.perimeter().excluded()) {
+            diagnostics.add(Diagnostic.builder(
+                            NOT_CLASSIFIED,
+                            DiagnosticSeverity.INFO,
+                            exclusion.type().qualifiedName() + " was read but not classified: " + exclusion.reason())
+                    .subject(exclusion.type())
+                    .build());
+        }
+        return diagnostics;
     }
 }

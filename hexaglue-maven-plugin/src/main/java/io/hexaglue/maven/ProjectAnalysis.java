@@ -14,6 +14,7 @@
 package io.hexaglue.maven;
 
 import io.hexaglue.engine.Analysis;
+import io.hexaglue.engine.AnalysisResult;
 import io.hexaglue.engine.EngineContext;
 import io.hexaglue.engine.Validation;
 import io.hexaglue.frontend.FrontendResult;
@@ -22,6 +23,7 @@ import io.hexaglue.knowledge.KnowledgePacks;
 import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.config.HexaGlueConfig;
 import io.hexaglue.model.finding.Diagnostic;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.apache.maven.project.MavenProject;
@@ -44,21 +46,24 @@ final class ProjectAnalysis {
      *
      * @param project the project being built
      * @param config what the build states about the analysis
-     * @return the model, what the reading left out, and what the gates made of it
+     * @return the model, everything the run left out of it, and what the gates made of it
      */
     static Result run(MavenProject project, HexaGlueConfig config) {
         Objects.requireNonNull(project, "project must not be null");
         Objects.requireNonNull(config, "config must not be null");
         FrontendResult read = SpoonFrontend.analyze(ProjectSources.request(project, config.analysis()));
-        ArchModel model = Analysis.analyze(EngineContext.of(read.code(), KnowledgePacks.embedded(), config));
-        return new Result(model, read.diagnostics(), Validation.of(model, config.validation()));
+        AnalysisResult analysed = Analysis.analyze(EngineContext.of(read.code(), KnowledgePacks.embedded(), config));
+        ArchModel model = analysed.model();
+        List<Diagnostic> diagnostics = new ArrayList<>(read.diagnostics());
+        diagnostics.addAll(analysed.diagnostics());
+        return new Result(model, diagnostics, Validation.of(model, config.validation()));
     }
 
     /**
      * What one run produced.
      *
      * @param model the classified model
-     * @param diagnostics what the reading left out
+     * @param diagnostics what was left out, by the reading then by the perimeter of the verdicts
      * @param validation what the gates made of the model
      */
     record Result(ArchModel model, List<Diagnostic> diagnostics, Validation validation) {

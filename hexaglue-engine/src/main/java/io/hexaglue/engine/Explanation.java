@@ -13,10 +13,12 @@
 
 package io.hexaglue.engine;
 
+import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.SourceLocation;
 import io.hexaglue.model.TypeId;
 import io.hexaglue.model.arch.ArchType;
 import io.hexaglue.model.arch.UnclassifiedType;
+import io.hexaglue.model.arch.UnclassifiedType.UnclassifiedCategory;
 import io.hexaglue.model.classification.Candidate;
 import io.hexaglue.model.classification.Classification;
 import io.hexaglue.model.classification.Evidence;
@@ -80,6 +82,35 @@ public final class Explanation {
         for (RemediationHint hint : verdict.remediations()) {
             lines.add(REASON_INDENT + "to make it explicit: " + hint.description());
         }
+        return List.copyOf(lines);
+    }
+
+    /**
+     * Renders how a whole run went: the total, a tally per kind with the fallback broken down
+     * under it, and one closing line on how much of the result the sources stated themselves.
+     *
+     * <p>A run that read nothing says so in as many words. A host that printed an empty tally
+     * instead would look like it had analysed something and found nothing to say about it.</p>
+     *
+     * @param outcome the counted run
+     * @return the lines, in a stable order, never empty
+     */
+    public static List<String> of(Outcome outcome) {
+        if (outcome.types() == 0) {
+            return List.of("no type was analysed");
+        }
+        List<String> lines = new ArrayList<>();
+        lines.add(outcome.types() + " types analysed");
+        for (Outcome.Tally<ArchKind> kind : outcome.kinds()) {
+            lines.add(REASON_INDENT + kind.count() + " " + kind.subject());
+            if (kind.subject() == ArchKind.UNCLASSIFIED) {
+                for (Outcome.Tally<UnclassifiedCategory> category : outcome.unclassified()) {
+                    lines.add(DETAIL_INDENT + category.count() + " " + category.subject());
+                }
+            }
+        }
+        lines.add(outcome.declared() + " declared, " + outcome.inferred() + " inferred, " + outcome.ambiguous()
+                + " left ambiguous");
         return List.copyOf(lines);
     }
 

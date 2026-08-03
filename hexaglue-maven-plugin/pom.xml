@@ -121,6 +121,13 @@
                     <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
                     <settingsFile>src/it/settings.xml</settingsFile>
                     <postBuildHookScript>verify</postBuildHookScript>
+                    <!-- The backends are declared by the test projects, not by this plugin, so
+                         nothing would refresh them in the isolated repository: a build would keep
+                         proving whatever an earlier session happened to leave there. -->
+                    <extraArtifacts>
+                        <extraArtifact>io.hexaglue:hexaglue-plugin-audit:${project.version}</extraArtifact>
+                        <extraArtifact>io.hexaglue:hexaglue-plugin-living-doc:${project.version}</extraArtifact>
+                    </extraArtifacts>
                     <goals>
                         <goal>clean</goal>
                         <goal>validate</goal>

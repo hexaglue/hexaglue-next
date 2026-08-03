@@ -19,6 +19,7 @@ import io.hexaglue.engine.Dependencies;
 import io.hexaglue.engine.EngineContext;
 import io.hexaglue.engine.Perimeter;
 import io.hexaglue.engine.Validation;
+import io.hexaglue.frontend.FrontendRequest;
 import io.hexaglue.frontend.FrontendResult;
 import io.hexaglue.frontend.SpoonFrontend;
 import io.hexaglue.knowledge.KnowledgePacks;
@@ -59,7 +60,28 @@ final class ProjectAnalysis {
     static Result run(MavenProject project, HexaGlueConfig config) {
         Objects.requireNonNull(project, "project must not be null");
         Objects.requireNonNull(config, "config must not be null");
-        FrontendResult read = SpoonFrontend.analyze(ProjectSources.request(project, config.analysis()));
+        return run(ProjectSources.request(project, config.analysis()), config);
+    }
+
+    /**
+     * Runs the chain over a whole reactor, in one reading.
+     *
+     * <p>One analysis rather than one per module: the modules of a reactor are the places its
+     * architecture is split across, and a reading that stopped at each boundary would report on
+     * each module as if the others were third parties.</p>
+     *
+     * @param modules the projects of the reactor, in build order
+     * @param config what the build states about the analysis
+     * @return the model, everything the run left out of it, and what the gates made of it
+     */
+    static Result runReactor(List<MavenProject> modules, HexaGlueConfig config) {
+        Objects.requireNonNull(modules, "modules must not be null");
+        Objects.requireNonNull(config, "config must not be null");
+        return run(ProjectSources.reactorRequest(modules, config.analysis()), config);
+    }
+
+    private static Result run(FrontendRequest request, HexaGlueConfig config) {
+        FrontendResult read = SpoonFrontend.analyze(request);
         AnalysisResult analysed = Analysis.analyze(EngineContext.of(read.code(), KnowledgePacks.embedded(), config));
         ArchModel model = analysed.model();
         List<Diagnostic> diagnostics = new ArrayList<>(read.diagnostics());

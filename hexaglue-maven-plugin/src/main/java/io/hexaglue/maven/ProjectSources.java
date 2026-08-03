@@ -18,6 +18,7 @@ import io.hexaglue.model.config.AnalysisScope;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.maven.artifact.Artifact;
@@ -68,6 +69,42 @@ final class ProjectSources {
             Optional.ofNullable(artifact.getFile()).map(File::toPath).ifPresent(request::classpathEntry);
         }
         return request.build();
+    }
+
+    /**
+     * Builds what to read from a whole reactor: every module's sources at once, each root under the
+     * module that declared it.
+     *
+     * <p>One reading rather than one per module, because the references that cross modules are the
+     * reason a reactor is worth reading as one: read module by module, a port declared in one and
+     * implemented in another resolves to a stub of itself, and the seam the analysis exists to find
+     * is exactly what it loses. A module holding no source of its own — an aggregator POM, a module
+     * whose sources are not there yet — contributes nothing and is passed over.</p>
+     *
+     * @param modules the projects of the reactor, in build order
+     * @param scope the perimeter of the analysis
+     * @return the request to hand the frontend
+     * @throws IllegalArgumentException when no module of the reactor holds a source root to read
+     */
+    static FrontendRequest reactorRequest(List<MavenProject> modules, AnalysisScope scope) {
+        Objects.requireNonNull(modules, "modules must not be null");
+        Objects.requireNonNull(scope, "scope must not be null");
+        FrontendRequest.Builder request = FrontendRequest.builder().scope(scope);
+        int level = FrontendRequest.DEFAULT_JAVA_VERSION;
+        for (MavenProject module : modules) {
+            Path sourceRoot = sourceRoot(module);
+            if (Files.isDirectory(sourceRoot)) {
+                request.sourceRoot(sourceRoot, module.getArtifactId());
+            }
+            // Reading below the level a module compiles at would fail on its own syntax, so the
+            // whole reactor is read at the highest level any of its modules claims.
+            level = Math.max(level, languageLevel(module));
+            compiledClasses(module).ifPresent(request::classpathEntry);
+            for (Artifact artifact : module.getArtifacts()) {
+                Optional.ofNullable(artifact.getFile()).map(File::toPath).ifPresent(request::classpathEntry);
+            }
+        }
+        return request.javaVersion(level).build();
     }
 
     /**

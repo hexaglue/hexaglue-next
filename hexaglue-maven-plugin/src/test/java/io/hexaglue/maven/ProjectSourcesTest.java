@@ -14,6 +14,7 @@
 package io.hexaglue.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import io.hexaglue.frontend.FrontendRequest;
 import io.hexaglue.model.config.AnalysisScope;
@@ -21,9 +22,11 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -122,5 +125,84 @@ class ProjectSourcesTest {
         directory("src/main/java");
 
         assertThat(requestOf(project()).javaVersion()).isEqualTo(FrontendRequest.DEFAULT_JAVA_VERSION);
+    }
+
+    @Nested
+    @DisplayName("a whole reactor")
+    class AWholeReactor {
+
+        private MavenProject module(String artifactId, String packaging) {
+            MavenProject module = new MavenProject();
+            module.setArtifactId(artifactId);
+            module.setPackaging(packaging);
+            Build build = new Build();
+            build.setSourceDirectory(
+                    projectDir.resolve(artifactId).resolve("src/main/java").toString());
+            build.setDirectory(projectDir.resolve(artifactId).resolve("target").toString());
+            build.setOutputDirectory(
+                    projectDir.resolve(artifactId).resolve("target/classes").toString());
+            module.getModel().setBuild(build);
+            return module;
+        }
+
+        private FrontendRequest requestOf(MavenProject... modules) {
+            return ProjectSources.reactorRequest(List.of(modules), AnalysisScope.everything());
+        }
+
+        @Test
+        @DisplayName("is read in one pass, each root under the module that declared it")
+        void isReadInOnePass() {
+            Path domain = directory("shop-domain/src/main/java");
+            Path infra = directory("shop-infra/src/main/java");
+
+            FrontendRequest request = requestOf(module("shop-domain", "jar"), module("shop-infra", "jar"));
+
+            assertThat(request.sourceRoots()).containsExactly(domain, infra);
+            assertThat(request.modules()).containsEntry(domain, "shop-domain").containsEntry(infra, "shop-infra");
+        }
+
+        @Test
+        @DisplayName("leaves out a module holding no sources of its own")
+        void leavesOutAModuleWithoutSources() {
+            Path domain = directory("shop-domain/src/main/java");
+
+            FrontendRequest request = requestOf(module("shop-parent", "pom"), module("shop-domain", "jar"));
+
+            assertThat(request.sourceRoots()).containsExactly(domain);
+            assertThat(request.modules()).containsOnlyKeys(domain);
+        }
+
+        @Test
+        @DisplayName("parses at the highest level any module compiles at, so no module is read below its own")
+        void parsesAtTheHighestLevelOfTheReactor() {
+            directory("shop-domain/src/main/java");
+            directory("shop-infra/src/main/java");
+            MavenProject domain = module("shop-domain", "jar");
+            MavenProject infra = module("shop-infra", "jar");
+            infra.getProperties().setProperty("maven.compiler.release", "21");
+
+            assertThat(requestOf(domain, infra).javaVersion()).isEqualTo(21);
+        }
+
+        @Test
+        @DisplayName("puts every module's compiled classes on the classpath")
+        void putsEveryModulesClassesOnTheClasspath() {
+            directory("shop-domain/src/main/java");
+            directory("shop-infra/src/main/java");
+            Path domainClasses = directory("shop-domain/target/classes");
+            Path infraClasses = directory("shop-infra/target/classes");
+
+            FrontendRequest request = requestOf(module("shop-domain", "jar"), module("shop-infra", "jar"));
+
+            assertThat(request.classpath()).contains(domainClasses, infraClasses);
+        }
+
+        @Test
+        @DisplayName("refuses a reactor where nothing holds a source to read")
+        void refusesAReactorWithoutSources() {
+            assertThatIllegalArgumentException()
+                    .isThrownBy(() -> requestOf(module("shop-parent", "pom")))
+                    .withMessageContaining("source root");
+        }
     }
 }

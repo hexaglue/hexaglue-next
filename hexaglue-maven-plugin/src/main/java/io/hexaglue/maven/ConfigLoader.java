@@ -27,10 +27,12 @@ import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.model.finding.DiagnosticSeverity;
 import io.hexaglue.model.finding.IssueCode;
 import io.hexaglue.model.finding.Severity;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
@@ -40,6 +42,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import org.apache.maven.project.MavenProject;
 
 /**
  * Reads {@code hexaglue.yaml} into the typed configuration, strictly.
@@ -127,13 +130,21 @@ final class ConfigLoader {
      */
     static Map<String, Map<String, String>> readPluginOptions(Path projectDir) {
         Objects.requireNonNull(projectDir, "projectDir must not be null");
-        for (String name : DOCUMENT_NAMES) {
-            Path document = projectDir.resolve(name);
-            if (Files.isRegularFile(document)) {
-                return pluginOptions(name, text(document, name));
-            }
-        }
-        return Map.of();
+        return readPluginOptions(List.of(projectDir));
+    }
+
+    /**
+     * Reads what the nearest document asks of each backend.
+     *
+     * @param directories where to look, nearest first
+     * @return what the nearest document asks, or nothing when there is no document
+     * @throws ConfigException when that document cannot be honoured as written
+     */
+    static Map<String, Map<String, String>> readPluginOptions(List<Path> directories) {
+        Objects.requireNonNull(directories, "directories must not be null");
+        return document(directories)
+                .map(found -> pluginOptions(found.origin(), text(found.path(), found.origin())))
+                .orElseGet(Map::of);
     }
 
     /**
@@ -145,14 +156,67 @@ final class ConfigLoader {
      */
     static HexaGlueConfig read(Path projectDir) {
         Objects.requireNonNull(projectDir, "projectDir must not be null");
-        for (String name : DOCUMENT_NAMES) {
-            Path document = projectDir.resolve(name);
-            if (Files.isRegularFile(document)) {
-                return load(name, text(document, name));
+        return read(List.of(projectDir));
+    }
+
+    /**
+     * Reads the nearest configuration a project or the reactor above it states.
+     *
+     * <p>The nearest document wins <em>whole</em>: a module stating one is read on its own, and
+     * nothing of the reactor's leaks into it. Merging two documents would make every value depend
+     * on a second file the reader is not looking at, and a gate would then be armed by something
+     * the module never says.</p>
+     *
+     * @param directories where to look, nearest first
+     * @return what the nearest document states, or the documented defaults when there is none
+     * @throws ConfigException when that document cannot be honoured as written
+     */
+    static HexaGlueConfig read(List<Path> directories) {
+        Objects.requireNonNull(directories, "directories must not be null");
+        return document(directories)
+                .map(found -> load(found.origin(), text(found.path(), found.origin())))
+                .orElseGet(HexaGlueConfig::defaults);
+    }
+
+    /**
+     * Returns where to look for the configuration of a project: beside it first, then beside each
+     * project it inherits from, up to the root of the reactor.
+     *
+     * <p>A module of a reactor rarely states its own configuration, and having to copy the same
+     * document into every module would guarantee they drift apart.</p>
+     *
+     * @param project the project being built
+     * @return the directories to look in, nearest first
+     */
+    static List<Path> searchPath(MavenProject project) {
+        Objects.requireNonNull(project, "project must not be null");
+        List<Path> directories = new ArrayList<>();
+        for (MavenProject current = project; current != null; current = current.getParent()) {
+            Optional.ofNullable(current.getBasedir()).map(File::toPath).ifPresent(directories::add);
+        }
+        return directories;
+    }
+
+    /**
+     * Returns the nearest document, looking for each spelling in turn in each directory.
+     */
+    private static Optional<Document> document(List<Path> directories) {
+        for (Path directory : directories) {
+            Objects.requireNonNull(directory, "a directory to look in must not be null");
+            for (String name : DOCUMENT_NAMES) {
+                Path path = directory.resolve(name);
+                if (Files.isRegularFile(path)) {
+                    return Optional.of(new Document(path, name));
+                }
             }
         }
-        return HexaGlueConfig.defaults();
+        return Optional.empty();
     }
+
+    /**
+     * A document found on disk, under the name every diagnostic about it names.
+     */
+    private record Document(Path path, String origin) {}
 
     /**
      * Reads a configuration from its YAML text.

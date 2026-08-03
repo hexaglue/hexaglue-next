@@ -20,6 +20,9 @@ import io.hexaglue.model.TypeId;
 import io.hexaglue.model.TypeNature;
 import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.arch.ArchType;
+import io.hexaglue.model.arch.ModuleDescriptor;
+import io.hexaglue.model.arch.ModuleRole;
+import io.hexaglue.model.arch.ModuleTopology;
 import io.hexaglue.model.arch.Stability;
 import io.hexaglue.model.arch.TypeStructure;
 import io.hexaglue.model.arch.UnclassifiedType;
@@ -70,6 +73,25 @@ class AuditPluginTest {
         return ArchModel.builder()
                 .addType(type(ORDER, ArchKind.VALUE_OBJECT, Basis.DECLARED))
                 .addType(type(TOOLS, ArchKind.UNCLASSIFIED, Basis.INFERRED))
+                .build();
+    }
+
+    /**
+     * The same two types, split across a reactor: the domain module depends on nothing, the
+     * infrastructure one depends on it.
+     */
+    private static ArchModel reactorModel() {
+        return ArchModel.builder()
+                .addType(type(ORDER, ArchKind.VALUE_OBJECT, Basis.DECLARED))
+                .addType(type(TOOLS, ArchKind.UNCLASSIFIED, Basis.INFERRED))
+                .moduleTopology(ModuleTopology.builder()
+                        .addModule(ModuleDescriptor.of("shop-domain", ModuleRole.DOMAIN))
+                        .addModule(ModuleDescriptor.of("shop-infra", ModuleRole.INFRASTRUCTURE))
+                        .assign(ORDER, "shop-domain")
+                        .assign(TOOLS, "shop-infra")
+                        .dependency("shop-infra", "shop-domain")
+                        .domainCandidate("shop-domain")
+                        .build())
                 .build();
     }
 
@@ -158,6 +180,29 @@ class AuditPluginTest {
             String report = document(run(Map.of()), AuditReport.NAME);
 
             assertThat(report).contains("| `Order` | VALUE_OBJECT | HIGH | DECLARED |");
+        }
+
+        @Test
+        @DisplayName("the inventory says nothing about modules on a project that has none")
+        void saysNothingAboutModulesOnASingleModuleProject() {
+            String report = document(run(Map.of()), AuditReport.NAME);
+
+            assertThat(report).doesNotContain("Declared role").doesNotContain("Holds a domain");
+        }
+
+        @Test
+        @DisplayName("the inventory lays out a reactor: its roles, what depends on what, and what holds a domain")
+        void laysOutAReactor() {
+            PluginRun run = PluginExecutor.run(
+                    List.of(new AuditPlugin()), reactorModel(), findings(), measurements(), Map.of());
+
+            String report = document(run, AuditReport.NAME);
+
+            assertThat(report)
+                    .contains("2 module(s)")
+                    .contains("| `shop-domain` | DOMAIN | nothing | 1 | yes |")
+                    .contains("| `shop-infra` | INFRASTRUCTURE | shop-domain | 1 | no |")
+                    .contains("| `Order` | VALUE_OBJECT | HIGH | DECLARED | `com.shop.domain` | `shop-domain` |");
         }
 
         @Test

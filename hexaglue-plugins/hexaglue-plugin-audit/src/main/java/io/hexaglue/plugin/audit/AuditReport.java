@@ -16,6 +16,8 @@ package io.hexaglue.plugin.audit;
 import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.arch.ArchType;
+import io.hexaglue.model.arch.ModuleDescriptor;
+import io.hexaglue.model.arch.ModuleTopology;
 import io.hexaglue.model.arch.Stability;
 import io.hexaglue.model.classification.Basis;
 import io.hexaglue.model.finding.Finding;
@@ -30,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * The report: what the architecture is, what holds, what does not, and what it would take.
@@ -204,14 +207,51 @@ final class AuditReport {
 
     private void writeInventory(Markdown document) {
         document.heading(2, "Inventory").paragraph("Every analysed type, with what the verdict about it rests on.");
-        Table table = Table.withHeaders("Type", "Kind", "Confidence", "Basis", "Package");
+        writeLayout(document);
+        ModuleTopology topology = model.moduleTopology();
+        Table table = topology.isEmpty()
+                ? Table.withHeaders("Type", "Kind", "Confidence", "Basis", "Package")
+                : Table.withHeaders("Type", "Kind", "Confidence", "Basis", "Package", "Module");
         for (ArchType type : model.types()) {
-            table.row(
+            List<String> cells = new ArrayList<>(List.of(
                     Markdown.inlineCode(type.id().simpleName()),
                     type.kind().name(),
                     type.classification().confidence().name(),
                     type.classification().basis().name(),
-                    Markdown.inlineCode(type.id().packageName()));
+                    Markdown.inlineCode(type.id().packageName())));
+            if (!topology.isEmpty()) {
+                cells.add(topology.moduleOf(type.id())
+                        .map(module -> Markdown.inlineCode(module.name()))
+                        .orElse("—"));
+            }
+            table.row(cells.toArray(String[]::new));
+        }
+        document.table(table);
+    }
+
+    /**
+     * Says how the build is laid out, when there is more than one module to lay out.
+     *
+     * <p>On a reactor the split itself is a claim about the architecture — this module holds the
+     * domain, that one the plumbing — and a report that only listed types would leave the reader to
+     * check that claim by opening POMs. What is stated as a role and what the references actually
+     * do are both here, side by side, because they can disagree.</p>
+     */
+    private void writeLayout(Markdown document) {
+        ModuleTopology topology = model.moduleTopology();
+        if (topology.isEmpty()) {
+            return;
+        }
+        document.paragraph("The reactor holds " + topology.size() + " module(s) whose role the project declares.");
+        Table table = Table.withHeaders("Module", "Declared role", "Depends on", "Types", "Holds a domain");
+        for (ModuleDescriptor module : topology.modules()) {
+            Set<String> dependencies = topology.dependenciesOf(module.name());
+            table.row(
+                    Markdown.inlineCode(module.name()),
+                    module.role().name(),
+                    dependencies.isEmpty() ? "nothing" : String.join(", ", dependencies),
+                    String.valueOf(topology.typesInModule(module.name()).size()),
+                    topology.isDomainCandidate(module.name()) ? "yes" : "no");
         }
         document.table(table);
     }

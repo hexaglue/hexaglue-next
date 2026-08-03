@@ -14,14 +14,9 @@
 package io.hexaglue.maven;
 
 import io.hexaglue.model.config.HexaGlueConfig;
-import io.hexaglue.model.finding.Diagnostic;
-import io.hexaglue.spi.Document;
 import io.hexaglue.spi.HexaGluePlugin;
 import io.hexaglue.spi.PluginDiscovery;
 import io.hexaglue.spi.PluginRun;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -93,9 +88,9 @@ public class ReportMojo extends AbstractMojo {
             log.info("HexaGlue is skipped");
             return;
         }
-        Path projectDir = project.getBasedir().toPath();
-        HexaGlueConfig config = ValidateMojo.scopedTo(ConfigLoader.read(projectDir), basePackage);
-        Map<String, Map<String, String>> options = ConfigLoader.readPluginOptions(projectDir);
+        List<Path> configuration = ConfigLoader.searchPath(project);
+        HexaGlueConfig config = ValidateMojo.scopedTo(ConfigLoader.read(configuration), basePackage);
+        Map<String, Map<String, String>> options = ConfigLoader.readPluginOptions(configuration);
 
         // The build sets the context loader to the realm holding this plugin and everything a
         // project declared alongside it, which is exactly where the backends are.
@@ -107,39 +102,8 @@ public class ReportMojo extends AbstractMojo {
         ProjectAnalysis.Result analysed = ProjectAnalysis.run(project, config);
         PluginRun run = ProjectAnalysis.contribute(analysed, plugins, options);
 
-        report(run, log);
-        write(run.documents(), Path.of(reportDirectory));
+        Documents.report(run, log);
+        Documents.write(run.documents(), Path.of(reportDirectory));
         log.info("HexaGlue wrote " + run.documents().size() + " document(s) to " + reportDirectory);
-    }
-
-    /**
-     * Says what the run refused before saying what it produced: a document missing because a plugin
-     * failed is worth hearing about at the moment it is missing.
-     */
-    private static void report(PluginRun run, Log log) {
-        for (Diagnostic diagnostic : run.diagnostics()) {
-            log.warn(diagnostic.code().value() + ": " + diagnostic.message());
-        }
-        if (!run.skipped().isEmpty()) {
-            log.warn("HexaGlue skipped " + String.join(", ", run.skipped()));
-        }
-    }
-
-    /**
-     * Writes the documents under one directory. The paths were confined when they were built, so
-     * nothing here can land outside it.
-     */
-    private static void write(List<Document> documents, Path root) throws MojoExecutionException {
-        for (Document document : documents) {
-            Path target = root.resolve(document.path());
-            Path directory = target.getParent();
-            try {
-                Files.createDirectories(directory == null ? root : directory);
-                Files.writeString(target, document.content(), StandardCharsets.UTF_8);
-            } catch (IOException unwritable) {
-                throw new MojoExecutionException(
-                        target + " could not be written: " + unwritable.getMessage(), unwritable);
-            }
-        }
     }
 }

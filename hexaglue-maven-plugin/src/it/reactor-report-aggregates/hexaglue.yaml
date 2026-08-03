@@ -1,0 +1,10 @@
+analysis:
+  basePackage: com.example.shop
+
+modules:
+  shop-domain: DOMAIN
+  shop-infra: INFRASTRUCTURE
+
+plugins:
+  io.hexaglue.audit:
+    outputDirectory: report

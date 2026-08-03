@@ -26,6 +26,8 @@ import io.hexaglue.model.finding.Severity;
 import io.hexaglue.testkit.SourceFixtures;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -260,6 +262,58 @@ class ConfigLoaderTest {
 
         private void write(String name, String content) {
             SourceFixtures.write(projectDir, name, content);
+        }
+    }
+
+    @Nested
+    @DisplayName("inherits the document of the reactor it belongs to")
+    class InheritsFromTheReactor {
+
+        private Path module;
+
+        @BeforeEach
+        void layOutAReactor() {
+            module = projectDir.resolve("shop-domain");
+        }
+
+        @Test
+        @DisplayName("a module without a document of its own reads the one beside the reactor")
+        void aModuleWithoutADocumentReadsTheReactors() {
+            SourceFixtures.write(projectDir, "hexaglue.yaml", "analysis:\n  basePackage: com.acme\n");
+
+            HexaGlueConfig config = ConfigLoader.read(List.of(module, projectDir));
+
+            assertThat(config.analysis().basePackage()).contains("com.acme");
+        }
+
+        @Test
+        @DisplayName("a module stating its own document is read on its own, the nearest one winning whole")
+        void theNearestDocumentWinsWhole() {
+            SourceFixtures.write(
+                    projectDir,
+                    "hexaglue.yaml",
+                    "analysis:\n  basePackage: com.acme\nmodules:\n  shop-domain: DOMAIN\n");
+            SourceFixtures.write(module, "hexaglue.yaml", "analysis:\n  basePackage: com.acme.shop\n");
+
+            HexaGlueConfig config = ConfigLoader.read(List.of(module, projectDir));
+
+            assertThat(config.analysis().basePackage()).contains("com.acme.shop");
+            assertThat(config.modules().roles()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("a reactor stating nothing anywhere answers the documented defaults")
+        void nothingAnywhereAnswersTheDefaults() {
+            assertThat(ConfigLoader.read(List.of(module, projectDir))).isEqualTo(HexaGlueConfig.defaults());
+        }
+
+        @Test
+        @DisplayName("what a backend is asked is inherited the same way")
+        void pluginOptionsAreInheritedTheSameWay() {
+            SourceFixtures.write(projectDir, "hexaglue.yaml", "plugins:\n  audit:\n    sections: verdict\n");
+
+            assertThat(ConfigLoader.readPluginOptions(List.of(module, projectDir)))
+                    .containsEntry("audit", Map.of("sections", "verdict"));
         }
     }
 

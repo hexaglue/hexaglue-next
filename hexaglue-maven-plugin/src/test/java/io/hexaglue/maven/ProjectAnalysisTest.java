@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.hexaglue.engine.Gate;
 import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.TypeId;
+import io.hexaglue.model.config.HexaGlueConfig;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -57,17 +58,19 @@ class ProjectAnalysisTest {
     @Test
     @DisplayName("classifies what the project declares, and passes when no gate is armed")
     void classifiesWhatTheProjectDeclares() {
-        MavenProject project = projectWith(
-                "com/acme/Order.java",
-                """
+        MavenProject project = projectWith("com/acme/Order.java", """
                 package com.acme;
                 @org.jmolecules.ddd.annotation.AggregateRoot
                 public class Order {}
                 """);
 
-        ProjectAnalysis.Result result = ProjectAnalysis.run(project, ValidateMojo.configuration("com.acme", false));
+        ProjectAnalysis.Result result =
+                ProjectAnalysis.run(project, ValidateMojo.configuration(HexaGlueConfig.defaults(), "com.acme", false));
 
-        assertThat(result.model().type(TypeId.of("com.acme.Order")).orElseThrow().kind())
+        assertThat(result.model()
+                        .type(TypeId.of("com.acme.Order"))
+                        .orElseThrow()
+                        .kind())
                 .isEqualTo(ArchKind.AGGREGATE_ROOT);
         assertThat(result.validation().passed()).isTrue();
     }
@@ -77,29 +80,27 @@ class ProjectAnalysisTest {
     void stopsTheBuildOnAnUndecidedType() {
         MavenProject project = projectWith("com/acme/Thing.java", "package com.acme; public class Thing {}");
 
-        ProjectAnalysis.Result result = ProjectAnalysis.run(project, ValidateMojo.configuration("com.acme", true));
+        ProjectAnalysis.Result result =
+                ProjectAnalysis.run(project, ValidateMojo.configuration(HexaGlueConfig.defaults(), "com.acme", true));
 
         assertThat(result.validation().passed()).isFalse();
-        assertThat(result.validation().refusals())
-                .singleElement()
-                .satisfies(refusal -> {
-                    assertThat(refusal.gate()).isEqualTo(Gate.UNCLASSIFIED);
-                    assertThat(refusal.subject().id()).isEqualTo(TypeId.of("com.acme.Thing"));
-                });
+        assertThat(result.validation().refusals()).singleElement().satisfies(refusal -> {
+            assertThat(refusal.gate()).isEqualTo(Gate.UNCLASSIFIED);
+            assertThat(refusal.subject().id()).isEqualTo(TypeId.of("com.acme.Thing"));
+        });
     }
 
     @Test
     @DisplayName("accounts for what the reading left out, rather than losing it silently")
     void accountsForWhatTheReadingLeftOut() {
-        MavenProject project = projectWith(
-                "com/acme/OrderAdapter.java",
-                """
+        MavenProject project = projectWith("com/acme/OrderAdapter.java", """
                 package com.acme;
                 @jakarta.annotation.Generated("some-generator")
                 public class OrderAdapter {}
                 """);
 
-        ProjectAnalysis.Result result = ProjectAnalysis.run(project, ValidateMojo.configuration("com.acme", false));
+        ProjectAnalysis.Result result =
+                ProjectAnalysis.run(project, ValidateMojo.configuration(HexaGlueConfig.defaults(), "com.acme", false));
 
         assertThat(result.model().type(TypeId.of("com.acme.OrderAdapter"))).isEmpty();
         assertThat(result.diagnostics())

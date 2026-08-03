@@ -64,7 +64,10 @@ class ValidationTest {
 
     private static ArchType value(String name, Confidence confidence, Basis basis) {
         TypeId id = TypeId.of(name);
-        return new ValueObject(id, structure(id), verdict(ArchKind.VALUE_OBJECT, confidence, basis).build());
+        return new ValueObject(
+                id,
+                structure(id),
+                verdict(ArchKind.VALUE_OBJECT, confidence, basis).build());
     }
 
     private static ArchType port(String name, Confidence confidence) {
@@ -93,8 +96,8 @@ class ValidationTest {
 
     private static ArchType tied(String name) {
         TypeId id = TypeId.of(name);
-        Evidence shape =
-                Evidence.of(EvidenceTier.LOCAL_STRUCTURE, Confidence.HIGH, "IMMUTABLE(" + name + ")", "it never changes");
+        Evidence shape = Evidence.of(
+                EvidenceTier.LOCAL_STRUCTURE, Confidence.HIGH, "IMMUTABLE(" + name + ")", "it never changes");
         return new UnclassifiedType(
                 id,
                 structure(id),
@@ -144,8 +147,8 @@ class ValidationTest {
         @Test
         @DisplayName("refuses every type that reached no kind, and says which")
         void refusesUnclassified() {
-            ArchModel model =
-                    model(value("com.acme.Money", Confidence.HIGH, Basis.INFERRED), silent("com.acme.Thing", List.of()));
+            ArchModel model = model(
+                    value("com.acme.Money", Confidence.HIGH, Basis.INFERRED), silent("com.acme.Thing", List.of()));
 
             Validation validation = Validation.of(
                     model, ValidationConfig.builder().failOnUnclassified(true).build());
@@ -163,7 +166,8 @@ class ValidationTest {
                     value("com.acme.Guess", Confidence.MEDIUM, Basis.INFERRED));
 
             Validation validation = Validation.of(
-                    model, ValidationConfig.builder().minConfidence(Confidence.HIGH).build());
+                    model,
+                    ValidationConfig.builder().minConfidence(Confidence.HIGH).build());
 
             assertThat(subjectsOf(validation)).containsExactly("com.acme.Guess");
             assertThat(validation.refusals().get(0).reason()).contains("MEDIUM").contains("HIGH");
@@ -175,7 +179,8 @@ class ValidationTest {
             ArchModel model = model(port("com.acme.Orders", Confidence.MEDIUM));
 
             Validation validation = Validation.of(
-                    model, ValidationConfig.builder().minConfidence(Confidence.HIGH).build());
+                    model,
+                    ValidationConfig.builder().minConfidence(Confidence.HIGH).build());
 
             assertThat(subjectsOf(validation)).containsExactly("com.acme.Orders");
         }
@@ -185,8 +190,8 @@ class ValidationTest {
         void refusesAmbiguous() {
             ArchModel model = model(tied("com.acme.Tied"), value("com.acme.Money", Confidence.HIGH, Basis.INFERRED));
 
-            Validation validation =
-                    Validation.of(model, ValidationConfig.builder().failOnAmbiguous(true).build());
+            Validation validation = Validation.of(
+                    model, ValidationConfig.builder().failOnAmbiguous(true).build());
 
             assertThat(subjectsOf(validation)).containsExactly("com.acme.Tied");
             assertThat(validation.refusals().get(0).gate()).isEqualTo(Gate.AMBIGUOUS);
@@ -199,8 +204,8 @@ class ValidationTest {
                     value("com.acme.Declared", Confidence.EXPLICIT, Basis.DECLARED),
                     value("com.acme.Deduced", Confidence.HIGH, Basis.INFERRED));
 
-            Validation validation =
-                    Validation.of(model, ValidationConfig.builder().allowInferred(false).build());
+            Validation validation = Validation.of(
+                    model, ValidationConfig.builder().allowInferred(false).build());
 
             assertThat(subjectsOf(validation)).containsExactly("com.acme.Deduced");
             assertThat(validation.refusals().get(0).gate()).isEqualTo(Gate.INFERRED);

@@ -77,7 +77,9 @@ final class ProjectSources {
      */
     private static Path sourceRoot(MavenProject project) {
         Path expanded = Path.of(project.getBuild().getDirectory(), EXPANDED_SOURCES);
-        return Files.isDirectory(expanded) ? expanded : Path.of(project.getBuild().getSourceDirectory());
+        return Files.isDirectory(expanded)
+                ? expanded
+                : Path.of(project.getBuild().getSourceDirectory());
     }
 
     private static Optional<Path> compiledClasses(MavenProject project) {

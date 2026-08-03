@@ -17,8 +17,6 @@ import io.hexaglue.engine.Explanation;
 import io.hexaglue.engine.Outcome;
 import io.hexaglue.engine.Validation;
 import io.hexaglue.model.config.AnalysisScope;
-import io.hexaglue.model.config.ClassificationConfig;
-import io.hexaglue.model.config.GenerationConfig;
 import io.hexaglue.model.config.HexaGlueConfig;
 import io.hexaglue.model.config.ValidationConfig;
 import io.hexaglue.model.finding.Diagnostic;
@@ -60,16 +58,18 @@ public class ValidateMojo extends AbstractMojo {
     private boolean skip;
 
     /**
-     * The package the analysis is scoped to. Left unset, everything the source root holds is read.
+     * The package the analysis is scoped to. Overrides {@code analysis.basePackage} of the
+     * configuration document when both are stated.
      */
     @Parameter(property = "hexaglue.basePackage")
     private String basePackage;
 
     /**
-     * Whether a type the analysis could not classify fails the build.
+     * Whether a type the analysis could not classify fails the build. Overrides
+     * {@code validation.failOnUnclassified} of the configuration document when both are stated.
      */
-    @Parameter(property = "hexaglue.failOnUnclassified", defaultValue = "false")
-    private boolean failOnUnclassified;
+    @Parameter(property = "hexaglue.failOnUnclassified")
+    private Boolean failOnUnclassified;
 
     /**
      * Creates the goal. The build instantiates it and fills its parameters before running it.
@@ -88,7 +88,9 @@ public class ValidateMojo extends AbstractMojo {
             log.info("HexaGlue is skipped");
             return;
         }
-        ProjectAnalysis.Result result = ProjectAnalysis.run(project, configuration(basePackage, failOnUnclassified));
+        HexaGlueConfig stated = ConfigLoader.read(project.getBasedir().toPath());
+        ProjectAnalysis.Result result =
+                ProjectAnalysis.run(project, configuration(stated, basePackage, failOnUnclassified));
         report(result.diagnostics());
         Explanation.of(Outcome.of(result.model())).forEach(log::info);
 
@@ -98,23 +100,42 @@ public class ValidateMojo extends AbstractMojo {
             return;
         }
         Explanation.of(validation).forEach(log::error);
-        throw new MojoFailureException("HexaGlue refused " + validation.refusals().size()
-                + " classification(s); the reasons and their remediation are logged above");
+        throw new MojoFailureException(
+                "HexaGlue refused " + validation.refusals().size()
+                        + " classification(s); the reasons and their remediation are logged above");
     }
 
     /**
-     * Assembles what the goal was told, out of the parameters the build states.
+     * Applies what the build states on top of what the document states.
      *
-     * @param basePackage the package the analysis is scoped to, blank for none
-     * @param failOnUnclassified whether an undecided type fails the build
+     * <p>A goal parameter wins over the document, and only when it is set: a build stating
+     * {@code -Dhexaglue.failOnUnclassified=true} means it, whereas a parameter left alone must not
+     * silently undo a gate the document armed. That is what distinguishes an unset parameter from
+     * one set to its default value here.</p>
+     *
+     * @param stated what the configuration document states
+     * @param basePackage the package the analysis is scoped to, null or blank when unset
+     * @param failOnUnclassified whether an undecided type fails the build, null when unset
      * @return the configuration of this run
      */
-    static HexaGlueConfig configuration(String basePackage, boolean failOnUnclassified) {
-        AnalysisScope scope = new AnalysisScope(
-                Optional.ofNullable(basePackage).filter(pkg -> !pkg.isBlank()), List.of(), List.of());
-        ValidationConfig gates =
-                ValidationConfig.builder().failOnUnclassified(failOnUnclassified).build();
-        return new HexaGlueConfig(scope, ClassificationConfig.defaults(), gates, GenerationConfig.defaults());
+    static HexaGlueConfig configuration(HexaGlueConfig stated, String basePackage, Boolean failOnUnclassified) {
+        AnalysisScope scope = Optional.ofNullable(basePackage)
+                .filter(pkg -> !pkg.isBlank())
+                .map(pkg -> new AnalysisScope(
+                        Optional.of(pkg),
+                        stated.analysis().includePackages(),
+                        stated.analysis().excludePackages()))
+                .orElseGet(stated::analysis);
+        ValidationConfig gates = Optional.ofNullable(failOnUnclassified)
+                .map(fail -> ValidationConfig.builder()
+                        .failOnUnclassified(fail)
+                        .minConfidence(stated.validation().minConfidence())
+                        .failOnAmbiguous(stated.validation().failOnAmbiguous())
+                        .allowInferred(stated.validation().allowInferred())
+                        .findingThresholds(stated.validation().findingThresholds())
+                        .build())
+                .orElseGet(stated::validation);
+        return new HexaGlueConfig(scope, stated.classification(), gates, stated.generation());
     }
 
     /**

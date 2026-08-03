@@ -95,8 +95,10 @@ public record Validation(List<Refusal> refusals) {
     }
 
     private static String candidates(Classification verdict) {
-        List<String> kinds =
-                verdict.candidates().stream().map(Candidate::kind).map(Enum::name).toList();
+        List<String> kinds = verdict.candidates().stream()
+                .map(Candidate::kind)
+                .map(Enum::name)
+                .toList();
         return kinds.size() + " candidates: " + String.join(", ", kinds);
     }
 

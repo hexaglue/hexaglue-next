@@ -68,8 +68,10 @@ public final class AnalysisChain implements AnalysisRunner {
      */
     static ArchModel modelOf(Path sources, String basePackage, ClassificationConfig classification) {
         AnalysisScope scope = new AnalysisScope(Optional.of(basePackage), List.of(), List.of());
-        CodeModel code = SpoonFrontend.analyze(
-                        FrontendRequest.builder().sourceRoot(sources).scope(scope).build())
+        CodeModel code = SpoonFrontend.analyze(FrontendRequest.builder()
+                        .sourceRoot(sources)
+                        .scope(scope)
+                        .build())
                 .code();
         HexaGlueConfig config =
                 new HexaGlueConfig(scope, classification, ValidationConfig.defaults(), GenerationConfig.defaults());

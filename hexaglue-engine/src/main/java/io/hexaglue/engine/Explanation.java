@@ -140,7 +140,8 @@ public final class Explanation {
         }
         Map<ArchType, List<Validation.Refusal>> byType = new LinkedHashMap<>();
         for (Validation.Refusal refusal : validation.refusals()) {
-            byType.computeIfAbsent(refusal.subject(), subject -> new ArrayList<>()).add(refusal);
+            byType.computeIfAbsent(refusal.subject(), subject -> new ArrayList<>())
+                    .add(refusal);
         }
         List<String> lines = new ArrayList<>();
         lines.add("validation refused " + byType.size() + (byType.size() == 1 ? " type" : " types"));

@@ -70,10 +70,7 @@ class FrontendDiagnosticsTest {
     @Test
     @DisplayName("names a type it left out as generated code, and the marker that says so")
     void namesGeneratedCodeAndItsMarker() {
-        SourceFixtures.write(
-                sources,
-                "com/acme/OrderAdapter.java",
-                """
+        SourceFixtures.write(sources, "com/acme/OrderAdapter.java", """
                 package com.acme;
                 @jakarta.annotation.Generated("hexaglue")
                 public class OrderAdapter {}
@@ -116,10 +113,7 @@ class FrontendDiagnosticsTest {
     @Test
     @DisplayName("stays silent about the parser when a reference it cannot resolve is the only gap")
     void staysSilentOnUnresolvedReferences() {
-        SourceFixtures.write(
-                sources,
-                "com/acme/Order.java",
-                """
+        SourceFixtures.write(sources, "com/acme/Order.java", """
                 package com.acme;
                 public class Order extends com.absent.Base {
                     private com.absent.Money total;

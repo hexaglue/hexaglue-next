@@ -42,8 +42,10 @@ class SpoonFrontendTest {
     }
 
     private CodeModel analyze(AnalysisScope scope) {
-        return SpoonFrontend.analyze(
-                        FrontendRequest.builder().sourceRoot(sources).scope(scope).build())
+        return SpoonFrontend.analyze(FrontendRequest.builder()
+                        .sourceRoot(sources)
+                        .scope(scope)
+                        .build())
                 .code();
     }
 

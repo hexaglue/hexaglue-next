@@ -141,7 +141,8 @@ public final class SpoonFrontend {
      * still becomes an external stub when something analyzed refers to it — so the message says
      * what was not read, never that the type does not exist.
      */
-    private static Diagnostic leftOut(CtType<?> type, AnalysisPerimeter.Exclusion exclusion, SourceLocations locations) {
+    private static Diagnostic leftOut(
+            CtType<?> type, AnalysisPerimeter.Exclusion exclusion, SourceLocations locations) {
         String name = type.getQualifiedName();
         Diagnostic.Builder diagnostic = Diagnostic.builder(
                         exclusion.code(), DiagnosticSeverity.INFO, name + " was not analyzed: " + exclusion.reason())

@@ -72,6 +72,11 @@
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-testkit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

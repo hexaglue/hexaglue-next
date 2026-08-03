@@ -54,7 +54,7 @@
         <slf4j.version>2.0.18</slf4j.version>
         <spoon.version>11.5.0</spoon.version>
         <classgraph.version>4.8.186</classgraph.version>
-        <snakeyaml-engine.version>2.10</snakeyaml-engine.version>
+        <snakeyaml-engine.version>3.0.1</snakeyaml-engine.version>
 
         <!-- Compilation guard rails -->
         <error-prone.version>2.50.0</error-prone.version>

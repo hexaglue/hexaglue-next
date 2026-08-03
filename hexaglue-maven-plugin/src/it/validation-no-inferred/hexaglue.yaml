@@ -1,0 +1,4 @@
+analysis:
+  basePackage: com.example
+validation:
+  allowInferred: false

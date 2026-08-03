@@ -72,6 +72,9 @@ verify: ## Tests + quality (incremental, no clean)
 	mvn verify -Pquality 2>&1 | tee $(BUILD_DIR)/build.log
 	$(QUALITY_AGGREGATE)
 
+integration: ## Run the plugin integration tests only
+	@mvn -pl hexaglue-maven-plugin -am install -DskipTests -q && mvn -pl hexaglue-maven-plugin invoker:install invoker:run
+
 ci: clean verify ## Full CI pipeline
 
 all: ci coverage ## Everything

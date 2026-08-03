@@ -1,0 +1,5 @@
+analysis:
+  basePackage: com.example
+classification:
+  explicit:
+    com.example.Ledger: AGGREGATE_ROOT

@@ -38,12 +38,13 @@ class SpoonFrontendTest {
     Path sources;
 
     private CodeModel analyze() {
-        return SpoonFrontend.analyze(FrontendRequest.of(sources));
+        return SpoonFrontend.analyze(FrontendRequest.of(sources)).code();
     }
 
     private CodeModel analyze(AnalysisScope scope) {
         return SpoonFrontend.analyze(
-                FrontendRequest.builder().sourceRoot(sources).scope(scope).build());
+                        FrontendRequest.builder().sourceRoot(sources).scope(scope).build())
+                .code();
     }
 
     /** The types read from source, leaving out the stubs standing for classpath types. */

@@ -37,7 +37,7 @@ class MembersTest {
     Path sources;
 
     private TypeNode node(String qualifiedName) {
-        CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources));
+        CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources)).code();
         return model.type(TypeId.of(qualifiedName)).orElseThrow();
     }
 

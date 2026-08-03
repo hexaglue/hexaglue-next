@@ -71,7 +71,7 @@ class MethodBodiesTest {
         if (withBodies) {
             request.capability(CodeModelCapability.METHOD_BODIES);
         }
-        return SpoonFrontend.analyze(request.build());
+        return SpoonFrontend.analyze(request.build()).code();
     }
 
     private Method methodOf(CodeModel model, String name) {

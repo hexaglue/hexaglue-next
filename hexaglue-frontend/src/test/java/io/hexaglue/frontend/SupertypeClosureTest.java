@@ -61,9 +61,10 @@ class SupertypeClosureTest {
 
     private CodeModel analyzeWithSpringData() {
         return SpoonFrontend.analyze(FrontendRequest.builder()
-                .sourceRoot(sources)
-                .classpathEntry(springDataClasspath())
-                .build());
+                        .sourceRoot(sources)
+                        .classpathEntry(springDataClasspath())
+                        .build())
+                .code();
     }
 
     @Nested
@@ -110,7 +111,7 @@ class SupertypeClosureTest {
                     public interface OrderRepository extends JpaRepository<String, Long> {}
                     """);
 
-            CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources));
+            CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources)).code();
 
             assertThat(model.supertypesOf(TypeId.of("com.acme.OrderRepository")))
                     .containsExactly(TypeId.of(JPA_REPOSITORY));
@@ -133,7 +134,7 @@ class SupertypeClosureTest {
             SourceFixtures.write(
                     sources, "com/acme/Order.java", "package com.acme; public class Order extends Base {}");
 
-            CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources));
+            CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources)).code();
 
             assertThat(model.supertypesOf(TypeId.of("com.acme.Order")))
                     .containsExactly(TypeId.of("com.acme.Base"), TypeId.of("com.acme.Auditable"));
@@ -144,7 +145,7 @@ class SupertypeClosureTest {
         void leavesTheImplicitRootOut() {
             SourceFixtures.write(sources, "com/acme/Order.java", "package com.acme; public class Order {}");
 
-            CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources));
+            CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources)).code();
 
             assertThat(model.supertypesOf(TypeId.of("com.acme.Order"))).isEmpty();
         }
@@ -155,7 +156,7 @@ class SupertypeClosureTest {
             SourceFixtures.write(sources, "com/acme/A.java", "package com.acme; public interface A extends B {}");
             SourceFixtures.write(sources, "com/acme/B.java", "package com.acme; public interface B extends A {}");
 
-            CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources));
+            CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources)).code();
 
             assertThat(model.supertypesOf(TypeId.of("com.acme.A")))
                     .containsExactly(TypeId.of("com.acme.B"), TypeId.of("com.acme.A"));
@@ -172,9 +173,9 @@ class SupertypeClosureTest {
                     "package com.acme; public class Order implements Marker, Audited {}");
 
             List<TypeId> first =
-                    SpoonFrontend.analyze(FrontendRequest.of(sources)).supertypesOf(TypeId.of("com.acme.Order"));
+                    SpoonFrontend.analyze(FrontendRequest.of(sources)).code().supertypesOf(TypeId.of("com.acme.Order"));
             List<TypeId> second =
-                    SpoonFrontend.analyze(FrontendRequest.of(sources)).supertypesOf(TypeId.of("com.acme.Order"));
+                    SpoonFrontend.analyze(FrontendRequest.of(sources)).code().supertypesOf(TypeId.of("com.acme.Order"));
 
             assertThat(first)
                     .containsExactly(TypeId.of("com.acme.Audited"), TypeId.of("com.acme.Marker"))

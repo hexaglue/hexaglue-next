@@ -22,6 +22,11 @@
  * <p>Everything here is a fact read from a declaration — never an interpretation. Deciding what a
  * type <em>is</em> belongs to the engine.</p>
  *
+ * <p>A reading also accounts for itself: {@link io.hexaglue.frontend.FrontendResult} carries the
+ * coded diagnostics of what was not read — outside the perimeter, generated, or recovered from a
+ * source the parser could not fully read. They explain a narrower reading, which no later stage
+ * can distinguish from a smaller code base; they are never verdicts, and no rule consumes them.</p>
+ *
  * @since 7.0.0
  */
 package io.hexaglue.frontend;

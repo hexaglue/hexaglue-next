@@ -16,6 +16,7 @@ package io.hexaglue.frontend;
 import static io.hexaglue.model.code.CodeModelCapability.METHOD_BODIES;
 
 import io.hexaglue.frontend.TypeNodeMapper.MappedType;
+import io.hexaglue.model.TypeId;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.MethodBodyFacts;
 import io.hexaglue.model.code.TypeNode;
@@ -63,24 +64,40 @@ public final class SpoonFrontend {
     /** The sources could not be parsed. */
     private static final IssueCode PARSING_FAILED = IssueCode.of("HG-FRONTEND-003");
 
+    /** The parser recovered from a source it could not fully read. */
+    private static final IssueCode PARSING_RECOVERED = IssueCode.of("HG-FRONTEND-006");
+
     private SpoonFrontend() {}
 
     /**
-     * Reads the requested sources into a code model.
+     * Reads the requested sources into a code model, and says what it left out of it.
      *
      * @param request what to read and how
-     * @return the code model of the analyzed sources
+     * @return the code model of the analyzed sources, with the diagnostics of what was not read
      */
-    public static CodeModel analyze(FrontendRequest request) {
+    public static FrontendResult analyze(FrontendRequest request) {
         Objects.requireNonNull(request, "request must not be null");
-        CtModel parsed = parse(request);
+        Parsed parsed = parse(request);
 
         AnalysisPerimeter perimeter = new AnalysisPerimeter(request.scope());
-        TypeNodeMapper mapper =
-                new TypeNodeMapper(new SourceLocations(request.sourceRoots()), request.has(METHOD_BODIES));
-        List<MappedType> mapped =
-                analyzedTypes(parsed, perimeter).stream().map(mapper::map).toList();
+        SourceLocations locations = new SourceLocations(request.sourceRoots());
+        TypeNodeMapper mapper = new TypeNodeMapper(locations, request.has(METHOD_BODIES));
 
+        List<CtType<?>> analyzed = new ArrayList<>();
+        List<Diagnostic> diagnostics = new ArrayList<>();
+        // The reading as a whole comes before what it left out, type by type.
+        if (parsed.recoveries() > 0) {
+            diagnostics.add(recovered(parsed.recoveries()));
+        }
+        for (CtType<?> type : declaredTypes(parsed.model())) {
+            perimeter
+                    .exclusionOf(type)
+                    .ifPresentOrElse(
+                            exclusion -> diagnostics.add(leftOut(type, exclusion, locations)),
+                            () -> analyzed.add(type));
+        }
+
+        List<MappedType> mapped = analyzed.stream().map(mapper::map).toList();
         List<TypeNode> nodes = mapped.stream().map(MappedType::node).toList();
         List<MethodBodyFacts> bodyFacts =
                 mapped.stream().flatMap(type -> type.bodyFacts().stream()).toList();
@@ -96,26 +113,66 @@ public final class SpoonFrontend {
         bodyFacts.forEach(model::addBodyFacts);
         Supertypes.closures(allNodes, request.classpath()).forEach(model::supertypes);
         LOG.debug(
-                "Code model built: {} analyzed types, {} external stubs, {} edges",
+                "Code model built: {} analyzed types, {} external stubs, {} edges, {} diagnostics",
                 nodes.size(),
                 relations.stubs().size(),
-                relations.all().size());
-        return model.build();
+                relations.all().size(),
+                diagnostics.size());
+        return new FrontendResult(model.build(), diagnostics);
     }
+
+    /**
+     * Words a parser recovery. Tolerant parsing is what makes an incomplete code base analyzable,
+     * but a declaration read half-way is indistinguishable from one written that way: the reading
+     * is the only place that knows the difference, so it is the only place that can say it.
+     */
+    private static Diagnostic recovered(int recoveries) {
+        return Diagnostic.builder(
+                        PARSING_RECOVERED,
+                        DiagnosticSeverity.WARNING,
+                        "The parser recovered from " + recoveries
+                                + " problem(s) while reading the sources; the declarations it could not fully read"
+                                + " are incomplete in the model")
+                .build();
+    }
+
+    /**
+     * Words an exclusion as a coded diagnostic. A type left out is not erased from the world — it
+     * still becomes an external stub when something analyzed refers to it — so the message says
+     * what was not read, never that the type does not exist.
+     */
+    private static Diagnostic leftOut(CtType<?> type, AnalysisPerimeter.Exclusion exclusion, SourceLocations locations) {
+        String name = type.getQualifiedName();
+        Diagnostic.Builder diagnostic = Diagnostic.builder(
+                        exclusion.code(), DiagnosticSeverity.INFO, name + " was not analyzed: " + exclusion.reason())
+                .subject(TypeId.of(name));
+        locations.of(type).ifPresent(diagnostic::location);
+        return diagnostic.build();
+    }
+
+    /**
+     * What one parse produced: the parsed sources, and how many problems the parser recovered from
+     * along the way. The count is the parser's own — measured to react to a source it could not
+     * read, and not to a reference it could not resolve, which is the normal condition of an
+     * analysis run without a complete classpath.
+     */
+    private record Parsed(CtModel model, int recoveries) {}
 
     // The parser signals every kind of setup and reading failure with unchecked exceptions of its
     // own and of its compiler backend. They are caught wholesale and rethrown coded — nothing is
     // swallowed, and no partial model escapes.
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
-    private static CtModel parse(FrontendRequest request) {
+    private static Parsed parse(FrontendRequest request) {
         checkInputs(request);
         Launcher launcher = new Launcher();
-        configure(launcher.getEnvironment(), request);
+        Environment environment = launcher.getEnvironment();
+        configure(environment, request);
         for (Path sourceRoot : request.sourceRoots()) {
             launcher.addInputResource(sourceRoot.toAbsolutePath().toString());
         }
         try {
-            return launcher.buildModel();
+            CtModel model = launcher.buildModel();
+            return new Parsed(model, environment.getErrorCount() + environment.getWarningCount());
         } catch (RuntimeException parseFailure) {
             // Converted, not swallowed: the caller gets a coded failure instead of a model
             // silently missing whatever could not be parsed.
@@ -166,19 +223,19 @@ public final class SpoonFrontend {
     }
 
     /**
-     * Returns the types to read, in identity order.
+     * Returns every type the sources declare, in identity order — before the perimeter decides
+     * which of them are read, so that what is left out is reported in that same stable order.
      *
      * <p>Nested types are read like any other: the parser's top-level view hides the domain
      * written inside an aggregate. Anonymous and local classes are left out — they name nothing
-     * stable and express no architectural intent.</p>
+     * stable and express no architectural intent, so nothing can be said about them either.</p>
      */
     // The explicit type argument is load-bearing: with a diamond the filter infers the raw
     // CtType and the result no longer carries the wildcard the model mapper expects.
     @SuppressWarnings("PMD.UseDiamondOperator")
-    private static List<CtType<?>> analyzedTypes(CtModel parsed, AnalysisPerimeter perimeter) {
+    private static List<CtType<?>> declaredTypes(CtModel parsed) {
         return parsed.getElements(new TypeFilter<CtType<?>>(CtType.class)).stream()
                 .filter(SpoonFrontend::isNamedDeclaration)
-                .filter(perimeter::covers)
                 .sorted(Comparator.comparing(CtType::getQualifiedName))
                 .toList();
     }

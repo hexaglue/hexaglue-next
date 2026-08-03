@@ -64,7 +64,7 @@ class AnnotationValuesTest {
     }
 
     private Annotation annotationOf(String typeName, String annotationQualifiedName) {
-        CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources));
+        CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources)).code();
         TypeNode node = model.type(TypeId.of(typeName)).orElseThrow();
         return node.annotations().stream()
                 .filter(annotation -> annotation.is(annotationQualifiedName))
@@ -149,7 +149,7 @@ class AnnotationValuesTest {
     void keepsEveryAnnotationInDeclarationOrder() {
         writeOrderAnnotatedWith("@Audited\n@Table(name = \"orders\")");
 
-        CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources));
+        CodeModel model = SpoonFrontend.analyze(FrontendRequest.of(sources)).code();
         assertThat(model.type(TypeId.of("com.acme.Order")).orElseThrow().annotations())
                 .extracting(Annotation::qualifiedName)
                 .containsExactly("com.acme.meta.Audited", "com.acme.meta.Table");

@@ -93,6 +93,6 @@ class FrontendFailuresTest {
 
         // Tolerant parsing is what makes an incomplete code base analyzable at all; the parser
         // recovers here rather than failing, and the type it could read is still reported.
-        assertThat(SpoonFrontend.analyze(FrontendRequest.of(sources)).types()).isNotEmpty();
+        assertThat(SpoonFrontend.analyze(FrontendRequest.of(sources)).code().types()).isNotEmpty();
     }
 }

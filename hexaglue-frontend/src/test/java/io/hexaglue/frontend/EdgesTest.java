@@ -40,7 +40,7 @@ class EdgesTest {
     Path sources;
 
     private CodeModel analyze() {
-        return SpoonFrontend.analyze(FrontendRequest.of(sources));
+        return SpoonFrontend.analyze(FrontendRequest.of(sources)).code();
     }
 
     private List<String> edgesOf(CodeModel model, String source) {

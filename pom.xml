@@ -35,6 +35,7 @@
         <module>hexaglue-frontend</module>
         <module>hexaglue-knowledge</module>
         <module>hexaglue-engine</module>
+        <module>hexaglue-spi</module>
         <module>hexaglue-maven-plugin</module>
         <module>hexaglue-testkit</module>
         <module>hexaglue-acceptance</module>
@@ -120,6 +121,11 @@
             <dependency>
                 <groupId>io.hexaglue</groupId>
                 <artifactId>hexaglue-engine</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.hexaglue</groupId>
+                <artifactId>hexaglue-spi</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

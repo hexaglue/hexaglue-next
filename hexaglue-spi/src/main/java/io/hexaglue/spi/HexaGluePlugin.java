@@ -13,15 +13,13 @@
 
 package io.hexaglue.spi;
 
-import io.hexaglue.model.arch.ArchModel;
-
 /**
  * A backend that turns the classified model into something: documentation, a report, sources.
  *
- * <p>Contributing is a pure function of the model. Everything a plugin needs is in {@link
- * ArchModel} — the verdicts, their provenance, the indexes over the domain, the ports and the
- * composition — so a plugin that re-derives an architectural fact of its own is reading the wrong
- * source. If something is missing there, the model is what grows, not the plugin.</p>
+ * <p>Contributing is a pure function of what it is handed. Everything a plugin needs is in the
+ * {@link Contribution} — the verdicts, their provenance, the indexes, and what the checks
+ * concluded — so a plugin that re-derives an architectural fact of its own is reading the wrong
+ * source. If something is missing there, the contribution is what grows, not the plugin.</p>
  *
  * <p>A plugin emits into the sinks and never writes anything itself. The host decides where the
  * output goes, which is what confines it.</p>
@@ -40,9 +38,7 @@ public interface HexaGluePlugin {
     /**
      * Contributes to the run.
      *
-     * @param model the classified model, complete and immutable
-     * @param config the options stated for this plugin, opaque to every other stage
-     * @param sinks where the contribution goes
+     * @param contribution what this plugin reads and where its result goes
      */
-    void contribute(ArchModel model, PluginConfig config, Sinks sinks);
+    void contribute(Contribution contribution);
 }

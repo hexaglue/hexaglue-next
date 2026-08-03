@@ -67,8 +67,8 @@ class PluginExecutorTest {
         }
 
         @Override
-        public void contribute(ArchModel model, PluginConfig config, Sinks sinks) {
-            behaviour.accept(sinks);
+        public void contribute(Contribution contribution) {
+            behaviour.accept(contribution.sinks());
         }
     }
 
@@ -100,8 +100,8 @@ class PluginExecutorTest {
                 }
 
                 @Override
-                public void contribute(ArchModel model, PluginConfig config, Sinks sinks) {
-                    seen.append(config.text("title").orElse("none"));
+                public void contribute(Contribution contribution) {
+                    seen.append(contribution.config().text("title").orElse("none"));
                 }
             };
 
@@ -155,7 +155,7 @@ class PluginExecutorTest {
                 }
 
                 @Override
-                public void contribute(ArchModel model, PluginConfig config, Sinks sinks) {
+                public void contribute(Contribution contribution) {
                     throw new IllegalStateException("never reached");
                 }
             };
@@ -251,8 +251,8 @@ class PluginExecutorTest {
                 }
 
                 @Override
-                public void contribute(ArchModel model, PluginConfig config, Sinks sinks) {
-                    config.number("depth", 3);
+                public void contribute(Contribution contribution) {
+                    contribution.config().number("depth", 3);
                 }
             };
 

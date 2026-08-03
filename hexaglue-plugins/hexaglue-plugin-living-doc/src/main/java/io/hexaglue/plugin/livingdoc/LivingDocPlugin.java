@@ -14,11 +14,9 @@
 package io.hexaglue.plugin.livingdoc;
 
 import io.hexaglue.model.arch.ArchModel;
-import io.hexaglue.spi.Document;
+import io.hexaglue.spi.Contribution;
 import io.hexaglue.spi.HexaGluePlugin;
-import io.hexaglue.spi.PluginConfig;
 import io.hexaglue.spi.PluginManifest;
-import io.hexaglue.spi.Sinks;
 import java.util.List;
 
 /**
@@ -52,14 +50,11 @@ public final class LivingDocPlugin implements HexaGluePlugin {
     }
 
     @Override
-    public void contribute(ArchModel model, PluginConfig config, Sinks sinks) {
-        LivingDocOptions options = LivingDocOptions.from(config);
-        emit(sinks, options, OverviewDocument.NAME, new OverviewDocument(model).render());
-        emit(sinks, options, DomainDocument.NAME, new DomainDocument(model, options).render());
-        emit(sinks, options, PortsDocument.NAME, new PortsDocument(model, options).render());
-    }
-
-    private static void emit(Sinks sinks, LivingDocOptions options, String name, String content) {
-        sinks.documents().emit(new Document(options.pathOf(name), content));
+    public void contribute(Contribution contribution) {
+        LivingDocOptions options = LivingDocOptions.from(contribution.config());
+        ArchModel model = contribution.model();
+        contribution.emit(options.pathOf(OverviewDocument.NAME), new OverviewDocument(model).render());
+        contribution.emit(options.pathOf(DomainDocument.NAME), new DomainDocument(model, options).render());
+        contribution.emit(options.pathOf(PortsDocument.NAME), new PortsDocument(model, options).render());
     }
 }

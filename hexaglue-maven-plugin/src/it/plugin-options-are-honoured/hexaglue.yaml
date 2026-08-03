@@ -1,0 +1,11 @@
+analysis:
+  basePackage: com.example.shop
+
+plugins:
+  io.hexaglue.audit:
+    outputDirectory: audit
+    writeJson: false
+  io.hexaglue.living-doc:
+    outputDirectory: docs
+    propertiesPerDiagram: 1
+    includeProvenance: false

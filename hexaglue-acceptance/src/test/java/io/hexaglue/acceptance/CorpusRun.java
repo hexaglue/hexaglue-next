@@ -52,14 +52,29 @@ record CorpusRun(CorpusScenario scenario, ArchModel model) {
     List<String> unmetClaims() {
         List<String> unmet = new ArrayList<>();
         for (CorpusExpectations.Claim claim : CorpusExpectations.of(scenario).claims()) {
-            String actual = model.type(TypeId.of(claim.qualifiedName()))
-                    .map(ArchType::kind)
-                    .map(ArchKind::name)
-                    .orElse("NO VERDICT");
+            String actual = kindIn(model, claim.qualifiedName());
             if (!claim.isSatisfiedBy(actual)) {
                 unmet.add(claim + " but got " + actual);
             }
         }
         return unmet;
+    }
+
+    /**
+     * Returns the kind a model gave a type, in the words a claim uses — the absence of a verdict
+     * included.
+     *
+     * <p>Here rather than at each caller: the scoreboard and the naming report both compare a model
+     * against claims, and two readings of what a claim means would be free to drift apart.</p>
+     *
+     * @param model the model to read
+     * @param qualifiedName the type to look up
+     * @return the kind, or {@link CorpusExpectations#NO_VERDICT} when the type reached none
+     */
+    static String kindIn(ArchModel model, String qualifiedName) {
+        return model.type(TypeId.of(qualifiedName))
+                .map(ArchType::kind)
+                .map(ArchKind::name)
+                .orElse(CorpusExpectations.NO_VERDICT);
     }
 }

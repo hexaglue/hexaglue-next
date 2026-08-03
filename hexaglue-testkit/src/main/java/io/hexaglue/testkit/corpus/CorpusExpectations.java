@@ -51,6 +51,15 @@ import java.util.Objects;
  */
 public record CorpusExpectations(String scenarioId, boolean reviewed, List<Claim> claims) {
 
+    /**
+     * What a claim names when a type reached no verdict at all, and the harness has no kind to
+     * render. Stated once here, next to the format it belongs to, so that everything comparing a
+     * model against a claim spells the absence the same way.
+     *
+     * @since 7.0.0
+     */
+    public static final String NO_VERDICT = "NO VERDICT";
+
     private static final String REVIEWED = "status: reviewed";
     private static final String EXPECT = "expect:";
     private static final String REJECT = "reject:";

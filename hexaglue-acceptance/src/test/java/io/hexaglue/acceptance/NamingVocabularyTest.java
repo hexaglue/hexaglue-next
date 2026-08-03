@@ -14,10 +14,7 @@
 package io.hexaglue.acceptance;
 
 import io.hexaglue.acceptance.NamingShift.Outcome;
-import io.hexaglue.model.ArchKind;
-import io.hexaglue.model.TypeId;
 import io.hexaglue.model.arch.ArchModel;
-import io.hexaglue.model.arch.ArchType;
 import io.hexaglue.model.config.ClassificationConfig;
 import io.hexaglue.testkit.GoldenFiles;
 import io.hexaglue.testkit.corpus.Corpus;
@@ -57,8 +54,6 @@ import org.junit.jupiter.api.io.TempDir;
 class NamingVocabularyTest {
 
     private static final Path GOLDEN_DIR = Path.of("src/test/resources/golden");
-
-    private static final String NO_VERDICT = "NO VERDICT";
 
     @TempDir
     Path workspace;
@@ -132,8 +127,8 @@ class NamingVocabularyTest {
 
         List<NamingShift> shifts = new ArrayList<>();
         for (String qualifiedName : namesIn(without, with)) {
-            String off = kindIn(without, qualifiedName);
-            String on = kindIn(with, qualifiedName);
+            String off = CorpusRun.kindIn(without, qualifiedName);
+            String on = CorpusRun.kindIn(with, qualifiedName);
             if (!off.equals(on)) {
                 shifts.add(NamingShift.of(qualifiedName, off, on, expectations.claims()));
             }
@@ -148,12 +143,5 @@ class NamingVocabularyTest {
             model.types().stream().map(type -> type.id().qualifiedName()).forEach(names::add);
         }
         return names;
-    }
-
-    private static String kindIn(ArchModel model, String qualifiedName) {
-        return model.type(TypeId.of(qualifiedName))
-                .map(ArchType::kind)
-                .map(ArchKind::name)
-                .orElse(NO_VERDICT);
     }
 }

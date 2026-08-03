@@ -16,8 +16,10 @@ package io.hexaglue.acceptance;
 import io.hexaglue.testkit.GoldenFiles;
 import io.hexaglue.testkit.corpus.AnalysisRunner;
 import io.hexaglue.testkit.corpus.Corpus;
+import io.hexaglue.testkit.corpus.CorpusProfile;
 import io.hexaglue.testkit.corpus.CorpusScenario;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,7 +27,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Every profile 1 scenario, snapshot for snapshot.
+ * Every corpus scenario, of every profile, snapshot for snapshot.
  *
  * <p>The scoreboard next door scores the claims a person reviewed; this pins everything else the
  * model says — which record each type landed in, what it was filled with, why the ones left over
@@ -36,15 +38,17 @@ import org.junit.jupiter.params.provider.MethodSource;
  * analysis, and this module is where one is bound to it. A missing runner is a wiring failure, not
  * a reason to skip.</p>
  */
-class Profile1GoldenTest {
+class CorpusGoldenTest {
 
-    private static final Path GOLDEN_DIR = Path.of("src/test/resources/golden/profile1");
+    private static final Path GOLDEN_ROOT = Path.of("src/test/resources/golden");
 
     @TempDir
     Path workspace;
 
     static Stream<Arguments> scenarios() {
-        return Corpus.profile1().stream().map(scenario -> Arguments.of(scenario.id(), scenario));
+        return Arrays.stream(CorpusProfile.values())
+                .flatMap(profile -> Corpus.of(profile).stream())
+                .map(scenario -> Arguments.of(scenario.id(), scenario));
     }
 
     @ParameterizedTest(name = "{0}")
@@ -56,6 +60,6 @@ class Profile1GoldenTest {
 
         String snapshot = runner.analyze(scenario.materialize(workspace.resolve(id)), scenario.basePackage());
 
-        GoldenFiles.assertMatchesExisting(GOLDEN_DIR, id + ".json", snapshot);
+        GoldenFiles.assertMatchesExisting(GOLDEN_ROOT.resolve(scenario.profile().directory()), id + ".json", snapshot);
     }
 }

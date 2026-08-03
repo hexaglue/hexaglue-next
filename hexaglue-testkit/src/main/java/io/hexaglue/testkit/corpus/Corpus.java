@@ -19,49 +19,56 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
  * Loads the reference acceptance corpus shipped as classpath resources of the testkit.
  *
- * <p>Each corpus profile is an index of scenarios; every scenario directory holds a {@code
+ * <p>Each {@link CorpusProfile} is an index of scenarios; every scenario directory holds a {@code
  * scenario.properties} descriptor ({@code basePackage}, {@code origin}), a {@code files.txt}
  * source listing and the source files themselves under {@code src/}. Scenario order follows the
- * index file, which is generated sorted, so corpus iteration is deterministic.
+ * index file, which is kept sorted, so corpus iteration is deterministic.
  *
  * @since 7.0.0
  */
 public final class Corpus {
 
-    private static final String PROFILE1_ROOT = "/corpus/profile1";
-
     private Corpus() {}
 
     /**
-     * Loads profile 1 of the corpus: sources following the HexaGlue naming and structure
-     * conventions, harvested from the historical classification test suite.
+     * Loads one profile of the corpus.
      *
-     * @return the scenarios of profile 1, in index order
+     * @param profile the profile to load
+     * @return its scenarios, in index order
      * @throws IllegalStateException if the corpus resources are missing or malformed
      */
-    public static List<CorpusScenario> profile1() {
-        return loadProfile(PROFILE1_ROOT);
-    }
-
-    private static List<CorpusScenario> loadProfile(String profileRoot) {
+    public static List<CorpusScenario> of(CorpusProfile profile) {
+        Objects.requireNonNull(profile, "profile must not be null");
+        String profileRoot = rootOf(profile);
         List<String> ids = readLines(profileRoot + "/scenarios.txt");
         if (ids.isEmpty()) {
             throw new IllegalStateException("Corpus index " + profileRoot + "/scenarios.txt is empty");
         }
         List<CorpusScenario> scenarios = new ArrayList<>(ids.size());
         for (String id : ids) {
-            scenarios.add(loadScenario(profileRoot, id));
+            scenarios.add(loadScenario(profile, id));
         }
         return List.copyOf(scenarios);
     }
 
-    private static CorpusScenario loadScenario(String profileRoot, String id) {
-        String scenarioRoot = profileRoot + "/" + id;
+    /**
+     * Returns the classpath root under which a profile ships its scenarios.
+     *
+     * @param profile the profile
+     * @return the resource path, without a trailing slash
+     */
+    static String rootOf(CorpusProfile profile) {
+        return "/corpus/" + profile.directory();
+    }
+
+    private static CorpusScenario loadScenario(CorpusProfile profile, String id) {
+        String scenarioRoot = rootOf(profile) + "/" + id;
         Properties descriptor = readProperties(scenarioRoot + "/scenario.properties");
         String basePackage = requireProperty(descriptor, "basePackage", scenarioRoot);
         String origin = requireProperty(descriptor, "origin", scenarioRoot);
@@ -70,7 +77,7 @@ public final class Corpus {
             String content = readResource(scenarioRoot + "/src/" + relativePath);
             sources.add(new CorpusScenario.SourceFile(relativePath, content));
         }
-        return new CorpusScenario(id, basePackage, origin, sources);
+        return new CorpusScenario(profile, id, basePackage, origin, sources);
     }
 
     private static String requireProperty(Properties descriptor, String key, String scenarioRoot) {

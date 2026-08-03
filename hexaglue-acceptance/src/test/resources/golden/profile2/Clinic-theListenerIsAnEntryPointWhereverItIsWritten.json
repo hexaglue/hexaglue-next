@@ -1,0 +1,15 @@
+{
+  "domain": [],
+  "application": [],
+  "ports": [],
+  "adapters": [
+    {
+      "qualifiedName": "com.acme.clinic.schedule.VisitReminders",
+      "direction": "DRIVING",
+      "ports": [],
+      "confidence": "HIGH",
+      "basis": "INFERRED"
+    }
+  ],
+  "unclassified": []
+}

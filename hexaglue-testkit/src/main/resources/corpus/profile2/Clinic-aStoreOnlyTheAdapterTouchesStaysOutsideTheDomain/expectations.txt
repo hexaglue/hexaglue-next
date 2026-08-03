@@ -1,0 +1,16 @@
+# Clinic-aStoreOnlyTheAdapterTouchesStaysOutsideTheDomain
+#
+# The other half of the discriminant: the same mapping annotations as the aggregate of this
+# profile, on a type that only an adapter ever touches.
+
+# Holding a JdbcTemplate places a type outside the hexagon whatever it is called, so the
+# ledger is a way out. The row type it reads and returns is mapped to a table exactly like
+# the aggregate two scenarios up, and lands nowhere: what separated them was never the
+# annotation but the position — one is kept by a way out the core calls, the other is an
+# internal detail of an adapter.
+#
+# Naming a type in a signature is not, on its own, a context to read it in. The reason the
+# report gives says as much, in the words it has for the general case.
+status: reviewed
+expect: com.acme.clinic.billing.InvoiceLedger = DRIVEN_ADAPTER
+expect: com.acme.clinic.billing.InvoiceRow = UNCLASSIFIED

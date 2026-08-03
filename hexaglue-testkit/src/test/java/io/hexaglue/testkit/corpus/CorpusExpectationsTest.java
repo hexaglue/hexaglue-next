@@ -19,6 +19,8 @@ import io.hexaglue.testkit.corpus.CorpusExpectations.Claim;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class CorpusExpectationsTest {
 
@@ -26,19 +28,20 @@ class CorpusExpectationsTest {
     @DisplayName("reads what a scenario is held to mean")
     class ReadsWhatAScenarioIsHeldToMean {
 
-        @Test
-        @DisplayName("for every scenario of the corpus, drafted or reviewed")
-        void forEveryScenarioOfTheCorpus() {
-            assertThat(Corpus.profile1())
+        @ParameterizedTest
+        @EnumSource(CorpusProfile.class)
+        @DisplayName("for every scenario of every profile, drafted or reviewed")
+        void forEveryScenarioOfEveryProfile(CorpusProfile profile) {
+            assertThat(Corpus.of(profile))
                     .allSatisfy(scenario -> assertThat(
-                                    CorpusExpectations.profile1(scenario.id()).scenarioId())
+                                    CorpusExpectations.of(scenario).scenarioId())
                             .isEqualTo(scenario.id()));
         }
 
         @Test
         @DisplayName("answering empty and unreviewed for a scenario that has no file")
         void emptyForAScenarioWithoutAFile() {
-            CorpusExpectations expectations = CorpusExpectations.profile1("no-such-scenario");
+            CorpusExpectations expectations = CorpusExpectations.of(CorpusProfile.PROFILE_1, "no-such-scenario");
 
             assertThat(expectations.reviewed()).isFalse();
             assertThat(expectations.claims()).isEmpty();
@@ -50,16 +53,16 @@ class CorpusExpectationsTest {
     @DisplayName("scores nothing")
     class ScoresNothing {
 
-        @Test
+        @ParameterizedTest
+        @EnumSource(CorpusProfile.class)
         @DisplayName("while the file is still a draft, however many claims it carries")
-        void whileTheFileIsStillADraft() {
+        void whileTheFileIsStillADraft(CorpusProfile profile) {
             // Every scenario starts as a draft: the legacy engine carries bugs, so an imported
             // expectation means nothing until someone has read it.
-            assertThat(Corpus.profile1())
-                    .filteredOn(scenario ->
-                            !CorpusExpectations.profile1(scenario.id()).reviewed())
+            assertThat(Corpus.of(profile))
+                    .filteredOn(scenario -> !CorpusExpectations.of(scenario).reviewed())
                     .allSatisfy(scenario -> assertThat(
-                                    CorpusExpectations.profile1(scenario.id()).isScorable())
+                                    CorpusExpectations.of(scenario).isScorable())
                             .isFalse());
         }
     }

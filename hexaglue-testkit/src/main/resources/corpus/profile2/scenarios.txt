@@ -1,0 +1,6 @@
+Clinic-aMappingToAStoreDecidesNoRole
+Clinic-aStoreOnlyTheAdapterTouchesStaysOutsideTheDomain
+Clinic-theListenerIsAnEntryPointWhereverItIsWritten
+Clinic-theServiceBetweenTheControllerAndTheRepository
+Clinic-theWholeClinic
+Clinic-whatSpringDataManagesIsTheAggregate

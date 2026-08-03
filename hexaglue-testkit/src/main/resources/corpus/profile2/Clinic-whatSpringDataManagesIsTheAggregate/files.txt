@@ -1,0 +1,4 @@
+org/springframework/data/repository/Repository.java
+org/springframework/data/jpa/repository/JpaRepository.java
+com/acme/clinic/owner/Owner.java
+com/acme/clinic/owner/OwnerRepository.java

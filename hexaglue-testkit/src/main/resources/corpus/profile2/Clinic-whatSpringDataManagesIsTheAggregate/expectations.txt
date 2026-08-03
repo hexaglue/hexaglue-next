@@ -1,0 +1,20 @@
+# Clinic-whatSpringDataManagesIsTheAggregate
+#
+# Authored for the enterprise profile. Everything here is what the field actually writes:
+# a mutable class with setters, mapped to a table, and an interface that declares the store
+# to Spring Data rather than implementing it.
+
+# The declaration is the whole evidence. Extending Repository states which type is kept and
+# which type finds it, so the interface is a way out and the type it keeps has a life of its
+# own — read from the same sentence, not from two conventions that happen to agree.
+#
+# The mapping decides nothing. @Entity and @Table say this type is stored, which is a fact
+# about storage and never a role: the reading would be identical without them, and the
+# coupling they reveal is a report of its own rather than a change of verdict.
+#
+# Nothing is claimed of the identifier: it is java.lang.Integer, outside the perimeter, so
+# there is no type here to give a verdict to. The tie survives it — the aggregate still
+# records which field finds it.
+status: reviewed
+expect: com.acme.clinic.owner.OwnerRepository = DRIVEN_PORT
+expect: com.acme.clinic.owner.Owner = AGGREGATE_ROOT

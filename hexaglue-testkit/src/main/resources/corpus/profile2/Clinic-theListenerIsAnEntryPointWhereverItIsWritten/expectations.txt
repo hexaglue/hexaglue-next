@@ -1,0 +1,15 @@
+# Clinic-theListenerIsAnEntryPointWhereverItIsWritten
+#
+# A message-driven adapter in the shape Spring gives it: a stereotype on the class, and the
+# broker named on the method that receives from it.
+
+# The type is called from outside the application and says so with a framework symbol —
+# which is the whole of the rule — except that the symbol is written where the framework
+# expects it, on the method rather than on the type. Reading only type-level annotations
+# would leave every listener in the code base looking like an ordinary component, and a
+# component holding services reads as the core.
+#
+# The stereotype on the class carries none of this: it supports a reading and never decides
+# one, and a class wearing it alone is undecided elsewhere in the corpus.
+status: reviewed
+expect: com.acme.clinic.schedule.VisitReminders = DRIVING_ADAPTER

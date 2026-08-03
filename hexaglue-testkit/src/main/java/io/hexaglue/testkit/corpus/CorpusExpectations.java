@@ -65,14 +65,27 @@ public record CorpusExpectations(String scenarioId, boolean reviewed, List<Claim
     }
 
     /**
-     * Reads the expectations recorded next to a profile 1 scenario.
+     * Reads the expectations recorded next to a scenario.
      *
+     * @param scenario the scenario
+     * @return its expectations, empty and unreviewed when the scenario has no file yet
+     */
+    public static CorpusExpectations of(CorpusScenario scenario) {
+        Objects.requireNonNull(scenario, "scenario must not be null");
+        return of(scenario.profile(), scenario.id());
+    }
+
+    /**
+     * Reads the expectations recorded next to a scenario named by its profile and id.
+     *
+     * @param profile the profile the scenario belongs to
      * @param scenarioId the scenario id
      * @return its expectations, empty and unreviewed when the scenario has no file yet
      */
-    public static CorpusExpectations profile1(String scenarioId) {
+    public static CorpusExpectations of(CorpusProfile profile, String scenarioId) {
+        Objects.requireNonNull(profile, "profile must not be null");
         Objects.requireNonNull(scenarioId, "scenarioId must not be null");
-        String resource = "/corpus/profile1/" + scenarioId + "/expectations.txt";
+        String resource = Corpus.rootOf(profile) + "/" + scenarioId + "/expectations.txt";
         try (InputStream stream = CorpusExpectations.class.getResourceAsStream(resource)) {
             if (stream == null) {
                 return new CorpusExpectations(scenarioId, false, List.of());

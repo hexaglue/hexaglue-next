@@ -1,0 +1,66 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.acme.clinic.owner.Owner",
+      "kind": "AGGREGATE_ROOT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS",
+      "identity": {
+        "field": "id",
+        "type": "java.lang.Integer"
+      },
+      "entities": [],
+      "valueObjects": [],
+      "domainEvents": [],
+      "drivenPort": "com.acme.clinic.owner.OwnerRepository",
+      "properties": [
+        {
+          "name": "id",
+          "type": "java.lang.Integer",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "lastName",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "telephone",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [
+    {
+      "qualifiedName": "com.acme.clinic.owner.OwnerService",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
+    {
+      "qualifiedName": "com.acme.clinic.owner.OwnerRepository",
+      "direction": "DRIVEN",
+      "portType": "REPOSITORY",
+      "managedAggregate": "com.acme.clinic.owner.Owner",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["findByLastName"]
+    }
+  ],
+  "adapters": [
+    {
+      "qualifiedName": "com.acme.clinic.owner.OwnerController",
+      "direction": "DRIVING",
+      "ports": [],
+      "confidence": "HIGH",
+      "basis": "INFERRED"
+    }
+  ],
+  "unclassified": []
+}

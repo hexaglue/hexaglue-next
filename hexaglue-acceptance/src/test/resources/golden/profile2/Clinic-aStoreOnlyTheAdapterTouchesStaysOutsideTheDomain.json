@@ -1,0 +1,21 @@
+{
+  "domain": [],
+  "application": [],
+  "ports": [],
+  "adapters": [
+    {
+      "qualifiedName": "com.acme.clinic.billing.InvoiceLedger",
+      "direction": "DRIVEN",
+      "ports": [],
+      "confidence": "HIGH",
+      "basis": "INFERRED"
+    }
+  ],
+  "unclassified": [
+    {
+      "qualifiedName": "com.acme.clinic.billing.InvoiceRow",
+      "category": "UNKNOWN",
+      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+    }
+  ]
+}

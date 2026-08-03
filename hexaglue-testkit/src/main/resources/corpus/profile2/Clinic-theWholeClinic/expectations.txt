@@ -1,0 +1,27 @@
+# Clinic-theWholeClinic
+#
+# The whole application in one scenario: an HTTP entry point, a stereotyped service, a store
+# declared to Spring Data, a mail gateway behind a hand-written contract, and a mapped domain
+# with a part inside it.
+
+# Every wave answers, and each one from the wave before it. The controller is placed by the
+# symbol the framework calls it through; the mail gateway by the client it holds. The store is
+# a way out because it declares what it keeps, the notifier because the core calls it and
+# nothing in the core implements it. The service is the application layer because it stands
+# between the two. The stored type has a life of its own because a way out keeps it, and what
+# it is made of is read from what it holds.
+#
+# One reading is right by the rules and wrong about the clinic, and it is recorded here rather
+# than hidden. A pet has an identity of its own — the schema says so — but that identity is a
+# bare java.lang.Integer, a type outside the perimeter that no rule can read as an identity.
+# What is left to see is a type an aggregate is made of, with nothing to tell it from a value,
+# so a value is what it reads as. Nothing in the sources could have said otherwise without the
+# persistence mapping deciding a role, which is the one thing it is not allowed to do.
+status: reviewed
+expect: com.acme.clinic.owner.OwnerController = DRIVING_ADAPTER
+expect: com.acme.clinic.notification.EmailVisitNotifier = DRIVEN_ADAPTER
+expect: com.acme.clinic.owner.OwnerRepository = DRIVEN_PORT
+expect: com.acme.clinic.notification.VisitNotifier = DRIVEN_PORT
+expect: com.acme.clinic.owner.OwnerService = APPLICATION_SERVICE
+expect: com.acme.clinic.owner.Owner = AGGREGATE_ROOT
+expect: com.acme.clinic.owner.Pet = VALUE_OBJECT

@@ -1,0 +1,14 @@
+# Clinic-aMappingToAStoreDecidesNoRole
+#
+# The counter-case of the scenario next door: the same annotations, and nothing else.
+
+# A type mapped to a table, that nothing in the perimeter keeps, finds or hands over, has no
+# role to read. Answering AGGREGATE_ROOT here — which the annotation alone would invite —
+# would make every row of every schema a piece of domain, and would tell the reader of a
+# migration report that the work is already done.
+#
+# This is the pin under the rule that a persistence mapping is never an evidence of kind:
+# it does not decide one on its own, and it does not withhold one either. What decides is
+# whether something reaches for the type, and here nothing does.
+status: reviewed
+expect: com.acme.clinic.vet.Speciality = UNCLASSIFIED

@@ -1,0 +1,17 @@
+# Clinic-theServiceBetweenTheControllerAndTheRepository
+#
+# The layered chain an enterprise application actually has, with every conventional name it
+# actually uses. None of those names is read.
+
+# Four waves in one file, each reading the one before it. The controller is placed by the
+# symbol the framework calls it through. The repository is a way out because it declares
+# what it keeps. The service is the application layer because it stands between them —
+# holding the way out is what says so, the stereotype only agreeing. The stored type has a
+# life of its own because a way out keeps it.
+#
+# Take the suffixes away and the reading is unchanged; that is the point of writing them in.
+status: reviewed
+expect: com.acme.clinic.owner.OwnerController = DRIVING_ADAPTER
+expect: com.acme.clinic.owner.OwnerService = APPLICATION_SERVICE
+expect: com.acme.clinic.owner.OwnerRepository = DRIVEN_PORT
+expect: com.acme.clinic.owner.Owner = AGGREGATE_ROOT

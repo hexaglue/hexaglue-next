@@ -17,36 +17,44 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
+/**
+ * Every profile answers the same structural questions, which is what makes a new one cheap to add:
+ * declaring it in {@link CorpusProfile} enrols it here, and an index naming a scenario the
+ * resources do not carry fails loudly rather than shrinking the corpus in silence.
+ */
 class CorpusTest {
 
     @TempDir
     Path tempDir;
 
-    @Test
-    @DisplayName("profile 1 loads with at least one scenario")
-    void profile1Loads() {
-        List<CorpusScenario> scenarios = Corpus.profile1();
-
-        assertThat(scenarios).isNotEmpty();
+    @ParameterizedTest
+    @EnumSource(CorpusProfile.class)
+    @DisplayName("loads with at least one scenario")
+    void loadsWithAtLeastOneScenario(CorpusProfile profile) {
+        assertThat(Corpus.of(profile)).isNotEmpty();
     }
 
-    @Test
-    @DisplayName("profile 1 scenario ids are unique")
-    void profile1IdsAreUnique() {
-        List<CorpusScenario> scenarios = Corpus.profile1();
-
-        assertThat(scenarios).extracting(CorpusScenario::id).doesNotHaveDuplicates();
+    @ParameterizedTest
+    @EnumSource(CorpusProfile.class)
+    @DisplayName("names each of its scenarios once")
+    void namesEachScenarioOnce(CorpusProfile profile) {
+        assertThat(Corpus.of(profile)).extracting(CorpusScenario::id).doesNotHaveDuplicates();
     }
 
-    @Test
-    @DisplayName("every profile 1 scenario has a base package and at least one source")
-    void profile1ScenariosAreComplete() {
-        for (CorpusScenario scenario : Corpus.profile1()) {
+    @ParameterizedTest
+    @EnumSource(CorpusProfile.class)
+    @DisplayName("gives every scenario its profile, a base package and at least one source")
+    void givesEveryScenarioWhatItNeeds(CorpusProfile profile) {
+        for (CorpusScenario scenario : Corpus.of(profile)) {
+            assertThat(scenario.profile()).isEqualTo(profile);
             assertThat(scenario.basePackage())
                     .as("basePackage of %s", scenario.id())
                     .isNotBlank();
@@ -55,9 +63,9 @@ class CorpusTest {
     }
 
     @Test
-    @DisplayName("a profile 1 scenario materializes its sources on disk")
+    @DisplayName("a scenario materializes its sources on disk")
     void scenarioMaterializes() throws Exception {
-        CorpusScenario scenario = Corpus.profile1().get(0);
+        CorpusScenario scenario = Corpus.of(CorpusProfile.PROFILE_1).get(0);
 
         Path root = scenario.materialize(tempDir);
 
@@ -65,5 +73,16 @@ class CorpusTest {
             Path file = root.resolve(source.relativePath());
             assertThat(Files.readString(file)).isEqualTo(source.content());
         }
+    }
+
+    @Test
+    @DisplayName("no two profiles name the same scenario, so one golden file names one scenario")
+    void noTwoProfilesNameTheSameScenario() {
+        List<String> ids = Arrays.stream(CorpusProfile.values())
+                .flatMap(profile -> Corpus.of(profile).stream())
+                .map(CorpusScenario::id)
+                .toList();
+
+        assertThat(ids).doesNotHaveDuplicates();
     }
 }

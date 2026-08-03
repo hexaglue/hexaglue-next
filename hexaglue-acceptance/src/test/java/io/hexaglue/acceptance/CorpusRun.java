@@ -51,8 +51,7 @@ record CorpusRun(CorpusScenario scenario, ArchModel model) {
      */
     List<String> unmetClaims() {
         List<String> unmet = new ArrayList<>();
-        for (CorpusExpectations.Claim claim :
-                CorpusExpectations.profile1(scenario.id()).claims()) {
+        for (CorpusExpectations.Claim claim : CorpusExpectations.of(scenario).claims()) {
             String actual = model.type(TypeId.of(claim.qualifiedName()))
                     .map(ArchType::kind)
                     .map(ArchKind::name)

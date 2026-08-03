@@ -25,6 +25,7 @@ import java.util.Objects;
  * <p>Construction rejects blank components and an empty source list with
  * {@link IllegalArgumentException}, and defensively copies {@code sources}.
  *
+ * @param profile the population this scenario belongs to
  * @param id unique scenario identifier, e.g. {@code ClassificationGoldenFilesTest-minimalExample}
  * @param basePackage the base package the analysis is scoped to
  * @param origin provenance of the fixture in the harvested code base, e.g. {@code
@@ -32,12 +33,14 @@ import java.util.Objects;
  * @param sources the fixture source files, in stable order
  * @since 7.0.0
  */
-public record CorpusScenario(String id, String basePackage, String origin, List<SourceFile> sources) {
+public record CorpusScenario(
+        CorpusProfile profile, String id, String basePackage, String origin, List<SourceFile> sources) {
 
     /**
      * Validates the components and defensively copies the source list.
      */
     public CorpusScenario {
+        Objects.requireNonNull(profile, "profile");
         requireNonBlank(id, "id");
         requireNonBlank(basePackage, "basePackage");
         requireNonBlank(origin, "origin");

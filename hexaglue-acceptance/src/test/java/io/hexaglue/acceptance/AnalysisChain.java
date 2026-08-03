@@ -24,6 +24,7 @@ import io.hexaglue.model.config.AnalysisScope;
 import io.hexaglue.model.config.ClassificationConfig;
 import io.hexaglue.model.config.GenerationConfig;
 import io.hexaglue.model.config.HexaGlueConfig;
+import io.hexaglue.model.config.ModulesConfig;
 import io.hexaglue.model.config.ValidationConfig;
 import io.hexaglue.testkit.ArchModelSnapshots;
 import io.hexaglue.testkit.corpus.AnalysisRunner;
@@ -73,8 +74,12 @@ public final class AnalysisChain implements AnalysisRunner {
                         .scope(scope)
                         .build())
                 .code();
-        HexaGlueConfig config =
-                new HexaGlueConfig(scope, classification, ValidationConfig.defaults(), GenerationConfig.defaults());
+        HexaGlueConfig config = new HexaGlueConfig(
+                scope,
+                classification,
+                ValidationConfig.defaults(),
+                GenerationConfig.defaults(),
+                ModulesConfig.defaults());
         return Analysis.analyze(EngineContext.of(code, KnowledgePacks.embedded(), config))
                 .model();
     }

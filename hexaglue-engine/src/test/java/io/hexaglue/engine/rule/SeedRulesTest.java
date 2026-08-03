@@ -35,6 +35,7 @@ import io.hexaglue.model.config.AnalysisScope;
 import io.hexaglue.model.config.ClassificationConfig;
 import io.hexaglue.model.config.GenerationConfig;
 import io.hexaglue.model.config.HexaGlueConfig;
+import io.hexaglue.model.config.ModulesConfig;
 import io.hexaglue.model.config.ValidationConfig;
 import io.hexaglue.model.declaration.Annotation;
 import java.util.List;
@@ -172,7 +173,8 @@ class SeedRulesTest {
                     AnalysisScope.everything(),
                     new ClassificationConfig(Map.of(ORDER, ArchKind.AGGREGATE_ROOT), Map.of()),
                     ValidationConfig.defaults(),
-                    GenerationConfig.defaults());
+                    GenerationConfig.defaults(),
+                    ModulesConfig.defaults());
             CodeModel code = CodeModel.builder()
                     .addType(TypeNode.builder(ORDER, TypeNature.CLASS).build())
                     .build();
@@ -193,7 +195,8 @@ class SeedRulesTest {
                     new AnalysisScope(Optional.of("com.other"), List.of(), List.of()),
                     new ClassificationConfig(Map.of(ORDER, ArchKind.AGGREGATE_ROOT), Map.of()),
                     ValidationConfig.defaults(),
-                    GenerationConfig.defaults());
+                    GenerationConfig.defaults(),
+                    ModulesConfig.defaults());
             CodeModel code = CodeModel.builder()
                     .addType(TypeNode.builder(ORDER, TypeNature.CLASS)
                             .annotations(List.of(Annotation.of(JMOLECULES_AGGREGATE)))

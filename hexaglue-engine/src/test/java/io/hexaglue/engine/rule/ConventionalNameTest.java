@@ -35,6 +35,7 @@ import io.hexaglue.model.config.AnalysisScope;
 import io.hexaglue.model.config.ClassificationConfig;
 import io.hexaglue.model.config.GenerationConfig;
 import io.hexaglue.model.config.HexaGlueConfig;
+import io.hexaglue.model.config.ModulesConfig;
 import io.hexaglue.model.config.ValidationConfig;
 import io.hexaglue.model.declaration.Field;
 import java.util.List;
@@ -67,7 +68,11 @@ class ConventionalNameTest {
 
     private static HexaGlueConfig with(ClassificationConfig classification) {
         return new HexaGlueConfig(
-                AnalysisScope.everything(), classification, ValidationConfig.defaults(), GenerationConfig.defaults());
+                AnalysisScope.everything(),
+                classification,
+                ValidationConfig.defaults(),
+                GenerationConfig.defaults(),
+                ModulesConfig.defaults());
     }
 
     private static List<ArchKind> namesOf(CodeModel code, HexaGlueConfig config) {

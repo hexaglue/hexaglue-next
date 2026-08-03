@@ -17,8 +17,9 @@ import java.util.Objects;
 
 /**
  * The typed configuration of an analysis: the perimeter, the intent the user declares out of the
- * code, the validation gates and the generation threshold. Plugin-specific options are not
- * represented here — they reach each plugin through the SPI, opaque to the model.
+ * code, the validation gates, the generation threshold and the role of each module of a reactor.
+ * Plugin-specific options are not represented here — they reach each plugin through the SPI, opaque
+ * to the model.
  *
  * <p>This record is the shape the strict YAML binding will fill: an unknown key or a malformed
  * value is the loader's error, never a silently ignored entry.</p>
@@ -27,27 +28,30 @@ import java.util.Objects;
  * @param classification the kinds the user declares for their own types
  * @param validation the gates the validate goal applies
  * @param generation the certainty threshold of code generation
+ * @param modules the role each module of the reactor plays
  * @since 7.0.0
  */
 public record HexaGlueConfig(
         AnalysisScope analysis,
         ClassificationConfig classification,
         ValidationConfig validation,
-        GenerationConfig generation) {
+        GenerationConfig generation,
+        ModulesConfig modules) {
 
     /**
-     * Validates the four blocks.
+     * Validates the five blocks.
      */
     public HexaGlueConfig {
         Objects.requireNonNull(analysis, "analysis must not be null");
         Objects.requireNonNull(classification, "classification must not be null");
         Objects.requireNonNull(validation, "validation must not be null");
         Objects.requireNonNull(generation, "generation must not be null");
+        Objects.requireNonNull(modules, "modules must not be null");
     }
 
     /**
      * Returns the documented default posture: analyze everything, declare nothing, gate nothing,
-     * generate at HIGH confidence.
+     * generate at HIGH confidence, and say nothing about modules.
      *
      * @return the default configuration
      */
@@ -56,6 +60,7 @@ public record HexaGlueConfig(
                 AnalysisScope.everything(),
                 ClassificationConfig.defaults(),
                 ValidationConfig.defaults(),
-                GenerationConfig.defaults());
+                GenerationConfig.defaults(),
+                ModulesConfig.defaults());
     }
 }

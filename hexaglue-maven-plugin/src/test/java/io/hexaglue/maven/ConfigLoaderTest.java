@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.TypeId;
+import io.hexaglue.model.arch.ModuleRole;
 import io.hexaglue.model.classification.Confidence;
 import io.hexaglue.model.config.HexaGlueConfig;
 import io.hexaglue.model.finding.IssueCode;
@@ -132,6 +133,19 @@ class ConfigLoaderTest {
         }
 
         @Test
+        @DisplayName("the role each module of the reactor plays")
+        void theRoleEachModulePlays() {
+            HexaGlueConfig config = load("""
+                    modules:
+                      shop-domain: DOMAIN
+                      shop-infra: INFRASTRUCTURE
+                    """);
+
+            assertThat(config.modules().roleOf("shop-domain")).contains(ModuleRole.DOMAIN);
+            assertThat(config.modules().roleOf("shop-infra")).contains(ModuleRole.INFRASTRUCTURE);
+        }
+
+        @Test
         @DisplayName("leaving unstated blocks at the documented defaults")
         void leavingUnstatedBlocksAtTheDefaults() {
             HexaGlueConfig config = load("analysis:\n  basePackage: com.acme\n");
@@ -170,6 +184,15 @@ class ConfigLoaderTest {
         @DisplayName("a block that is not a mapping")
         void aBlockThatIsNotAMapping() {
             assertThat(messageOf("validation: true\n")).contains("validation");
+        }
+
+        @Test
+        @DisplayName("a module role outside the vocabulary, naming the roles that exist")
+        void aModuleRoleOutsideTheVocabulary() {
+            assertThat(messageOf("modules:\n  shop-domain: BUSINESS\n"))
+                    .contains("BUSINESS")
+                    .contains("DOMAIN")
+                    .contains("INFRASTRUCTURE");
         }
 
         @Test

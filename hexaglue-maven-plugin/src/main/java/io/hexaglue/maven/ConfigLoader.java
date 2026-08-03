@@ -15,11 +15,13 @@ package io.hexaglue.maven;
 
 import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.TypeId;
+import io.hexaglue.model.arch.ModuleRole;
 import io.hexaglue.model.classification.Confidence;
 import io.hexaglue.model.config.AnalysisScope;
 import io.hexaglue.model.config.ClassificationConfig;
 import io.hexaglue.model.config.GenerationConfig;
 import io.hexaglue.model.config.HexaGlueConfig;
+import io.hexaglue.model.config.ModulesConfig;
 import io.hexaglue.model.config.ValidationConfig;
 import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.model.finding.DiagnosticSeverity;
@@ -68,6 +70,9 @@ import java.util.stream.Collectors;
  *     HG-DDD-012: BLOCKER
  * generation:
  *   minConfidence: HIGH
+ * modules:
+ *   shop-domain: DOMAIN
+ *   shop-infra: INFRASTRUCTURE
  * }</pre>
  *
  * <p>An absent document is a project that configured nothing, and so is an empty one: both answer
@@ -89,6 +94,9 @@ final class ConfigLoader {
     /** Where a project states what it asks of each backend, keyed by plugin identifier. */
     private static final String PLUGINS = "plugins";
 
+    /** Where a project states the role each module of its reactor plays, keyed by module name. */
+    private static final String MODULES = "modules";
+
     private static final String BASE_PACKAGE = "basePackage";
     private static final String INCLUDE_PACKAGES = "includePackages";
     private static final String EXCLUDE_PACKAGES = "excludePackages";
@@ -100,7 +108,8 @@ final class ConfigLoader {
     private static final String ALLOW_INFERRED = "allowInferred";
     private static final String FINDINGS = "findings";
 
-    private static final List<String> ROOT_KEYS = sorted(ANALYSIS, CLASSIFICATION, VALIDATION, GENERATION, PLUGINS);
+    private static final List<String> ROOT_KEYS =
+            sorted(ANALYSIS, CLASSIFICATION, VALIDATION, GENERATION, MODULES, PLUGINS);
     private static final List<String> ANALYSIS_KEYS = sorted(BASE_PACKAGE, INCLUDE_PACKAGES, EXCLUDE_PACKAGES);
     private static final List<String> CLASSIFICATION_KEYS = sorted(EXPLICIT, NAMING_SUFFIXES);
     private static final List<String> VALIDATION_KEYS =
@@ -192,7 +201,8 @@ final class ConfigLoader {
                 analysis(document.block(ANALYSIS, ANALYSIS_KEYS)),
                 classification(document.block(CLASSIFICATION, CLASSIFICATION_KEYS)),
                 validation(document.block(VALIDATION, VALIDATION_KEYS)),
-                generation(document.block(GENERATION, GENERATION_KEYS)));
+                generation(document.block(GENERATION, GENERATION_KEYS)),
+                modules(document));
     }
 
     private static String text(Path document, String origin) {
@@ -253,6 +263,19 @@ final class ConfigLoader {
                         .allowInferred(block.flag(ALLOW_INFERRED, defaults.allowInferred()))
                         .findingThresholds(thresholds)
                         .build());
+    }
+
+    /**
+     * Reads the role of each module of the reactor. The keys are module names, so they are read
+     * from the document itself rather than from a block of known keys: nothing here can list them,
+     * and only the value is held to a vocabulary.
+     */
+    private static ModulesConfig modules(YamlDocument document) {
+        Map<String, ModuleRole> roles = new LinkedHashMap<>();
+        document.entries(MODULES)
+                .forEach((module, role) ->
+                        roles.put(module, word(document, MODULES + "." + module, role, ModuleRole.class)));
+        return refusedByTheModel(document, () -> new ModulesConfig(roles));
     }
 
     private static GenerationConfig generation(YamlDocument block) {

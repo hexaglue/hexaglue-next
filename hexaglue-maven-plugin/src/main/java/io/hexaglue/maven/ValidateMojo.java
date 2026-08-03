@@ -129,7 +129,7 @@ public class ValidateMojo extends AbstractMojo {
                         .findingThresholds(stated.validation().findingThresholds())
                         .build())
                 .orElseGet(stated::validation);
-        return new HexaGlueConfig(scope, stated.classification(), gates, stated.generation());
+        return new HexaGlueConfig(scope, stated.classification(), gates, stated.generation(), stated.modules());
     }
 
     /**
@@ -147,7 +147,8 @@ public class ValidateMojo extends AbstractMojo {
                         stated.analysis().includePackages(),
                         stated.analysis().excludePackages()))
                 .orElseGet(stated::analysis);
-        return new HexaGlueConfig(scope, stated.classification(), stated.validation(), stated.generation());
+        return new HexaGlueConfig(
+                scope, stated.classification(), stated.validation(), stated.generation(), stated.modules());
     }
 
     /**

@@ -32,6 +32,7 @@ import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.TypeNode;
 import io.hexaglue.model.config.ClassificationConfig;
 import io.hexaglue.model.config.HexaGlueConfig;
+import io.hexaglue.model.config.ModulesConfig;
 import io.hexaglue.model.declaration.Annotation;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,8 @@ class PortImplementationTest {
                 defaults.analysis(),
                 new ClassificationConfig(Map.of(subject, kind), Map.of()),
                 defaults.validation(),
-                defaults.generation());
+                defaults.generation(),
+                ModulesConfig.defaults());
     }
 
     private static Verdicts verdicts(TypeNode... types) {

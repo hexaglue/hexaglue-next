@@ -57,7 +57,8 @@ class HexaGlueConfigTest {
                     ValidationConfig.builder().failOnUnclassified(true).build();
             GenerationConfig generation = new GenerationConfig(Confidence.EXPLICIT);
 
-            HexaGlueConfig config = new HexaGlueConfig(scope, classification, validation, generation);
+            HexaGlueConfig config =
+                    new HexaGlueConfig(scope, classification, validation, generation, ModulesConfig.defaults());
 
             assertThat(config.analysis().basePackage()).contains("com.shop");
             assertThat(config.classification().declaredKind(TypeId.of("com.shop.Order")))

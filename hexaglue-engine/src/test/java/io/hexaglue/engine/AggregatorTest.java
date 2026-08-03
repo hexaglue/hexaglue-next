@@ -203,5 +203,26 @@ class AggregatorTest {
 
             assertThat(verdict.proof().conclusion()).contains("no signal");
         }
+
+        @Test
+        @DisplayName("stating what carried the decision rather than the number it sorted on")
+        void statingWhatCarriedTheDecisionRatherThanTheNumberItSortedOn() {
+            Classification verdict = decide(
+                    evidence(ArchKind.ENTITY, EvidenceTier.FRAMEWORK_KNOWLEDGE, "managed by a repo", 0),
+                    evidence(ArchKind.ENTITY, EvidenceTier.GRAPH_RELATION, "kept by a port", 0));
+
+            assertThat(verdict.proof().conclusion())
+                    .isEqualTo("ENTITY(com.acme.Order) [decided on 1 signal at S2, 1 at S3]");
+        }
+
+        @Test
+        @DisplayName("mentioning how far a signal was found only when it was not found here")
+        void mentioningHowFarASignalWasFoundOnlyWhenItWasNotFoundHere() {
+            Classification verdict =
+                    decide(evidence(ArchKind.ENTITY, EvidenceTier.FRAMEWORK_KNOWLEDGE, "managed by a repo", 2));
+
+            assertThat(verdict.proof().conclusion())
+                    .isEqualTo("ENTITY(com.acme.Order) [decided on 1 signal at S2, nearest 2 steps away]");
+        }
     }
 }

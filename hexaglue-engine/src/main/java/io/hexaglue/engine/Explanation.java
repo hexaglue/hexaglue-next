@@ -73,7 +73,8 @@ public final class Explanation {
             appendEvidence(lines, evidence, REASON_INDENT, type);
         }
         for (Candidate candidate : verdict.candidates()) {
-            lines.add(REASON_INDENT + "candidate " + candidate.kind() + " (score " + candidate.score() + ")");
+            lines.add(REASON_INDENT + "candidate " + candidate.kind() + " (" + Tiers.carrying(candidate.evidences())
+                    + ")");
             for (Evidence evidence : candidate.evidences()) {
                 appendEvidence(lines, evidence, DETAIL_INDENT, type);
             }

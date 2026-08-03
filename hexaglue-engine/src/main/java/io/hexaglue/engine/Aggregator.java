@@ -245,10 +245,16 @@ public final class Aggregator {
             return signals.stream().map(KindEvidence::proof).toList();
         }
 
+        /**
+         * States the decision in the terms it can be argued with: which tiers spoke and how many
+         * times, and how far away the nearest signal sat when it did not sit on the type itself.
+         * The score is left out on purpose — it orders candidates, it does not explain one.
+         */
         ProofNode proof(RuleId rule) {
+            String reach = distance == 0 ? "" : ", nearest " + distance + " steps away";
             return new ProofNode(
-                    kind + "(" + signals.get(0).subject().qualifiedName() + ") [decided on " + score + " at distance "
-                            + distance + "]",
+                    kind + "(" + signals.get(0).subject().qualifiedName() + ") [decided on "
+                            + Tiers.carrying(evidences()) + reach + "]",
                     Optional.of(rule),
                     proofs());
         }

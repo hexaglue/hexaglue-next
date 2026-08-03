@@ -19,7 +19,7 @@ Clinic-aStoreOnlyTheAdapterTouchesStaysOutsideTheDomain
     [S2] com.acme.clinic.billing.InvoiceLedger is a DRIVEN_ADAPTER because it holds JdbcTemplate, which reaches outside the application (org.springframework.jdbc.core.JdbcTemplate)
       involving org.springframework.jdbc.core.JdbcTemplate
     derivation:
-      [S3-DECISION] DRIVEN_ADAPTER(com.acme.clinic.billing.InvoiceLedger) [decided on 10000 at distance 0]
+      [S3-DECISION] DRIVEN_ADAPTER(com.acme.clinic.billing.InvoiceLedger) [decided on 1 signal at S2]
         [W1-DR] DRIVEN_ADAPTER(com.acme.clinic.billing.InvoiceLedger) [S2 INFRA_DEPENDENCY(org.springframework.jdbc.core.JdbcTemplate) d0]
           INFRA_DEPENDENCY(org.springframework.jdbc.core.JdbcTemplate) [spring:org.springframework.jdbc.core.JdbcTemplate]
   com.acme.clinic.billing.InvoiceRow: UNCLASSIFIED (LOW, inferred)
@@ -35,7 +35,7 @@ Clinic-theListenerIsAnEntryPointWhereverItIsWritten
   com.acme.clinic.schedule.VisitReminders: DRIVING_ADAPTER (HIGH, inferred)
     [S2] com.acme.clinic.schedule.VisitReminders is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.kafka.annotation.KafkaListener)
     derivation:
-      [S3-DECISION] DRIVING_ADAPTER(com.acme.clinic.schedule.VisitReminders) [decided on 10000 at distance 0]
+      [S3-DECISION] DRIVING_ADAPTER(com.acme.clinic.schedule.VisitReminders) [decided on 1 signal at S2]
         [W1-DA] DRIVING_ADAPTER(com.acme.clinic.schedule.VisitReminders) [S2 DRIVING_ENTRYPOINT(com.acme.clinic.schedule.VisitReminders) d0]
           DRIVING_ENTRYPOINT(com.acme.clinic.schedule.VisitReminders) [spring:org.springframework.kafka.annotation.KafkaListener]
 
@@ -52,14 +52,14 @@ Clinic-theServiceBetweenTheControllerAndTheRepository
     [S3] com.acme.clinic.owner.Owner is a AGGREGATE_ROOT because OwnerRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.clinic.owner.OwnerRepository
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [decided on 11000 at distance 0]
+      [S3-DECISION] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [decided on 1 signal at S2, 1 at S3]
         [R1] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [S2 SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) d0]
           SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) [spring:org.springframework.data.repository.Repository]
         [R1b] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [S3 MANAGED_BY(com.acme.clinic.owner.OwnerRepository) d0]
   com.acme.clinic.owner.OwnerController: DRIVING_ADAPTER (HIGH, inferred)
     [S2] com.acme.clinic.owner.OwnerController is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
     derivation:
-      [S3-DECISION] DRIVING_ADAPTER(com.acme.clinic.owner.OwnerController) [decided on 10000 at distance 0]
+      [S3-DECISION] DRIVING_ADAPTER(com.acme.clinic.owner.OwnerController) [decided on 1 signal at S2]
         [W1-DA] DRIVING_ADAPTER(com.acme.clinic.owner.OwnerController) [S2 DRIVING_ENTRYPOINT(com.acme.clinic.owner.OwnerController) d0]
           DRIVING_ENTRYPOINT(com.acme.clinic.owner.OwnerController) [spring:org.springframework.web.bind.annotation.RestController]
   com.acme.clinic.owner.OwnerRepository: DRIVEN_PORT (HIGH, inferred)
@@ -67,7 +67,7 @@ Clinic-theServiceBetweenTheControllerAndTheRepository
     [S3] com.acme.clinic.owner.OwnerRepository is a DRIVEN_PORT because OwnerService calls it and nothing inside the hexagon implements it
       involving com.acme.clinic.owner.OwnerService
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.clinic.owner.OwnerRepository) [decided on 11000 at distance 0]
+      [S3-DECISION] DRIVEN_PORT(com.acme.clinic.owner.OwnerRepository) [decided on 1 signal at S2, 1 at S3]
         [R1] DRIVEN_PORT(com.acme.clinic.owner.OwnerRepository) [S2 SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) d0]
           SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) [spring:org.springframework.data.repository.Repository]
         [R4] DRIVEN_PORT(com.acme.clinic.owner.OwnerRepository) [S3 CONSUMED_BY_CORE(com.acme.clinic.owner.OwnerService) d0]
@@ -77,7 +77,7 @@ Clinic-theServiceBetweenTheControllerAndTheRepository
     [S3] com.acme.clinic.owner.OwnerService is a APPLICATION_SERVICE because OwnerController hands the work to it, and it reaches outside through OwnerRepository
       involving com.acme.clinic.owner.OwnerController
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.clinic.owner.OwnerService) [decided on 2000 at distance 0]
+      [S3-DECISION] APPLICATION_SERVICE(com.acme.clinic.owner.OwnerService) [decided on 2 signals at S3]
         [R6] APPLICATION_SERVICE(com.acme.clinic.owner.OwnerService) [S3 CALLS_DRIVEN_PORT(com.acme.clinic.owner.OwnerRepository) d0]
         [R6b] APPLICATION_SERVICE(com.acme.clinic.owner.OwnerService) [S3 REACHED_FROM_THE_RING(com.acme.clinic.owner.OwnerController) d0]
 
@@ -96,7 +96,7 @@ Clinic-theWholeClinic
     [S3] com.acme.clinic.notification.EmailVisitNotifier is a DRIVEN_ADAPTER because it answers VisitNotifier, which the hexagon calls to reach outside
       involving com.acme.clinic.notification.VisitNotifier
     derivation:
-      [S3-DECISION] DRIVEN_ADAPTER(com.acme.clinic.notification.EmailVisitNotifier) [decided on 11000 at distance 0]
+      [S3-DECISION] DRIVEN_ADAPTER(com.acme.clinic.notification.EmailVisitNotifier) [decided on 1 signal at S2, 1 at S3]
         [W1-DR] DRIVEN_ADAPTER(com.acme.clinic.notification.EmailVisitNotifier) [S2 INFRA_DEPENDENCY(org.springframework.web.client.RestTemplate) d0]
           INFRA_DEPENDENCY(org.springframework.web.client.RestTemplate) [spring:org.springframework.web.client.RestTemplate]
         [W1-DR2] DRIVEN_ADAPTER(com.acme.clinic.notification.EmailVisitNotifier) [S3 IMPLEMENTS_DRIVEN_PORT(com.acme.clinic.notification.VisitNotifier) d0]
@@ -104,7 +104,7 @@ Clinic-theWholeClinic
     [S3] com.acme.clinic.notification.VisitNotifier is a DRIVEN_PORT because OwnerService calls it and nothing inside the hexagon implements it
       involving com.acme.clinic.owner.OwnerService
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.clinic.notification.VisitNotifier) [decided on 1000 at distance 0]
+      [S3-DECISION] DRIVEN_PORT(com.acme.clinic.notification.VisitNotifier) [decided on 1 signal at S3]
         [R4] DRIVEN_PORT(com.acme.clinic.notification.VisitNotifier) [S3 CONSUMED_BY_CORE(com.acme.clinic.owner.OwnerService) d0]
   com.acme.clinic.owner.Owner: AGGREGATE_ROOT (HIGH, inferred)
     [S2] com.acme.clinic.owner.Owner is a AGGREGATE_ROOT because a repository stores and retrieves it (org.springframework.data.repository.Repository)
@@ -112,14 +112,14 @@ Clinic-theWholeClinic
     [S3] com.acme.clinic.owner.Owner is a AGGREGATE_ROOT because OwnerRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.clinic.owner.OwnerRepository
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [decided on 11000 at distance 0]
+      [S3-DECISION] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [decided on 1 signal at S2, 1 at S3]
         [R1] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [S2 SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) d0]
           SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) [spring:org.springframework.data.repository.Repository]
         [R1b] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [S3 MANAGED_BY(com.acme.clinic.owner.OwnerRepository) d0]
   com.acme.clinic.owner.OwnerController: DRIVING_ADAPTER (HIGH, inferred)
     [S2] com.acme.clinic.owner.OwnerController is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
     derivation:
-      [S3-DECISION] DRIVING_ADAPTER(com.acme.clinic.owner.OwnerController) [decided on 10000 at distance 0]
+      [S3-DECISION] DRIVING_ADAPTER(com.acme.clinic.owner.OwnerController) [decided on 1 signal at S2]
         [W1-DA] DRIVING_ADAPTER(com.acme.clinic.owner.OwnerController) [S2 DRIVING_ENTRYPOINT(com.acme.clinic.owner.OwnerController) d0]
           DRIVING_ENTRYPOINT(com.acme.clinic.owner.OwnerController) [spring:org.springframework.web.bind.annotation.RestController]
   com.acme.clinic.owner.OwnerRepository: DRIVEN_PORT (HIGH, inferred)
@@ -127,7 +127,7 @@ Clinic-theWholeClinic
     [S3] com.acme.clinic.owner.OwnerRepository is a DRIVEN_PORT because OwnerService calls it and nothing inside the hexagon implements it
       involving com.acme.clinic.owner.OwnerService
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.clinic.owner.OwnerRepository) [decided on 11000 at distance 0]
+      [S3-DECISION] DRIVEN_PORT(com.acme.clinic.owner.OwnerRepository) [decided on 1 signal at S2, 1 at S3]
         [R1] DRIVEN_PORT(com.acme.clinic.owner.OwnerRepository) [S2 SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) d0]
           SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) [spring:org.springframework.data.repository.Repository]
         [R4] DRIVEN_PORT(com.acme.clinic.owner.OwnerRepository) [S3 CONSUMED_BY_CORE(com.acme.clinic.owner.OwnerService) d0]
@@ -137,14 +137,14 @@ Clinic-theWholeClinic
     [S3] com.acme.clinic.owner.OwnerService is a APPLICATION_SERVICE because OwnerController hands the work to it, and it reaches outside through VisitNotifier
       involving com.acme.clinic.owner.OwnerController
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.clinic.owner.OwnerService) [decided on 2000 at distance 0]
+      [S3-DECISION] APPLICATION_SERVICE(com.acme.clinic.owner.OwnerService) [decided on 2 signals at S3]
         [R6] APPLICATION_SERVICE(com.acme.clinic.owner.OwnerService) [S3 CALLS_DRIVEN_PORT(com.acme.clinic.notification.VisitNotifier) d0]
         [R6b] APPLICATION_SERVICE(com.acme.clinic.owner.OwnerService) [S3 REACHED_FROM_THE_RING(com.acme.clinic.owner.OwnerController) d0]
   com.acme.clinic.owner.Pet: VALUE_OBJECT (HIGH, inferred)
     [S3] com.acme.clinic.owner.Pet is a VALUE_OBJECT because Owner is made of it and it carries no identity of its own
       involving com.acme.clinic.owner.Owner
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.acme.clinic.owner.Pet) [decided on 1000 at distance 0]
+      [S3-DECISION] VALUE_OBJECT(com.acme.clinic.owner.Pet) [decided on 1 signal at S3]
         [R3b] VALUE_OBJECT(com.acme.clinic.owner.Pet) [S3 OWNED_BY(com.acme.clinic.owner.Owner) d0]
 
 Clinic-whatSpringDataManagesIsTheAggregate
@@ -158,14 +158,14 @@ Clinic-whatSpringDataManagesIsTheAggregate
     [S3] com.acme.clinic.owner.Owner is a AGGREGATE_ROOT because OwnerRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.clinic.owner.OwnerRepository
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [decided on 11000 at distance 0]
+      [S3-DECISION] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [decided on 1 signal at S2, 1 at S3]
         [R1] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [S2 SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) d0]
           SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) [spring:org.springframework.data.repository.Repository]
         [R1b] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [S3 MANAGED_BY(com.acme.clinic.owner.OwnerRepository) d0]
   com.acme.clinic.owner.OwnerRepository: DRIVEN_PORT (HIGH, inferred)
     [S2] com.acme.clinic.owner.OwnerRepository is a DRIVEN_PORT because it is a Spring Data repository (org.springframework.data.repository.Repository)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.clinic.owner.OwnerRepository) [decided on 10000 at distance 0]
+      [S3-DECISION] DRIVEN_PORT(com.acme.clinic.owner.OwnerRepository) [decided on 1 signal at S2]
         [R1] DRIVEN_PORT(com.acme.clinic.owner.OwnerRepository) [S2 SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) d0]
           SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) [spring:org.springframework.data.repository.Repository]
 

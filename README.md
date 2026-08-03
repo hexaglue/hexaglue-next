@@ -41,7 +41,7 @@ com.acme.clinic.owner.Owner: AGGREGATE_ROOT (HIGH, inferred)
   [S3] com.acme.clinic.owner.Owner is a AGGREGATE_ROOT because OwnerRepository keeps it and hands it back, which is a lifecycle of its own
     involving com.acme.clinic.owner.OwnerRepository
   derivation:
-    [S3-DECISION] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [decided on 11000 at distance 0]
+    [S3-DECISION] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [decided on 1 signal at S2, 1 at S3]
       [R1] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [S2 SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) d0]
         SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) [spring:org.springframework.data.repository.Repository]
       [R1b] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [S3 MANAGED_BY(com.acme.clinic.owner.OwnerRepository) d0]

@@ -228,9 +228,9 @@ class ExplanationTest {
             assertThat(lines)
                     .contains(
                             "  AMBIGUOUS",
-                            "  candidate ENTITY (score 1000)",
+                            "  candidate ENTITY (1 signal at S4)",
                             "    [S4] it never changes",
-                            "  candidate VALUE_OBJECT (score 1000)");
+                            "  candidate VALUE_OBJECT (1 signal at S4)");
         }
     }
 

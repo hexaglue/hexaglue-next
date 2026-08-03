@@ -9,13 +9,13 @@ Armada-aNameThatPointsTheWrongWayIsNotRead
     [S3] com.acme.armada.log.Bookkeeping is a DRIVEN_PORT because Ledger calls it and nothing inside the hexagon implements it
       involving com.acme.armada.log.Ledger
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.armada.log.Bookkeeping) [decided on 1000 at distance 0]
+      [S3-DECISION] DRIVEN_PORT(com.acme.armada.log.Bookkeeping) [decided on 1 signal at S3]
         [R4] DRIVEN_PORT(com.acme.armada.log.Bookkeeping) [S3 CONSUMED_BY_CORE(com.acme.armada.log.Ledger) d0]
   com.acme.armada.log.FleetRepository: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (score 100)
+    candidate IDENTIFIER (1 signal at S4)
       [S4] com.acme.armada.log.FleetRepository reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (score 100)
+    candidate VALUE_OBJECT (1 signal at S4)
       [S4] com.acme.armada.log.FleetRepository reads as a VALUE_OBJECT because every field it declares is final, so its state cannot change
     to make it explicit: com.acme.armada.log.FleetRepository reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
@@ -26,7 +26,7 @@ Armada-aNameThatPointsTheWrongWayIsNotRead
     [S3] com.acme.armada.log.Ledger is a APPLICATION_SERVICE because it stands on Bookkeeping, through which the application reaches outside
       involving com.acme.armada.log.Bookkeeping
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.armada.log.Ledger) [decided on 1000 at distance 0]
+      [S3-DECISION] APPLICATION_SERVICE(com.acme.armada.log.Ledger) [decided on 1 signal at S3]
         [R6] APPLICATION_SERVICE(com.acme.armada.log.Ledger) [S3 CALLS_DRIVEN_PORT(com.acme.armada.log.Bookkeeping) d0]
 
 Armada-anIdentityNobodyWrappedStaysAPlatformType
@@ -39,19 +39,19 @@ Armada-anIdentityNobodyWrappedStaysAPlatformType
     [S3] com.acme.armada.dock.Convoy is a AGGREGATE_ROOT because Convoys keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.armada.dock.Convoys
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.acme.armada.dock.Convoy) [decided on 1000 at distance 0]
+      [S3-DECISION] AGGREGATE_ROOT(com.acme.armada.dock.Convoy) [decided on 1 signal at S3]
         [R1b] AGGREGATE_ROOT(com.acme.armada.dock.Convoy) [S3 MANAGED_BY(com.acme.armada.dock.Convoys) d0]
   com.acme.armada.dock.Convoys: DRIVEN_PORT (HIGH, inferred)
     [S3] com.acme.armada.dock.Convoys is a DRIVEN_PORT because Harbourmaster calls it and nothing inside the hexagon implements it
       involving com.acme.armada.dock.Harbourmaster
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.armada.dock.Convoys) [decided on 1000 at distance 0]
+      [S3-DECISION] DRIVEN_PORT(com.acme.armada.dock.Convoys) [decided on 1 signal at S3]
         [R4] DRIVEN_PORT(com.acme.armada.dock.Convoys) [S3 CONSUMED_BY_CORE(com.acme.armada.dock.Harbourmaster) d0]
   com.acme.armada.dock.Harbourmaster: APPLICATION_SERVICE (HIGH, inferred)
     [S3] com.acme.armada.dock.Harbourmaster is a APPLICATION_SERVICE because it stands on Convoys, through which the application reaches outside
       involving com.acme.armada.dock.Convoys
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.armada.dock.Harbourmaster) [decided on 1000 at distance 0]
+      [S3-DECISION] APPLICATION_SERVICE(com.acme.armada.dock.Harbourmaster) [decided on 1 signal at S3]
         [R6] APPLICATION_SERVICE(com.acme.armada.dock.Harbourmaster) [S3 CALLS_DRIVEN_PORT(com.acme.armada.dock.Convoys) d0]
 
 Armada-theKeyAWayOutSearchesByIsTheIdentity
@@ -66,35 +66,35 @@ Armada-theKeyAWayOutSearchesByIsTheIdentity
     [S3] com.acme.armada.yard.Fleet is a AGGREGATE_ROOT because Fleets keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.armada.yard.Fleets
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.acme.armada.yard.Fleet) [decided on 1000 at distance 0]
+      [S3-DECISION] AGGREGATE_ROOT(com.acme.armada.yard.Fleet) [decided on 1 signal at S3]
         [R1b] AGGREGATE_ROOT(com.acme.armada.yard.Fleet) [S3 MANAGED_BY(com.acme.armada.yard.Fleets) d0]
   com.acme.armada.yard.FleetTag: IDENTIFIER (HIGH, inferred)
     [S3] com.acme.armada.yard.FleetTag is a IDENTIFIER because Fleets takes it to answer with Fleet, which keeps it
       involving com.acme.armada.yard.Fleet, com.acme.armada.yard.Fleets
     [S4] com.acme.armada.yard.FleetTag reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.acme.armada.yard.FleetTag) [decided on 1100 at distance 0]
+      [S3-DECISION] IDENTIFIER(com.acme.armada.yard.FleetTag) [decided on 1 signal at S3, 1 at S4]
         [R2] IDENTIFIER(com.acme.armada.yard.FleetTag) [S3 SEARCHED_BY(com.acme.armada.yard.Fleets) d0]
         [S4-SHAPE] IDENTIFIER(com.acme.armada.yard.FleetTag) [S4 SINGLE_VALUE_WRAPPER(com.acme.armada.yard.FleetTag) d0]
   com.acme.armada.yard.Fleets: DRIVEN_PORT (HIGH, inferred)
     [S3] com.acme.armada.yard.Fleets is a DRIVEN_PORT because Quartermaster calls it and nothing inside the hexagon implements it
       involving com.acme.armada.yard.Quartermaster
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.armada.yard.Fleets) [decided on 1000 at distance 0]
+      [S3-DECISION] DRIVEN_PORT(com.acme.armada.yard.Fleets) [decided on 1 signal at S3]
         [R4] DRIVEN_PORT(com.acme.armada.yard.Fleets) [S3 CONSUMED_BY_CORE(com.acme.armada.yard.Quartermaster) d0]
   com.acme.armada.yard.Hull: VALUE_OBJECT (HIGH, inferred)
     [S3] com.acme.armada.yard.Hull is a VALUE_OBJECT because Fleet is made of it and it carries no identity of its own
       involving com.acme.armada.yard.Fleet
     [S4] com.acme.armada.yard.Hull reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.acme.armada.yard.Hull) [decided on 1100 at distance 0]
+      [S3-DECISION] VALUE_OBJECT(com.acme.armada.yard.Hull) [decided on 1 signal at S3, 1 at S4]
         [R3b] VALUE_OBJECT(com.acme.armada.yard.Hull) [S3 OWNED_BY(com.acme.armada.yard.Fleet) d0]
         [S4-SHAPE] VALUE_OBJECT(com.acme.armada.yard.Hull) [S4 IMMUTABLE_SHAPE(com.acme.armada.yard.Hull) d0]
   com.acme.armada.yard.Quartermaster: APPLICATION_SERVICE (HIGH, inferred)
     [S3] com.acme.armada.yard.Quartermaster is a APPLICATION_SERVICE because it stands on Fleets, through which the application reaches outside
       involving com.acme.armada.yard.Fleets
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.armada.yard.Quartermaster) [decided on 1000 at distance 0]
+      [S3-DECISION] APPLICATION_SERVICE(com.acme.armada.yard.Quartermaster) [decided on 1 signal at S3]
         [R6] APPLICATION_SERVICE(com.acme.armada.yard.Quartermaster) [S3 CALLS_DRIVEN_PORT(com.acme.armada.yard.Fleets) d0]
 
 Armada-theWholeArmada
@@ -115,67 +115,67 @@ Armada-theWholeArmada
     [S3] com.acme.armada.dock.Locker is a DRIVEN_ADAPTER because it answers Fleets, which the hexagon calls to reach outside
       involving com.acme.armada.yard.Fleets
     derivation:
-      [S3-DECISION] DRIVEN_ADAPTER(com.acme.armada.dock.Locker) [decided on 11000 at distance 0]
+      [S3-DECISION] DRIVEN_ADAPTER(com.acme.armada.dock.Locker) [decided on 1 signal at S2, 1 at S3]
         [W1-DR] DRIVEN_ADAPTER(com.acme.armada.dock.Locker) [S2 INFRA_DEPENDENCY(org.springframework.jdbc.core.JdbcTemplate) d0]
           INFRA_DEPENDENCY(org.springframework.jdbc.core.JdbcTemplate) [spring:org.springframework.jdbc.core.JdbcTemplate]
         [W1-DR2] DRIVEN_ADAPTER(com.acme.armada.dock.Locker) [S3 IMPLEMENTS_DRIVEN_PORT(com.acme.armada.yard.Fleets) d0]
   com.acme.armada.gate.Gate: DRIVING_ADAPTER (HIGH, inferred)
     [S2] com.acme.armada.gate.Gate is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
     derivation:
-      [S3-DECISION] DRIVING_ADAPTER(com.acme.armada.gate.Gate) [decided on 10000 at distance 0]
+      [S3-DECISION] DRIVING_ADAPTER(com.acme.armada.gate.Gate) [decided on 1 signal at S2]
         [W1-DA] DRIVING_ADAPTER(com.acme.armada.gate.Gate) [S2 DRIVING_ENTRYPOINT(com.acme.armada.gate.Gate) d0]
           DRIVING_ENTRYPOINT(com.acme.armada.gate.Gate) [spring:org.springframework.web.bind.annotation.RestController]
   com.acme.armada.yard.Boarding: DRIVING_PORT (HIGH, inferred)
     [S3] com.acme.armada.yard.Boarding is a DRIVING_PORT because Gate reaches the application through it and Quartermaster answers it
       involving com.acme.armada.gate.Gate, com.acme.armada.yard.Quartermaster
     derivation:
-      [S3-DECISION] DRIVING_PORT(com.acme.armada.yard.Boarding) [decided on 1000 at distance 0]
+      [S3-DECISION] DRIVING_PORT(com.acme.armada.yard.Boarding) [decided on 1 signal at S3]
         [R5] DRIVING_PORT(com.acme.armada.yard.Boarding) [S3 HELD_BY_DRIVING_ADAPTER(com.acme.armada.gate.Gate) d0]
   com.acme.armada.yard.Fleet: AGGREGATE_ROOT (HIGH, inferred)
     [S3] com.acme.armada.yard.Fleet is a AGGREGATE_ROOT because Fleets keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.armada.yard.Fleets
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.acme.armada.yard.Fleet) [decided on 1000 at distance 0]
+      [S3-DECISION] AGGREGATE_ROOT(com.acme.armada.yard.Fleet) [decided on 1 signal at S3]
         [R1b] AGGREGATE_ROOT(com.acme.armada.yard.Fleet) [S3 MANAGED_BY(com.acme.armada.yard.Fleets) d0]
   com.acme.armada.yard.FleetLaunched: DOMAIN_EVENT (HIGH, inferred)
     [S3] com.acme.armada.yard.FleetLaunched is a DOMAIN_EVENT because Trumpets carries it outward and never asks anything back
       involving com.acme.armada.yard.Trumpets
     derivation:
-      [S3-DECISION] DOMAIN_EVENT(com.acme.armada.yard.FleetLaunched) [decided on 1000 at distance 0]
+      [S3-DECISION] DOMAIN_EVENT(com.acme.armada.yard.FleetLaunched) [decided on 1 signal at S3]
         [R7] DOMAIN_EVENT(com.acme.armada.yard.FleetLaunched) [S3 ANNOUNCED_BY(com.acme.armada.yard.Trumpets) d0]
   com.acme.armada.yard.FleetTag: IDENTIFIER (HIGH, inferred)
     [S3] com.acme.armada.yard.FleetTag is a IDENTIFIER because Fleets takes it to answer with Fleet, which keeps it
       involving com.acme.armada.yard.Fleet, com.acme.armada.yard.Fleets
     [S4] com.acme.armada.yard.FleetTag reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.acme.armada.yard.FleetTag) [decided on 1100 at distance 0]
+      [S3-DECISION] IDENTIFIER(com.acme.armada.yard.FleetTag) [decided on 1 signal at S3, 1 at S4]
         [R2] IDENTIFIER(com.acme.armada.yard.FleetTag) [S3 SEARCHED_BY(com.acme.armada.yard.Fleets) d0]
         [S4-SHAPE] IDENTIFIER(com.acme.armada.yard.FleetTag) [S4 SINGLE_VALUE_WRAPPER(com.acme.armada.yard.FleetTag) d0]
   com.acme.armada.yard.Fleets: DRIVEN_PORT (HIGH, inferred)
     [S3] com.acme.armada.yard.Fleets is a DRIVEN_PORT because Quartermaster calls it and nothing inside the hexagon implements it
       involving com.acme.armada.yard.Quartermaster
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.armada.yard.Fleets) [decided on 1000 at distance 0]
+      [S3-DECISION] DRIVEN_PORT(com.acme.armada.yard.Fleets) [decided on 1 signal at S3]
         [R4] DRIVEN_PORT(com.acme.armada.yard.Fleets) [S3 CONSUMED_BY_CORE(com.acme.armada.yard.Quartermaster) d0]
   com.acme.armada.yard.Hull: VALUE_OBJECT (HIGH, inferred)
     [S3] com.acme.armada.yard.Hull is a VALUE_OBJECT because Fleet is made of it and it carries no identity of its own
       involving com.acme.armada.yard.Fleet
     [S4] com.acme.armada.yard.Hull reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.acme.armada.yard.Hull) [decided on 1100 at distance 0]
+      [S3-DECISION] VALUE_OBJECT(com.acme.armada.yard.Hull) [decided on 1 signal at S3, 1 at S4]
         [R3b] VALUE_OBJECT(com.acme.armada.yard.Hull) [S3 OWNED_BY(com.acme.armada.yard.Fleet) d0]
         [S4-SHAPE] VALUE_OBJECT(com.acme.armada.yard.Hull) [S4 IMMUTABLE_SHAPE(com.acme.armada.yard.Hull) d0]
   com.acme.armada.yard.Quartermaster: APPLICATION_SERVICE (HIGH, inferred)
     [S3] com.acme.armada.yard.Quartermaster is a APPLICATION_SERVICE because it stands on Boarding, through which the outside reaches the application
       involving com.acme.armada.yard.Boarding
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.armada.yard.Quartermaster) [decided on 1000 at distance 0]
+      [S3-DECISION] APPLICATION_SERVICE(com.acme.armada.yard.Quartermaster) [decided on 1 signal at S3]
         [R6] APPLICATION_SERVICE(com.acme.armada.yard.Quartermaster) [S3 ANSWERS_DRIVING_PORT(com.acme.armada.yard.Boarding) d0]
   com.acme.armada.yard.Trumpets: DRIVEN_PORT (HIGH, inferred)
     [S3] com.acme.armada.yard.Trumpets is a DRIVEN_PORT because Quartermaster calls it and nothing inside the hexagon implements it
       involving com.acme.armada.yard.Quartermaster
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.armada.yard.Trumpets) [decided on 1000 at distance 0]
+      [S3-DECISION] DRIVEN_PORT(com.acme.armada.yard.Trumpets) [decided on 1 signal at S3]
         [R4] DRIVEN_PORT(com.acme.armada.yard.Trumpets) [S3 CONSUMED_BY_CORE(com.acme.armada.yard.Quartermaster) d0]
 
 Armada-whatTheCoreAnnouncesIsAnEvent
@@ -188,18 +188,18 @@ Armada-whatTheCoreAnnouncesIsAnEvent
     [S3] com.acme.armada.yard.FleetLaunched is a DOMAIN_EVENT because Trumpets carries it outward and never asks anything back
       involving com.acme.armada.yard.Trumpets
     derivation:
-      [S3-DECISION] DOMAIN_EVENT(com.acme.armada.yard.FleetLaunched) [decided on 1000 at distance 0]
+      [S3-DECISION] DOMAIN_EVENT(com.acme.armada.yard.FleetLaunched) [decided on 1 signal at S3]
         [R7] DOMAIN_EVENT(com.acme.armada.yard.FleetLaunched) [S3 ANNOUNCED_BY(com.acme.armada.yard.Trumpets) d0]
   com.acme.armada.yard.Herald: APPLICATION_SERVICE (HIGH, inferred)
     [S3] com.acme.armada.yard.Herald is a APPLICATION_SERVICE because it stands on Trumpets, through which the application reaches outside
       involving com.acme.armada.yard.Trumpets
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.armada.yard.Herald) [decided on 1000 at distance 0]
+      [S3-DECISION] APPLICATION_SERVICE(com.acme.armada.yard.Herald) [decided on 1 signal at S3]
         [R6] APPLICATION_SERVICE(com.acme.armada.yard.Herald) [S3 CALLS_DRIVEN_PORT(com.acme.armada.yard.Trumpets) d0]
   com.acme.armada.yard.Trumpets: DRIVEN_PORT (HIGH, inferred)
     [S3] com.acme.armada.yard.Trumpets is a DRIVEN_PORT because Herald calls it and nothing inside the hexagon implements it
       involving com.acme.armada.yard.Herald
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.armada.yard.Trumpets) [decided on 1000 at distance 0]
+      [S3-DECISION] DRIVEN_PORT(com.acme.armada.yard.Trumpets) [decided on 1 signal at S3]
         [R4] DRIVEN_PORT(com.acme.armada.yard.Trumpets) [S3 CONSUMED_BY_CORE(com.acme.armada.yard.Herald) d0]
 

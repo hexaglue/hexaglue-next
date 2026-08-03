@@ -58,6 +58,7 @@
         <spoon.version>11.5.0</spoon.version>
         <classgraph.version>4.8.186</classgraph.version>
         <snakeyaml-engine.version>3.0.1</snakeyaml-engine.version>
+        <jgrapht.version>1.5.2</jgrapht.version>
 
         <!-- Compilation guard rails -->
         <error-prone.version>2.50.0</error-prone.version>
@@ -181,6 +182,15 @@
                 <groupId>io.github.classgraph</groupId>
                 <artifactId>classgraph</artifactId>
                 <version>${classgraph.version}</version>
+            </dependency>
+
+            <!-- Graph algorithms, confined to hexaglue-engine. Strongly connected
+                 components are what makes a dependency cycle a single fact rather
+                 than one fact per path through it. -->
+            <dependency>
+                <groupId>org.jgrapht</groupId>
+                <artifactId>jgrapht-core</artifactId>
+                <version>${jgrapht.version}</version>
             </dependency>
 
             <!-- YAML reader for the knowledge packs and, later, the user configuration.

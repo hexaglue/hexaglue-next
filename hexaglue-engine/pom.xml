@@ -31,6 +31,13 @@
             <groupId>io.hexaglue</groupId>
             <artifactId>hexaglue-knowledge</artifactId>
         </dependency>
+        <!-- Strongly connected components, on a graph the engine builds itself.
+             A hand-rolled cycle search reports one cycle per path through the
+             same knot; an SCC reports the knot. -->
+        <dependency>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-core</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

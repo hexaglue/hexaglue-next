@@ -13,16 +13,67 @@ architectural model with evidence-backed proofs, then consumed by plugins
 | `hexaglue-model` | The contract: immutable records and sealed interfaces for the code model, the architectural model, classification traces, findings and typed configuration. Zero dependencies, zero logic beyond structural invariants |
 | `hexaglue-frontend` | Reads Java sources and their classpath into the code model: type nodes, external stubs for classpath types, typed edges with provenance, typed annotation values and the supertype closure. The only module that sees a parser |
 | `hexaglue-knowledge` | What the frameworks mean, as versioned declarative packs: which annotation, supertype or package carries which technical fact. A symbol is always named in full, never by simple name |
-| `hexaglue-engine` | The solver: rules derive facts to a fixed point, a deterministic weighing turns the evidences into a verdict, and every verdict carries the proof of how it was reached. No I/O |
+| `hexaglue-engine` | The solver: rules derive facts to a fixed point, a deterministic weighing turns the evidences into a verdict, and every verdict carries the proof of how it was reached. Also renders that verdict for a reader. No I/O |
 | `hexaglue-testkit` | Published test harness: source fixture helpers, golden-file harness, determinism checks and the reference acceptance corpus |
+| `hexaglue-acceptance` | Where the whole chain is exercised end to end: the only module that sees both the frontend and the engine, and the home of the corpus scoreboard and the golden files |
 
 Dependencies point one way: `frontend → model ← engine ← spi ← plugins`. The
 boundary between stages is a data model, never a layer of interfaces — a
 second frontend, if one ever exists, produces the same code model rather than
 implementing an abstraction invented in advance.
 
-Further modules (`hexaglue-spi`, plugins, Maven adapter, CLI) arrive as the
-reactor is built out.
+Further modules arrive as the reactor is built out: `hexaglue-spi`, the
+plugins, and the Maven adapter, which will be the host HexaGlue is primarily
+used through. A standalone command line stays possible rather than planned —
+the engine already renders everything such a host would print, so what remains
+to build is the host and nothing else.
+
+## Why a verdict is auditable
+
+A classifier that cannot be argued with is a classifier nobody can trust. Every
+conclusion the engine reaches carries the evidence that supports it and the
+tree of rules it was derived from, and the engine renders both:
+
+```
+com.acme.clinic.owner.Owner: AGGREGATE_ROOT (HIGH, inferred)
+  [S2] com.acme.clinic.owner.Owner is a AGGREGATE_ROOT because a repository stores and retrieves it (org.springframework.data.repository.Repository)
+    involving com.acme.clinic.owner.OwnerRepository
+  [S3] com.acme.clinic.owner.Owner is a AGGREGATE_ROOT because OwnerRepository keeps it and hands it back, which is a lifecycle of its own
+    involving com.acme.clinic.owner.OwnerRepository
+  derivation:
+    [S3-DECISION] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [decided on 11000 at distance 0]
+      [R1] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [S2 SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) d0]
+        SPRING_DATA_REPOSITORY(com.acme.clinic.owner.OwnerRepository) [spring:org.springframework.data.repository.Repository]
+      [R1b] AGGREGATE_ROOT(com.acme.clinic.owner.Owner) [S3 MANAGED_BY(com.acme.clinic.owner.OwnerRepository) d0]
+```
+
+A type that reached no kind says so with the same detail — its category, the
+reason, the candidates that could not be separated, and what would settle the
+question. Nothing is ever silently absent from a verdict.
+
+`Explanation` renders one type or a whole run; `Outcome` counts a run. Both
+answer in lines a host writes as it pleases — a build plugin logs them one at a
+time, a report indents them under a heading — while the structure behind them
+stays readable on its own. The rendering is a leaf of the pipeline, never a
+stage of it: nothing downstream parses the text back.
+
+## The acceptance corpus
+
+Correctness here is not a matter of unit tests agreeing with the code that was
+just written. The reference corpus holds 154 reviewed scenarios across three
+populations, each asking a question the others cannot:
+
+| Profile | Population | What it proves |
+|---|---|---|
+| 1 | Sources written in HexaGlue's own vocabulary | That the engine does not need those names |
+| 2 | An enterprise application whose domain is welded to its storage | That roles are read as if the mapping were not there |
+| 3 | An application with no naming convention to lean on | That position alone carries the reading |
+
+Every scenario is reviewed by a human before it counts, and the score is held
+against a committed floor that fails both below it — a regression — and above
+it — a gain nobody recorded. Alongside the floor, golden files pin the whole
+model and the whole rendered explanation of every scenario, so a rule that
+changes what a verdict rests on shows up as a diff the day it lands.
 
 ## Build
 
@@ -44,3 +95,12 @@ JaCoCo line coverage, ArchUnit rules applied to the reactor itself, and
 single module each belongs to. Use `make ci` rather than `make verify` when
 what matters is that nothing warns: an incremental build does not recompile
 untouched modules, and their compiler warnings go unreported.
+
+Recording a golden file is a run that declares itself
+(`-Dhexaglue.golden.regenerate=true`); a missing golden is a failure, never a
+file quietly created from whatever the engine happens to answer today.
+
+## License
+
+Mozilla Public License 2.0. Commercial licensing options are available for
+organizations wishing to use HexaGlue under different terms: <info@hexaglue.io>.

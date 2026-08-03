@@ -22,11 +22,14 @@ import io.hexaglue.model.arch.UnclassifiedType.UnclassifiedCategory;
 import io.hexaglue.model.classification.Candidate;
 import io.hexaglue.model.classification.Classification;
 import io.hexaglue.model.classification.Evidence;
+import io.hexaglue.model.classification.EvidenceTier;
 import io.hexaglue.model.classification.ProofNode;
 import io.hexaglue.model.classification.RemediationHint;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * What the engine concluded about a type, and why, put into lines a host can hand to whatever it
@@ -66,6 +69,9 @@ public final class Explanation {
         Classification verdict = type.classification();
         List<String> lines = new ArrayList<>();
         lines.add(header(type.id(), verdict));
+        if (weighed(verdict)) {
+            lines.add(REASON_INDENT + "signals, strongest first: " + Tiers.ranking());
+        }
         if (type instanceof UnclassifiedType unclassified) {
             lines.add(REASON_INDENT + fallback(unclassified));
         }
@@ -128,6 +134,23 @@ public final class Explanation {
         return List.copyOf(lines);
     }
 
+    /**
+     * Answers whether a verdict actually had a pecking order to apply.
+     *
+     * <p>Reasons of one kind alone were never weighed against anything, and printing the ranking
+     * over them would explain a comparison that never happened. Two kinds or more — across the
+     * reasons that decided and the candidates that could not be separated — and the order is what
+     * the reader needs to make sense of what follows.</p>
+     */
+    private static boolean weighed(Classification verdict) {
+        Set<EvidenceTier> tiers = EnumSet.noneOf(EvidenceTier.class);
+        verdict.evidences().forEach(evidence -> tiers.add(evidence.tier()));
+        verdict.candidates().stream()
+                .flatMap(candidate -> candidate.evidences().stream())
+                .forEach(evidence -> tiers.add(evidence.tier()));
+        return tiers.size() > 1;
+    }
+
     private static String header(TypeId id, Classification verdict) {
         return id.qualifiedName() + ": " + verdict.kind() + " (" + verdict.confidence() + ", "
                 + verdict.basis().name().toLowerCase(Locale.ROOT) + ")";
@@ -153,7 +176,7 @@ public final class Explanation {
      * next, which is the only thing worth an extra line.</p>
      */
     private static void appendEvidence(List<String> lines, Evidence evidence, String indent, ArchType subject) {
-        lines.add(indent + "[" + evidence.tier().code() + "] " + evidence.justification());
+        lines.add(indent + "[" + Tiers.named(evidence.tier()) + "] " + evidence.justification());
         evidence.sourceLocation()
                 .filter(location ->
                         !location.equals(subject.structure().sourceLocation().orElse(null)))

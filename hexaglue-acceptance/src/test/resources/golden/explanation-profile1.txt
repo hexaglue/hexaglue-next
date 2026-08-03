@@ -10,10 +10,10 @@ AdapterRing-httpEntryPointIsADrivingAdapter
     derivation:
       no signal about com.acme.hangar.core.Assembly
   com.acme.hangar.web.HangarDoor: DRIVING_ADAPTER (HIGH, inferred)
-    [S2] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
+    [framework knowledge] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
     derivation:
-      [S3-DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal at S2]
-        [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [S2 DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) d0]
+      [DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal of framework knowledge]
+        [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [framework knowledge: DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor)]
           DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) [spring:org.springframework.web.bind.annotation.RestController]
 
 AdapterRing-neutralDependencyIsNotAWayOut
@@ -39,11 +39,11 @@ AdapterRing-persistenceHolderIsADrivenAdapter
     derivation:
       no signal about com.acme.hangar.core.Fleet
   com.acme.hangar.store.HangarBooks: DRIVEN_ADAPTER (HIGH, inferred)
-    [S2] com.acme.hangar.store.HangarBooks is a DRIVEN_ADAPTER because it holds EntityManager, which reaches outside the application (jakarta.persistence.EntityManager)
+    [framework knowledge] com.acme.hangar.store.HangarBooks is a DRIVEN_ADAPTER because it holds EntityManager, which reaches outside the application (jakarta.persistence.EntityManager)
       involving jakarta.persistence.EntityManager
     derivation:
-      [S3-DECISION] DRIVEN_ADAPTER(com.acme.hangar.store.HangarBooks) [decided on 1 signal at S2]
-        [W1-DR] DRIVEN_ADAPTER(com.acme.hangar.store.HangarBooks) [S2 INFRA_DEPENDENCY(jakarta.persistence.EntityManager) d0]
+      [DECISION] DRIVEN_ADAPTER(com.acme.hangar.store.HangarBooks) [decided on 1 signal of framework knowledge]
+        [W1-DR] DRIVEN_ADAPTER(com.acme.hangar.store.HangarBooks) [framework knowledge: INFRA_DEPENDENCY(jakarta.persistence.EntityManager)]
           INFRA_DEPENDENCY(jakarta.persistence.EntityManager) [jakarta:jakarta.persistence.EntityManager]
 
 AdapterRing-plumbingBelongsToNoRing
@@ -89,15 +89,15 @@ ApplicationLayer-aStereotypeNobodyReachesForSaysNothing
       no signal about com.acme.hangar.core.Dispatch
   com.acme.hangar.core.Manifest: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.acme.hangar.core.Manifest reads as a IDENTIFIER because it wraps exactly one value, com.acme.hangar.core.Dispatch, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.acme.hangar.core.Manifest reads as a VALUE_OBJECT because every field it declares is final, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.acme.hangar.core.Manifest reads as a IDENTIFIER because it wraps exactly one value, com.acme.hangar.core.Dispatch, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.acme.hangar.core.Manifest reads as a VALUE_OBJECT because every field it declares is final, so its state cannot change
     to make it explicit: com.acme.hangar.core.Manifest reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.acme.hangar.core.Manifest) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.acme.hangar.core.Manifest) [S4 SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Manifest) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [S4 IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest) d0]
+      [DECISION] UNCLASSIFIED(com.acme.hangar.core.Manifest) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.acme.hangar.core.Manifest) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Manifest)]
+        [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest)]
 
 ApplicationLayer-behaviourAcrossTwoDomainTypesIsADomainService
   4 types analysed
@@ -108,31 +108,31 @@ ApplicationLayer-behaviourAcrossTwoDomainTypesIsADomainService
   0 declared, 4 inferred, 1 left ambiguous
   com.acme.hangar.core.Checkout: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.acme.hangar.core.Checkout reads as a IDENTIFIER because it wraps exactly one value, com.acme.hangar.core.Dispatch, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.acme.hangar.core.Checkout reads as a VALUE_OBJECT because every field it declares is final, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.acme.hangar.core.Checkout reads as a IDENTIFIER because it wraps exactly one value, com.acme.hangar.core.Dispatch, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.acme.hangar.core.Checkout reads as a VALUE_OBJECT because every field it declares is final, so its state cannot change
     to make it explicit: com.acme.hangar.core.Checkout reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.acme.hangar.core.Checkout) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.acme.hangar.core.Checkout) [S4 SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Checkout) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.acme.hangar.core.Checkout) [S4 IMMUTABLE_SHAPE(com.acme.hangar.core.Checkout) d0]
+      [DECISION] UNCLASSIFIED(com.acme.hangar.core.Checkout) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.acme.hangar.core.Checkout) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Checkout)]
+        [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Checkout) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Checkout)]
   com.acme.hangar.core.Dispatch: DOMAIN_SERVICE (HIGH, inferred)
-    [S3] com.acme.hangar.core.Dispatch is a DOMAIN_SERVICE because it keeps nothing that can change, reaches nothing outside, and works across Manifest and Fleet
+    [graph relation] com.acme.hangar.core.Dispatch is a DOMAIN_SERVICE because it keeps nothing that can change, reaches nothing outside, and works across Manifest and Fleet
       involving com.acme.hangar.core.Manifest, com.acme.hangar.core.Fleet
     derivation:
-      [S3-DECISION] DOMAIN_SERVICE(com.acme.hangar.core.Dispatch) [decided on 1 signal at S3]
-        [R8] DOMAIN_SERVICE(com.acme.hangar.core.Dispatch) [S3 SPANS_DOMAIN_TYPES(2) d0]
+      [DECISION] DOMAIN_SERVICE(com.acme.hangar.core.Dispatch) [decided on 1 signal of graph relation]
+        [R8] DOMAIN_SERVICE(com.acme.hangar.core.Dispatch) [graph relation: SPANS_DOMAIN_TYPES(2)]
   com.acme.hangar.core.Fleet: VALUE_OBJECT (HIGH, inferred)
-    [S4] com.acme.hangar.core.Fleet reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.acme.hangar.core.Fleet reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.acme.hangar.core.Fleet) [decided on 1 signal at S4]
-        [S4-SHAPE] VALUE_OBJECT(com.acme.hangar.core.Fleet) [S4 IMMUTABLE_SHAPE(com.acme.hangar.core.Fleet) d0]
+      [DECISION] VALUE_OBJECT(com.acme.hangar.core.Fleet) [decided on 1 signal of local structure]
+        [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Fleet) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Fleet)]
   com.acme.hangar.core.Manifest: VALUE_OBJECT (HIGH, inferred)
-    [S4] com.acme.hangar.core.Manifest reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.acme.hangar.core.Manifest reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.acme.hangar.core.Manifest) [decided on 1 signal at S4]
-        [S4-SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [S4 IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest) d0]
+      [DECISION] VALUE_OBJECT(com.acme.hangar.core.Manifest) [decided on 1 signal of local structure]
+        [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest)]
 
 ApplicationLayer-behaviourThatRemembersIsNotADomainService
   4 types analysed
@@ -143,30 +143,30 @@ ApplicationLayer-behaviourThatRemembersIsNotADomainService
   0 declared, 4 inferred, 1 left ambiguous
   com.acme.hangar.core.Checkout: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.acme.hangar.core.Checkout reads as a IDENTIFIER because it wraps exactly one value, com.acme.hangar.core.Dispatch, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.acme.hangar.core.Checkout reads as a VALUE_OBJECT because every field it declares is final, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.acme.hangar.core.Checkout reads as a IDENTIFIER because it wraps exactly one value, com.acme.hangar.core.Dispatch, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.acme.hangar.core.Checkout reads as a VALUE_OBJECT because every field it declares is final, so its state cannot change
     to make it explicit: com.acme.hangar.core.Checkout reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.acme.hangar.core.Checkout) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.acme.hangar.core.Checkout) [S4 SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Checkout) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.acme.hangar.core.Checkout) [S4 IMMUTABLE_SHAPE(com.acme.hangar.core.Checkout) d0]
+      [DECISION] UNCLASSIFIED(com.acme.hangar.core.Checkout) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.acme.hangar.core.Checkout) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Checkout)]
+        [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Checkout) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Checkout)]
   com.acme.hangar.core.Dispatch: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.acme.hangar.core.Dispatch is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
       no signal about com.acme.hangar.core.Dispatch
   com.acme.hangar.core.Fleet: VALUE_OBJECT (HIGH, inferred)
-    [S4] com.acme.hangar.core.Fleet reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.acme.hangar.core.Fleet reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.acme.hangar.core.Fleet) [decided on 1 signal at S4]
-        [S4-SHAPE] VALUE_OBJECT(com.acme.hangar.core.Fleet) [S4 IMMUTABLE_SHAPE(com.acme.hangar.core.Fleet) d0]
+      [DECISION] VALUE_OBJECT(com.acme.hangar.core.Fleet) [decided on 1 signal of local structure]
+        [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Fleet) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Fleet)]
   com.acme.hangar.core.Manifest: VALUE_OBJECT (HIGH, inferred)
-    [S4] com.acme.hangar.core.Manifest reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.acme.hangar.core.Manifest reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.acme.hangar.core.Manifest) [decided on 1 signal at S4]
-        [S4-SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [S4 IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest) d0]
+      [DECISION] VALUE_OBJECT(com.acme.hangar.core.Manifest) [decided on 1 signal of local structure]
+        [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest)]
 
 ApplicationLayer-theTypeAnEntryPointHandsTheWorkToIsTheApplication
   2 types analysed
@@ -174,16 +174,16 @@ ApplicationLayer-theTypeAnEntryPointHandsTheWorkToIsTheApplication
     1 DRIVING_ADAPTER
   0 declared, 2 inferred, 0 left ambiguous
   com.acme.hangar.core.Dispatch: APPLICATION_SERVICE (HIGH, inferred)
-    [S3] com.acme.hangar.core.Dispatch is a APPLICATION_SERVICE because HangarDoor hands the work to it, and the framework knows it as application work (org.springframework.stereotype.Service)
+    [graph relation] com.acme.hangar.core.Dispatch is a APPLICATION_SERVICE because HangarDoor hands the work to it, and the framework knows it as application work (org.springframework.stereotype.Service)
       involving com.acme.hangar.web.HangarDoor
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Dispatch) [decided on 1 signal at S3]
-        [R6b] APPLICATION_SERVICE(com.acme.hangar.core.Dispatch) [S3 REACHED_FROM_THE_RING(com.acme.hangar.web.HangarDoor) d0]
+      [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Dispatch) [decided on 1 signal of graph relation]
+        [R6b] APPLICATION_SERVICE(com.acme.hangar.core.Dispatch) [graph relation: REACHED_FROM_THE_RING(com.acme.hangar.web.HangarDoor)]
   com.acme.hangar.web.HangarDoor: DRIVING_ADAPTER (HIGH, inferred)
-    [S2] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
+    [framework knowledge] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
     derivation:
-      [S3-DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal at S2]
-        [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [S2 DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) d0]
+      [DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal of framework knowledge]
+        [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [framework knowledge: DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor)]
           DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) [spring:org.springframework.web.bind.annotation.RestController]
 
 ApplicationLayer-theTypeBetweenTwoPortsIsTheApplication
@@ -194,28 +194,28 @@ ApplicationLayer-theTypeBetweenTwoPortsIsTheApplication
     1 DRIVING_ADAPTER
   0 declared, 4 inferred, 0 left ambiguous
   com.acme.hangar.core.Boarding: DRIVING_PORT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Boarding is a DRIVING_PORT because HangarDoor reaches the application through it and Checkout answers it
+    [graph relation] com.acme.hangar.core.Boarding is a DRIVING_PORT because HangarDoor reaches the application through it and Checkout answers it
       involving com.acme.hangar.web.HangarDoor, com.acme.hangar.core.Checkout
     derivation:
-      [S3-DECISION] DRIVING_PORT(com.acme.hangar.core.Boarding) [decided on 1 signal at S3]
-        [R5] DRIVING_PORT(com.acme.hangar.core.Boarding) [S3 HELD_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) d0]
+      [DECISION] DRIVING_PORT(com.acme.hangar.core.Boarding) [decided on 1 signal of graph relation]
+        [R5] DRIVING_PORT(com.acme.hangar.core.Boarding) [graph relation: HELD_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor)]
   com.acme.hangar.core.Checkout: APPLICATION_SERVICE (HIGH, inferred)
-    [S3] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Boarding, through which the outside reaches the application
+    [graph relation] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Boarding, through which the outside reaches the application
       involving com.acme.hangar.core.Boarding
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal at S3]
-        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [S3 ANSWERS_DRIVING_PORT(com.acme.hangar.core.Boarding) d0]
+      [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: ANSWERS_DRIVING_PORT(com.acme.hangar.core.Boarding)]
   com.acme.hangar.core.Ledger: DRIVEN_PORT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
+    [graph relation] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal at S3]
-        [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [S3 CONSUMED_BY_CORE(com.acme.hangar.core.Checkout) d0]
+      [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of graph relation]
+        [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
   com.acme.hangar.web.HangarDoor: DRIVING_ADAPTER (HIGH, inferred)
-    [S2] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
+    [framework knowledge] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
     derivation:
-      [S3-DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal at S2]
-        [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [S2 DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) d0]
+      [DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal of framework knowledge]
+        [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [framework knowledge: DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor)]
           DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) [spring:org.springframework.web.bind.annotation.RestController]
 
 ClassificationConfigIntegrationTest-exclusionsAndExplicitsShouldWorkTogether
@@ -236,25 +236,25 @@ ClassificationConfigIntegrationTest-exclusionsAndExplicitsShouldWorkTogether
       no signal about com.example.OrderCreatedException
   com.example.OrderId: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.OrderId reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.OrderId) [S4 SINGLE_VALUE_WRAPPER(com.example.OrderId) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.OrderId) [S4 IMMUTABLE_SHAPE(com.example.OrderId) d0]
+      [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
+        [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
 
 ClassificationConfigIntegrationTest-explicitClassificationShouldHaveHighestPriority
   1 types analysed
     1 AGGREGATE_ROOT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.Order: AGGREGATE_ROOT (EXPLICIT, declared)
-    [S1] com.example.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
+    [declared intent] com.example.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal at S1]
-        [S1-INTENT] AGGREGATE_ROOT(com.example.Order) [S1 DECLARED_KIND(AGGREGATE_ROOT) d0]
+      [DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal of declared intent]
+        [INTENT] AGGREGATE_ROOT(com.example.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
 
 ClassificationConfigIntegrationTest-explicitClassificationShouldOverrideCriteriaBased
@@ -335,15 +335,15 @@ ClassificationConfigIntegrationTest-nonGeneratedTypesShouldBeClassifiedNormally
       no signal about com.example.Order
   com.example.OrderId: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.OrderId reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.OrderId) [S4 SINGLE_VALUE_WRAPPER(com.example.OrderId) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.OrderId) [S4 IMMUTABLE_SHAPE(com.example.OrderId) d0]
+      [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
+        [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
 
 ClassificationConfigIntegrationTest-typesMatchingExcludePatternsShouldBeSkipped
   2 types analysed
@@ -404,10 +404,10 @@ ClassificationContractTest-portPriorityDominatesConfidence
     1 DRIVEN_PORT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.OrderRepository: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.example.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.OrderRepository) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.OrderRepository) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.OrderRepository) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 ClassificationContractTest-priorityDominatesConfidence
@@ -417,10 +417,10 @@ ClassificationContractTest-priorityDominatesConfidence
       1 UNKNOWN
   1 declared, 1 inferred, 0 left ambiguous
   com.example.Order: AGGREGATE_ROOT (EXPLICIT, declared)
-    [S1] com.example.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
+    [declared intent] com.example.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal at S1]
-        [S1-INTENT] AGGREGATE_ROOT(com.example.Order) [S1 DECLARED_KIND(AGGREGATE_ROOT) d0]
+      [DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal of declared intent]
+        [INTENT] AGGREGATE_ROOT(com.example.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
   com.example.OrderRepository: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
@@ -476,36 +476,37 @@ ClassificationGoldenFilesTest-createApplicationServiceExample
       1 UNKNOWN
   0 declared, 5 inferred, 0 left ambiguous
   com.example.order.application.OrderService: APPLICATION_SERVICE (HIGH, inferred)
-    [S3] com.example.order.application.OrderService is a APPLICATION_SERVICE because it stands on OrderRepository, through which the application reaches outside
+    [graph relation] com.example.order.application.OrderService is a APPLICATION_SERVICE because it stands on OrderRepository, through which the application reaches outside
       involving com.example.order.ports.out.OrderRepository
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.example.order.application.OrderService) [decided on 1 signal at S3]
-        [R6] APPLICATION_SERVICE(com.example.order.application.OrderService) [S3 CALLS_DRIVEN_PORT(com.example.order.ports.out.OrderRepository) d0]
+      [DECISION] APPLICATION_SERVICE(com.example.order.application.OrderService) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.example.order.application.OrderService) [graph relation: CALLS_DRIVEN_PORT(com.example.order.ports.out.OrderRepository)]
   com.example.order.domain.Order: AGGREGATE_ROOT (HIGH, inferred)
-    [S3] com.example.order.domain.Order is a AGGREGATE_ROOT because OrderRepository keeps it and hands it back, which is a lifecycle of its own
+    [graph relation] com.example.order.domain.Order is a AGGREGATE_ROOT because OrderRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.example.order.ports.out.OrderRepository
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.example.order.domain.Order) [decided on 1 signal at S3]
-        [R1b] AGGREGATE_ROOT(com.example.order.domain.Order) [S3 MANAGED_BY(com.example.order.ports.out.OrderRepository) d0]
+      [DECISION] AGGREGATE_ROOT(com.example.order.domain.Order) [decided on 1 signal of graph relation]
+        [R1b] AGGREGATE_ROOT(com.example.order.domain.Order) [graph relation: MANAGED_BY(com.example.order.ports.out.OrderRepository)]
   com.example.order.domain.OrderId: IDENTIFIER (HIGH, inferred)
-    [S3] com.example.order.domain.OrderId is a IDENTIFIER because OrderRepository takes it to answer with Order, which keeps it
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.example.order.domain.OrderId is a IDENTIFIER because OrderRepository takes it to answer with Order, which keeps it
       involving com.example.order.domain.Order, com.example.order.ports.out.OrderRepository
-    [S4] com.example.order.domain.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
+    [local structure] com.example.order.domain.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.example.order.domain.OrderId) [decided on 1 signal at S3, 1 at S4]
-        [R2] IDENTIFIER(com.example.order.domain.OrderId) [S3 SEARCHED_BY(com.example.order.ports.out.OrderRepository) d0]
-        [S4-SHAPE] IDENTIFIER(com.example.order.domain.OrderId) [S4 SINGLE_VALUE_WRAPPER(com.example.order.domain.OrderId) d0]
+      [DECISION] IDENTIFIER(com.example.order.domain.OrderId) [decided on 1 signal of graph relation, 1 of local structure]
+        [R2] IDENTIFIER(com.example.order.domain.OrderId) [graph relation: SEARCHED_BY(com.example.order.ports.out.OrderRepository)]
+        [SHAPE] IDENTIFIER(com.example.order.domain.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.order.domain.OrderId)]
   com.example.order.ports.in.OrderUseCases: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.example.order.ports.in.OrderUseCases is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
       no signal about com.example.order.ports.in.OrderUseCases
   com.example.order.ports.out.OrderRepository: DRIVEN_PORT (HIGH, inferred)
-    [S3] com.example.order.ports.out.OrderRepository is a DRIVEN_PORT because OrderService calls it and nothing inside the hexagon implements it
+    [graph relation] com.example.order.ports.out.OrderRepository is a DRIVEN_PORT because OrderService calls it and nothing inside the hexagon implements it
       involving com.example.order.application.OrderService
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.order.ports.out.OrderRepository) [decided on 1 signal at S3]
-        [R4] DRIVEN_PORT(com.example.order.ports.out.OrderRepository) [S3 CONSUMED_BY_CORE(com.example.order.application.OrderService) d0]
+      [DECISION] DRIVEN_PORT(com.example.order.ports.out.OrderRepository) [decided on 1 signal of graph relation]
+        [R4] DRIVEN_PORT(com.example.order.ports.out.OrderRepository) [graph relation: CONSUMED_BY_CORE(com.example.order.application.OrderService)]
 
 ClassificationGoldenFilesTest-createBankingExample
   6 types analysed
@@ -517,50 +518,52 @@ ClassificationGoldenFilesTest-createBankingExample
     1 DRIVEN_PORT
   4 declared, 2 inferred, 0 left ambiguous
   com.example.banking.domain.Account: AGGREGATE_ROOT (HIGH, inferred)
-    [S3] com.example.banking.domain.Account is a AGGREGATE_ROOT because AccountRepository keeps it and hands it back, which is a lifecycle of its own
+    [graph relation] com.example.banking.domain.Account is a AGGREGATE_ROOT because AccountRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.example.banking.ports.out.AccountRepository
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.example.banking.domain.Account) [decided on 1 signal at S3]
-        [R1b] AGGREGATE_ROOT(com.example.banking.domain.Account) [S3 MANAGED_BY(com.example.banking.ports.out.AccountRepository) d0]
+      [DECISION] AGGREGATE_ROOT(com.example.banking.domain.Account) [decided on 1 signal of graph relation]
+        [R1b] AGGREGATE_ROOT(com.example.banking.domain.Account) [graph relation: MANAGED_BY(com.example.banking.ports.out.AccountRepository)]
   com.example.banking.domain.AccountId: IDENTIFIER (HIGH, inferred)
-    [S3] com.example.banking.domain.AccountId is a IDENTIFIER because AccountRepository takes it to answer with Account, which keeps it
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.example.banking.domain.AccountId is a IDENTIFIER because AccountRepository takes it to answer with Account, which keeps it
       involving com.example.banking.domain.Account, com.example.banking.ports.out.AccountRepository
-    [S4] com.example.banking.domain.AccountId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
+    [local structure] com.example.banking.domain.AccountId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.example.banking.domain.AccountId) [decided on 1 signal at S3, 1 at S4]
-        [R2] IDENTIFIER(com.example.banking.domain.AccountId) [S3 SEARCHED_BY(com.example.banking.ports.out.AccountRepository) d0]
-        [S4-SHAPE] IDENTIFIER(com.example.banking.domain.AccountId) [S4 SINGLE_VALUE_WRAPPER(com.example.banking.domain.AccountId) d0]
+      [DECISION] IDENTIFIER(com.example.banking.domain.AccountId) [decided on 1 signal of graph relation, 1 of local structure]
+        [R2] IDENTIFIER(com.example.banking.domain.AccountId) [graph relation: SEARCHED_BY(com.example.banking.ports.out.AccountRepository)]
+        [SHAPE] IDENTIFIER(com.example.banking.domain.AccountId) [local structure: SINGLE_VALUE_WRAPPER(com.example.banking.domain.AccountId)]
   com.example.banking.domain.Money: VALUE_OBJECT (EXPLICIT, declared)
-    [S1] com.example.banking.domain.Money declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
-    [S3] com.example.banking.domain.Money is a VALUE_OBJECT because Account is made of it and it carries no identity of its own
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [declared intent] com.example.banking.domain.Money declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
+    [graph relation] com.example.banking.domain.Money is a VALUE_OBJECT because Account is made of it and it carries no identity of its own
       involving com.example.banking.domain.Account
-    [S3] com.example.banking.domain.Money is a VALUE_OBJECT because Transaction is made of it and it carries no identity of its own
+    [graph relation] com.example.banking.domain.Money is a VALUE_OBJECT because Transaction is made of it and it carries no identity of its own
       involving com.example.banking.domain.Transaction
-    [S4] com.example.banking.domain.Money reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.example.banking.domain.Money reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.banking.domain.Money) [decided on 1 signal at S1, 2 at S3, 1 at S4]
-        [S1-INTENT] VALUE_OBJECT(com.example.banking.domain.Money) [S1 DECLARED_KIND(VALUE_OBJECT) d0]
+      [DECISION] VALUE_OBJECT(com.example.banking.domain.Money) [decided on 1 signal of declared intent, 2 of graph relation, 1 of local structure]
+        [INTENT] VALUE_OBJECT(com.example.banking.domain.Money) [declared intent: DECLARED_KIND(VALUE_OBJECT)]
           DECLARED_KIND(com.example.banking.domain.Money) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
-        [R3b] VALUE_OBJECT(com.example.banking.domain.Money) [S3 OWNED_BY(com.example.banking.domain.Account) d0]
-        [R3b] VALUE_OBJECT(com.example.banking.domain.Money) [S3 OWNED_BY(com.example.banking.domain.Transaction) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.banking.domain.Money) [S4 IMMUTABLE_SHAPE(com.example.banking.domain.Money) d0]
+        [R3b] VALUE_OBJECT(com.example.banking.domain.Money) [graph relation: OWNED_BY(com.example.banking.domain.Account)]
+        [R3b] VALUE_OBJECT(com.example.banking.domain.Money) [graph relation: OWNED_BY(com.example.banking.domain.Transaction)]
+        [SHAPE] VALUE_OBJECT(com.example.banking.domain.Money) [local structure: IMMUTABLE_SHAPE(com.example.banking.domain.Money)]
   com.example.banking.domain.Transaction: ENTITY (EXPLICIT, declared)
-    [S1] com.example.banking.domain.Transaction declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
+    [declared intent] com.example.banking.domain.Transaction declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
     derivation:
-      [S3-DECISION] ENTITY(com.example.banking.domain.Transaction) [decided on 1 signal at S1]
-        [S1-INTENT] ENTITY(com.example.banking.domain.Transaction) [S1 DECLARED_KIND(ENTITY) d0]
+      [DECISION] ENTITY(com.example.banking.domain.Transaction) [decided on 1 signal of declared intent]
+        [INTENT] ENTITY(com.example.banking.domain.Transaction) [declared intent: DECLARED_KIND(ENTITY)]
           DECLARED_KIND(com.example.banking.domain.Transaction) [jmolecules:org.jmolecules.ddd.annotation.Entity]
   com.example.banking.ports.in.TransferUseCase: DRIVING_PORT (EXPLICIT, declared)
-    [S1] com.example.banking.ports.in.TransferUseCase declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
+    [declared intent] com.example.banking.ports.in.TransferUseCase declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVING_PORT(com.example.banking.ports.in.TransferUseCase) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVING_PORT(com.example.banking.ports.in.TransferUseCase) [S1 DECLARED_KIND(DRIVING_PORT) d0]
+      [DECISION] DRIVING_PORT(com.example.banking.ports.in.TransferUseCase) [decided on 1 signal of declared intent]
+        [INTENT] DRIVING_PORT(com.example.banking.ports.in.TransferUseCase) [declared intent: DECLARED_KIND(DRIVING_PORT)]
           DECLARED_KIND(com.example.banking.ports.in.TransferUseCase) [jmolecules:org.jmolecules.architecture.hexagonal.PrimaryPort]
   com.example.banking.ports.out.AccountRepository: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.banking.ports.out.AccountRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.example.banking.ports.out.AccountRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.banking.ports.out.AccountRepository) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.banking.ports.out.AccountRepository) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.banking.ports.out.AccountRepository) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.banking.ports.out.AccountRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.banking.ports.out.AccountRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 ClassificationGoldenFilesTest-createMinimalExample
@@ -576,15 +579,15 @@ ClassificationGoldenFilesTest-createMinimalExample
       no signal about com.example.domain.Task
   com.example.domain.TaskId: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.domain.TaskId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.domain.TaskId reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.domain.TaskId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.domain.TaskId reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.domain.TaskId reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.domain.TaskId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.domain.TaskId) [S4 SINGLE_VALUE_WRAPPER(com.example.domain.TaskId) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.domain.TaskId) [S4 IMMUTABLE_SHAPE(com.example.domain.TaskId) d0]
+      [DECISION] UNCLASSIFIED(com.example.domain.TaskId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.domain.TaskId) [local structure: SINGLE_VALUE_WRAPPER(com.example.domain.TaskId)]
+        [SHAPE] VALUE_OBJECT(com.example.domain.TaskId) [local structure: IMMUTABLE_SHAPE(com.example.domain.TaskId)]
   com.example.ports.in.TaskUseCases: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.example.ports.in.TaskUseCases is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -605,44 +608,47 @@ ClassificationIntegrationTest-coffeeShopDomainClassification
     1 DRIVEN_PORT
   4 declared, 1 inferred, 0 left ambiguous
   com.coffeeshop.order.LineItem: ENTITY (EXPLICIT, declared)
-    [S1] com.coffeeshop.order.LineItem declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
+    [declared intent] com.coffeeshop.order.LineItem declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
     derivation:
-      [S3-DECISION] ENTITY(com.coffeeshop.order.LineItem) [decided on 1 signal at S1]
-        [S1-INTENT] ENTITY(com.coffeeshop.order.LineItem) [S1 DECLARED_KIND(ENTITY) d0]
+      [DECISION] ENTITY(com.coffeeshop.order.LineItem) [decided on 1 signal of declared intent]
+        [INTENT] ENTITY(com.coffeeshop.order.LineItem) [declared intent: DECLARED_KIND(ENTITY)]
           DECLARED_KIND(com.coffeeshop.order.LineItem) [jmolecules:org.jmolecules.ddd.annotation.Entity]
   com.coffeeshop.order.Location: VALUE_OBJECT (EXPLICIT, declared)
-    [S1] com.coffeeshop.order.Location declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
-    [S3] com.coffeeshop.order.Location is a VALUE_OBJECT because Order is made of it and it carries no identity of its own
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [declared intent] com.coffeeshop.order.Location declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
+    [graph relation] com.coffeeshop.order.Location is a VALUE_OBJECT because Order is made of it and it carries no identity of its own
       involving com.coffeeshop.order.Order
-    [S4] com.coffeeshop.order.Location reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.coffeeshop.order.Location reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.coffeeshop.order.Location) [decided on 1 signal at S1, 1 at S3, 1 at S4]
-        [S1-INTENT] VALUE_OBJECT(com.coffeeshop.order.Location) [S1 DECLARED_KIND(VALUE_OBJECT) d0]
+      [DECISION] VALUE_OBJECT(com.coffeeshop.order.Location) [decided on 1 signal of declared intent, 1 of graph relation, 1 of local structure]
+        [INTENT] VALUE_OBJECT(com.coffeeshop.order.Location) [declared intent: DECLARED_KIND(VALUE_OBJECT)]
           DECLARED_KIND(com.coffeeshop.order.Location) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
-        [R3b] VALUE_OBJECT(com.coffeeshop.order.Location) [S3 OWNED_BY(com.coffeeshop.order.Order) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.coffeeshop.order.Location) [S4 IMMUTABLE_SHAPE(com.coffeeshop.order.Location) d0]
+        [R3b] VALUE_OBJECT(com.coffeeshop.order.Location) [graph relation: OWNED_BY(com.coffeeshop.order.Order)]
+        [SHAPE] VALUE_OBJECT(com.coffeeshop.order.Location) [local structure: IMMUTABLE_SHAPE(com.coffeeshop.order.Location)]
   com.coffeeshop.order.Order: AGGREGATE_ROOT (EXPLICIT, declared)
-    [S1] com.coffeeshop.order.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
-    [S3] com.coffeeshop.order.Order is a AGGREGATE_ROOT because OrderRepository keeps it and hands it back, which is a lifecycle of its own
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [declared intent] com.coffeeshop.order.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
+    [graph relation] com.coffeeshop.order.Order is a AGGREGATE_ROOT because OrderRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.coffeeshop.order.OrderRepository
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.coffeeshop.order.Order) [decided on 1 signal at S1, 1 at S3]
-        [S1-INTENT] AGGREGATE_ROOT(com.coffeeshop.order.Order) [S1 DECLARED_KIND(AGGREGATE_ROOT) d0]
+      [DECISION] AGGREGATE_ROOT(com.coffeeshop.order.Order) [decided on 1 signal of declared intent, 1 of graph relation]
+        [INTENT] AGGREGATE_ROOT(com.coffeeshop.order.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.coffeeshop.order.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
-        [R1b] AGGREGATE_ROOT(com.coffeeshop.order.Order) [S3 MANAGED_BY(com.coffeeshop.order.OrderRepository) d0]
+        [R1b] AGGREGATE_ROOT(com.coffeeshop.order.Order) [graph relation: MANAGED_BY(com.coffeeshop.order.OrderRepository)]
   com.coffeeshop.order.OrderId: IDENTIFIER (HIGH, inferred)
-    [S3] com.coffeeshop.order.OrderId is a IDENTIFIER because OrderRepository takes it to answer with Order, which keeps it
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.coffeeshop.order.OrderId is a IDENTIFIER because OrderRepository takes it to answer with Order, which keeps it
       involving com.coffeeshop.order.Order, com.coffeeshop.order.OrderRepository
-    [S4] com.coffeeshop.order.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    [local structure] com.coffeeshop.order.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.coffeeshop.order.OrderId) [decided on 1 signal at S3, 1 at S4]
-        [R2] IDENTIFIER(com.coffeeshop.order.OrderId) [S3 SEARCHED_BY(com.coffeeshop.order.OrderRepository) d0]
-        [S4-SHAPE] IDENTIFIER(com.coffeeshop.order.OrderId) [S4 SINGLE_VALUE_WRAPPER(com.coffeeshop.order.OrderId) d0]
+      [DECISION] IDENTIFIER(com.coffeeshop.order.OrderId) [decided on 1 signal of graph relation, 1 of local structure]
+        [R2] IDENTIFIER(com.coffeeshop.order.OrderId) [graph relation: SEARCHED_BY(com.coffeeshop.order.OrderRepository)]
+        [SHAPE] IDENTIFIER(com.coffeeshop.order.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.coffeeshop.order.OrderId)]
   com.coffeeshop.order.OrderRepository: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.coffeeshop.order.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.coffeeshop.order.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.coffeeshop.order.OrderRepository) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.coffeeshop.order.OrderRepository) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.coffeeshop.order.OrderRepository) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.coffeeshop.order.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.coffeeshop.order.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 ClassificationIntegrationTest-explicitAnnotationsOverrideHeuristics
@@ -650,10 +656,10 @@ ClassificationIntegrationTest-explicitAnnotationsOverrideHeuristics
     1 VALUE_OBJECT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.Money: VALUE_OBJECT (EXPLICIT, declared)
-    [S1] com.example.Money declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
+    [declared intent] com.example.Money declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.Money) [decided on 1 signal at S1]
-        [S1-INTENT] VALUE_OBJECT(com.example.Money) [S1 DECLARED_KIND(VALUE_OBJECT) d0]
+      [DECISION] VALUE_OBJECT(com.example.Money) [decided on 1 signal of declared intent]
+        [INTENT] VALUE_OBJECT(com.example.Money) [declared intent: DECLARED_KIND(VALUE_OBJECT)]
           DECLARED_KIND(com.example.Money) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
 
 ClassificationIntegrationTest-namingCriteriaEvidence
@@ -663,15 +669,15 @@ ClassificationIntegrationTest-namingCriteriaEvidence
   0 declared, 1 inferred, 1 left ambiguous
   com.example.ProductId: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.ProductId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.ProductId reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.ProductId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.ProductId reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.ProductId reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.ProductId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.ProductId) [S4 SINGLE_VALUE_WRAPPER(com.example.ProductId) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.ProductId) [S4 IMMUTABLE_SHAPE(com.example.ProductId) d0]
+      [DECISION] UNCLASSIFIED(com.example.ProductId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.ProductId) [local structure: SINGLE_VALUE_WRAPPER(com.example.ProductId)]
+        [SHAPE] VALUE_OBJECT(com.example.ProductId) [local structure: IMMUTABLE_SHAPE(com.example.ProductId)]
 
 ClassificationIntegrationTest-orderRepositoryShouldBeRepositoryPort
   2 types analysed
@@ -734,22 +740,22 @@ ClassificationIntegrationTest-portsInOutClassification
     derivation:
       no signal about com.example.domain.Order
   com.example.infrastructure.PaymentGateway: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.infrastructure.PaymentGateway declares DRIVEN_PORT by bearing org.jmolecules.architecture.hexagonal.SecondaryPort (pack jmolecules)
+    [declared intent] com.example.infrastructure.PaymentGateway declares DRIVEN_PORT by bearing org.jmolecules.architecture.hexagonal.SecondaryPort (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.infrastructure.PaymentGateway) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.infrastructure.PaymentGateway) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.infrastructure.PaymentGateway) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.infrastructure.PaymentGateway) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.infrastructure.PaymentGateway) [jmolecules:org.jmolecules.architecture.hexagonal.SecondaryPort]
   com.example.ports.in.PlaceOrderUseCase: DRIVING_PORT (EXPLICIT, declared)
-    [S1] com.example.ports.in.PlaceOrderUseCase declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
+    [declared intent] com.example.ports.in.PlaceOrderUseCase declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVING_PORT(com.example.ports.in.PlaceOrderUseCase) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVING_PORT(com.example.ports.in.PlaceOrderUseCase) [S1 DECLARED_KIND(DRIVING_PORT) d0]
+      [DECISION] DRIVING_PORT(com.example.ports.in.PlaceOrderUseCase) [decided on 1 signal of declared intent]
+        [INTENT] DRIVING_PORT(com.example.ports.in.PlaceOrderUseCase) [declared intent: DECLARED_KIND(DRIVING_PORT)]
           DECLARED_KIND(com.example.ports.in.PlaceOrderUseCase) [jmolecules:org.jmolecules.architecture.hexagonal.PrimaryPort]
   com.example.ports.out.OrderRepository: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.ports.out.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.example.ports.out.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.ports.out.OrderRepository) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.ports.out.OrderRepository) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.ports.out.OrderRepository) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.ports.out.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.ports.out.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 ClassificationIntegrationTest-repositoryAnnotationClassification
@@ -757,10 +763,10 @@ ClassificationIntegrationTest-repositoryAnnotationClassification
     1 DRIVEN_PORT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.CustomerStore: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.CustomerStore declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.example.CustomerStore declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.CustomerStore) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.CustomerStore) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.CustomerStore) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.CustomerStore) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.CustomerStore) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 ClassificationIntegrationTest-repositoryDominantEvidence
@@ -797,16 +803,16 @@ ConflictDetectionTest-conflictingExplicitAnnotationsWithSamePriority
   0 declared, 1 inferred, 1 left ambiguous
   com.example.Ambiguous: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: ENTITY and VALUE_OBJECT
-    candidate ENTITY (1 signal at S1)
-      [S1] com.example.Ambiguous declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
-    candidate VALUE_OBJECT (1 signal at S1)
-      [S1] com.example.Ambiguous declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
+    candidate ENTITY (1 signal of declared intent)
+      [declared intent] com.example.Ambiguous declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
+    candidate VALUE_OBJECT (1 signal of declared intent)
+      [declared intent] com.example.Ambiguous declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
     to make it explicit: com.example.Ambiguous reads as ENTITY and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.Ambiguous) [AMBIGUOUS between ENTITY and VALUE_OBJECT]
-        [S1-INTENT] ENTITY(com.example.Ambiguous) [S1 DECLARED_KIND(ENTITY) d0]
+      [DECISION] UNCLASSIFIED(com.example.Ambiguous) [AMBIGUOUS between ENTITY and VALUE_OBJECT]
+        [INTENT] ENTITY(com.example.Ambiguous) [declared intent: DECLARED_KIND(ENTITY)]
           DECLARED_KIND(com.example.Ambiguous) [jmolecules:org.jmolecules.ddd.annotation.Entity]
-        [S1-INTENT] VALUE_OBJECT(com.example.Ambiguous) [S1 DECLARED_KIND(VALUE_OBJECT) d0]
+        [INTENT] VALUE_OBJECT(com.example.Ambiguous) [declared intent: DECLARED_KIND(VALUE_OBJECT)]
           DECLARED_KIND(com.example.Ambiguous) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
 
 ConflictDetectionTest-enumShouldBeClassifiedAsValueObjectForDomainClassifier
@@ -814,10 +820,10 @@ ConflictDetectionTest-enumShouldBeClassifiedAsValueObjectForDomainClassifier
     1 VALUE_OBJECT
   0 declared, 1 inferred, 0 left ambiguous
   com.example.Color: VALUE_OBJECT (HIGH, inferred)
-    [S4] com.example.Color reads as a VALUE_OBJECT because it is an enum, a closed set of values
+    [local structure] com.example.Color reads as a VALUE_OBJECT because it is an enum, a closed set of values
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.Color) [decided on 1 signal at S4]
-        [S4-SHAPE] VALUE_OBJECT(com.example.Color) [S4 IMMUTABLE_SHAPE(com.example.Color) d0]
+      [DECISION] VALUE_OBJECT(com.example.Color) [decided on 1 signal of local structure]
+        [SHAPE] VALUE_OBJECT(com.example.Color) [local structure: IMMUTABLE_SHAPE(com.example.Color)]
 
 ConflictDetectionTest-explicitAnnotationShouldWinWithHighConfidence
   2 types analysed
@@ -826,10 +832,10 @@ ConflictDetectionTest-explicitAnnotationShouldWinWithHighConfidence
       1 UNKNOWN
   1 declared, 1 inferred, 0 left ambiguous
   com.example.Order: AGGREGATE_ROOT (EXPLICIT, declared)
-    [S1] com.example.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
+    [declared intent] com.example.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal at S1]
-        [S1-INTENT] AGGREGATE_ROOT(com.example.Order) [S1 DECLARED_KIND(AGGREGATE_ROOT) d0]
+      [DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal of declared intent]
+        [INTENT] AGGREGATE_ROOT(com.example.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
   com.example.OrderRepository: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
@@ -844,10 +850,10 @@ ConflictDetectionTest-explicitAnnotationWinsWhenRepositoryDominantAlsoMatches
       1 UNKNOWN
   1 declared, 1 inferred, 0 left ambiguous
   com.example.Customer: AGGREGATE_ROOT (EXPLICIT, declared)
-    [S1] com.example.Customer declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
+    [declared intent] com.example.Customer declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.example.Customer) [decided on 1 signal at S1]
-        [S1-INTENT] AGGREGATE_ROOT(com.example.Customer) [S1 DECLARED_KIND(AGGREGATE_ROOT) d0]
+      [DECISION] AGGREGATE_ROOT(com.example.Customer) [decided on 1 signal of declared intent]
+        [INTENT] AGGREGATE_ROOT(com.example.Customer) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Customer) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
   com.example.CustomerRepository: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
@@ -860,10 +866,10 @@ ConflictDetectionTest-explicitRepositoryShouldClassifyPortCorrectly
     1 DRIVEN_PORT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.PaymentGateway: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.PaymentGateway declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.example.PaymentGateway declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.PaymentGateway) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.PaymentGateway) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.PaymentGateway) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.PaymentGateway) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.PaymentGateway) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 ConflictDetectionTest-interfaceWithoutMarkersIsUnclassified
@@ -906,15 +912,15 @@ ConflictDetectionTest-recordIdShouldBeIdentifier
   0 declared, 1 inferred, 1 left ambiguous
   com.example.ProductId: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.ProductId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.ProductId reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.ProductId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.ProductId reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.ProductId reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.ProductId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.ProductId) [S4 SINGLE_VALUE_WRAPPER(com.example.ProductId) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.ProductId) [S4 IMMUTABLE_SHAPE(com.example.ProductId) d0]
+      [DECISION] UNCLASSIFIED(com.example.ProductId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.ProductId) [local structure: SINGLE_VALUE_WRAPPER(com.example.ProductId)]
+        [SHAPE] VALUE_OBJECT(com.example.ProductId) [local structure: IMMUTABLE_SHAPE(com.example.ProductId)]
 
 ConflictDetectionTest-repositoryDominantClassificationShouldSucceed
   2 types analysed
@@ -969,10 +975,10 @@ DomainClassifierTest-explicitAnnotationClassifiesWithoutConflict
     1 AGGREGATE_ROOT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.Order: AGGREGATE_ROOT (EXPLICIT, declared)
-    [S1] com.example.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
+    [declared intent] com.example.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal at S1]
-        [S1-INTENT] AGGREGATE_ROOT(com.example.Order) [S1 DECLARED_KIND(AGGREGATE_ROOT) d0]
+      [DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal of declared intent]
+        [INTENT] AGGREGATE_ROOT(com.example.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
 
 DomainClassifierTest-explicitAnnotationShouldWinOverHeuristic
@@ -980,10 +986,10 @@ DomainClassifierTest-explicitAnnotationShouldWinOverHeuristic
     1 ENTITY
   1 declared, 0 inferred, 0 left ambiguous
   com.example.Customer: ENTITY (EXPLICIT, declared)
-    [S1] com.example.Customer declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
+    [declared intent] com.example.Customer declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
     derivation:
-      [S3-DECISION] ENTITY(com.example.Customer) [decided on 1 signal at S1]
-        [S1-INTENT] ENTITY(com.example.Customer) [S1 DECLARED_KIND(ENTITY) d0]
+      [DECISION] ENTITY(com.example.Customer) [decided on 1 signal of declared intent]
+        [INTENT] ENTITY(com.example.Customer) [declared intent: DECLARED_KIND(ENTITY)]
           DECLARED_KIND(com.example.Customer) [jmolecules:org.jmolecules.ddd.annotation.Entity]
 
 DomainClassifierTest-higherPriorityShouldWin
@@ -993,35 +999,35 @@ DomainClassifierTest-higherPriorityShouldWin
   0 declared, 1 inferred, 1 left ambiguous
   com.example.OrderId: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.OrderId reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.OrderId) [S4 SINGLE_VALUE_WRAPPER(com.example.OrderId) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.OrderId) [S4 IMMUTABLE_SHAPE(com.example.OrderId) d0]
+      [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
+        [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
 
 DomainClassifierTest-shouldClassifyEnumTypesAsValueObject
   1 types analysed
     1 VALUE_OBJECT
   0 declared, 1 inferred, 0 left ambiguous
   com.example.OrderStatus: VALUE_OBJECT (HIGH, inferred)
-    [S4] com.example.OrderStatus reads as a VALUE_OBJECT because it is an enum, a closed set of values
+    [local structure] com.example.OrderStatus reads as a VALUE_OBJECT because it is an enum, a closed set of values
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.OrderStatus) [decided on 1 signal at S4]
-        [S4-SHAPE] VALUE_OBJECT(com.example.OrderStatus) [S4 IMMUTABLE_SHAPE(com.example.OrderStatus) d0]
+      [DECISION] VALUE_OBJECT(com.example.OrderStatus) [decided on 1 signal of local structure]
+        [SHAPE] VALUE_OBJECT(com.example.OrderStatus) [local structure: IMMUTABLE_SHAPE(com.example.OrderStatus)]
 
 DomainClassifierTest-shouldClassifyExplicitAggregateRoot
   1 types analysed
     1 AGGREGATE_ROOT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.Order: AGGREGATE_ROOT (EXPLICIT, declared)
-    [S1] com.example.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
+    [declared intent] com.example.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal at S1]
-        [S1-INTENT] AGGREGATE_ROOT(com.example.Order) [S1 DECLARED_KIND(AGGREGATE_ROOT) d0]
+      [DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal of declared intent]
+        [INTENT] AGGREGATE_ROOT(com.example.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
 
 DomainClassifierTest-shouldClassifyExplicitEntity
@@ -1029,10 +1035,10 @@ DomainClassifierTest-shouldClassifyExplicitEntity
     1 ENTITY
   1 declared, 0 inferred, 0 left ambiguous
   com.example.LineItem: ENTITY (EXPLICIT, declared)
-    [S1] com.example.LineItem declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
+    [declared intent] com.example.LineItem declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
     derivation:
-      [S3-DECISION] ENTITY(com.example.LineItem) [decided on 1 signal at S1]
-        [S1-INTENT] ENTITY(com.example.LineItem) [S1 DECLARED_KIND(ENTITY) d0]
+      [DECISION] ENTITY(com.example.LineItem) [decided on 1 signal of declared intent]
+        [INTENT] ENTITY(com.example.LineItem) [declared intent: DECLARED_KIND(ENTITY)]
           DECLARED_KIND(com.example.LineItem) [jmolecules:org.jmolecules.ddd.annotation.Entity]
 
 DomainClassifierTest-shouldClassifyExplicitValueObject
@@ -1040,13 +1046,14 @@ DomainClassifierTest-shouldClassifyExplicitValueObject
     1 VALUE_OBJECT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.Money: VALUE_OBJECT (EXPLICIT, declared)
-    [S1] com.example.Money declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
-    [S4] com.example.Money reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [declared intent] com.example.Money declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
+    [local structure] com.example.Money reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.Money) [decided on 1 signal at S1, 1 at S4]
-        [S1-INTENT] VALUE_OBJECT(com.example.Money) [S1 DECLARED_KIND(VALUE_OBJECT) d0]
+      [DECISION] VALUE_OBJECT(com.example.Money) [decided on 1 signal of declared intent, 1 of local structure]
+        [INTENT] VALUE_OBJECT(com.example.Money) [declared intent: DECLARED_KIND(VALUE_OBJECT)]
           DECLARED_KIND(com.example.Money) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
-        [S4-SHAPE] VALUE_OBJECT(com.example.Money) [S4 IMMUTABLE_SHAPE(com.example.Money) d0]
+        [SHAPE] VALUE_OBJECT(com.example.Money) [local structure: IMMUTABLE_SHAPE(com.example.Money)]
 
 DomainClassifierTest-shouldClassifyRecordIdAsIdentifier
   1 types analysed
@@ -1055,15 +1062,15 @@ DomainClassifierTest-shouldClassifyRecordIdAsIdentifier
   0 declared, 1 inferred, 1 left ambiguous
   com.example.OrderId: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.OrderId reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.OrderId) [S4 SINGLE_VALUE_WRAPPER(com.example.OrderId) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.OrderId) [S4 IMMUTABLE_SHAPE(com.example.OrderId) d0]
+      [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
+        [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
 
 DomainClassifierTest-shouldClassifyRepositoryDominantAsAggregateRoot
   2 types analysed
@@ -1088,10 +1095,10 @@ DomainClassifierTest-shouldClassifySubclassWhenParentHasAnnotation
       1 UNKNOWN
   1 declared, 1 inferred, 0 left ambiguous
   com.example.BaseOrder: AGGREGATE_ROOT (EXPLICIT, declared)
-    [S1] com.example.BaseOrder declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
+    [declared intent] com.example.BaseOrder declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.example.BaseOrder) [decided on 1 signal at S1]
-        [S1-INTENT] AGGREGATE_ROOT(com.example.BaseOrder) [S1 DECLARED_KIND(AGGREGATE_ROOT) d0]
+      [DECISION] AGGREGATE_ROOT(com.example.BaseOrder) [decided on 1 signal of declared intent]
+        [INTENT] AGGREGATE_ROOT(com.example.BaseOrder) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.BaseOrder) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
   com.example.PremiumOrder: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
@@ -1217,10 +1224,10 @@ DomainCriteriaTest-shouldMatchRecordEndingWithEvent
     1 VALUE_OBJECT
   0 declared, 1 inferred, 0 left ambiguous
   com.example.PaymentReceivedEvent: VALUE_OBJECT (HIGH, inferred)
-    [S4] com.example.PaymentReceivedEvent reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.example.PaymentReceivedEvent reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.PaymentReceivedEvent) [decided on 1 signal at S4]
-        [S4-SHAPE] VALUE_OBJECT(com.example.PaymentReceivedEvent) [S4 IMMUTABLE_SHAPE(com.example.PaymentReceivedEvent) d0]
+      [DECISION] VALUE_OBJECT(com.example.PaymentReceivedEvent) [decided on 1 signal of local structure]
+        [SHAPE] VALUE_OBJECT(com.example.PaymentReceivedEvent) [local structure: IMMUTABLE_SHAPE(com.example.PaymentReceivedEvent)]
 
 DomainCriteriaTest-shouldMatchRecordWithSingleComponentAndIdSuffix
   1 types analysed
@@ -1229,15 +1236,15 @@ DomainCriteriaTest-shouldMatchRecordWithSingleComponentAndIdSuffix
   0 declared, 1 inferred, 1 left ambiguous
   com.example.OrderId: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.OrderId reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.OrderId) [S4 SINGLE_VALUE_WRAPPER(com.example.OrderId) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.OrderId) [S4 IMMUTABLE_SHAPE(com.example.OrderId) d0]
+      [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
+        [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
 
 DomainCriteriaTest-shouldMatchRecordWithoutIdentityReferencedByOtherType
   2 types analysed
@@ -1251,10 +1258,10 @@ DomainCriteriaTest-shouldMatchRecordWithoutIdentityReferencedByOtherType
     derivation:
       no signal about com.example.Order
   com.example.ShippingRate: VALUE_OBJECT (HIGH, inferred)
-    [S4] com.example.ShippingRate reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.example.ShippingRate reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.ShippingRate) [decided on 1 signal at S4]
-        [S4-SHAPE] VALUE_OBJECT(com.example.ShippingRate) [S4 IMMUTABLE_SHAPE(com.example.ShippingRate) d0]
+      [DECISION] VALUE_OBJECT(com.example.ShippingRate) [decided on 1 signal of local structure]
+        [SHAPE] VALUE_OBJECT(com.example.ShippingRate) [local structure: IMMUTABLE_SHAPE(com.example.ShippingRate)]
 
 DomainCriteriaTest-shouldMatchRecordWrappingUUID
   1 types analysed
@@ -1263,28 +1270,29 @@ DomainCriteriaTest-shouldMatchRecordWrappingUUID
   0 declared, 1 inferred, 1 left ambiguous
   com.example.CustomerId: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.CustomerId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.CustomerId reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.CustomerId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.CustomerId reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.CustomerId reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.CustomerId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.CustomerId) [S4 SINGLE_VALUE_WRAPPER(com.example.CustomerId) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.CustomerId) [S4 IMMUTABLE_SHAPE(com.example.CustomerId) d0]
+      [DECISION] UNCLASSIFIED(com.example.CustomerId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.CustomerId) [local structure: SINGLE_VALUE_WRAPPER(com.example.CustomerId)]
+        [SHAPE] VALUE_OBJECT(com.example.CustomerId) [local structure: IMMUTABLE_SHAPE(com.example.CustomerId)]
 
 DomainCriteriaTest-shouldMatchTypeImplementingIdentifierInterface
   1 types analysed
     1 IDENTIFIER
   1 declared, 0 inferred, 0 left ambiguous
   com.example.OrderId: IDENTIFIER (EXPLICIT, declared)
-    [S1] com.example.OrderId declares IDENTIFIER by bearing org.jmolecules.ddd.types.Identifier (pack jmolecules)
-    [S4] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [declared intent] com.example.OrderId declares IDENTIFIER by bearing org.jmolecules.ddd.types.Identifier (pack jmolecules)
+    [local structure] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.example.OrderId) [decided on 1 signal at S1, 1 at S4]
-        [S1-INTENT] IDENTIFIER(com.example.OrderId) [S1 DECLARED_KIND(IDENTIFIER) d1]
+      [DECISION] IDENTIFIER(com.example.OrderId) [decided on 1 signal of declared intent, 1 of local structure]
+        [INTENT] IDENTIFIER(com.example.OrderId) [declared intent: DECLARED_KIND(IDENTIFIER), 1 steps away]
           DECLARED_KIND(com.example.OrderId) [jmolecules:org.jmolecules.ddd.types.Identifier]
-        [S4-SHAPE] IDENTIFIER(com.example.OrderId) [S4 SINGLE_VALUE_WRAPPER(com.example.OrderId) d0]
+        [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
 
 DomainCriteriaTest-shouldMatchTypeUsedInRepositoryWithIdField
   2 types analysed
@@ -1307,10 +1315,10 @@ DomainCriteriaTest-shouldMatchTypeWithAggregateRootAnnotation
     1 AGGREGATE_ROOT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.Order: AGGREGATE_ROOT (EXPLICIT, declared)
-    [S1] com.example.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
+    [declared intent] com.example.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal at S1]
-        [S1-INTENT] AGGREGATE_ROOT(com.example.Order) [S1 DECLARED_KIND(AGGREGATE_ROOT) d0]
+      [DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal of declared intent]
+        [INTENT] AGGREGATE_ROOT(com.example.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
 
 DomainCriteriaTest-shouldMatchTypeWithEntityAnnotation
@@ -1318,10 +1326,10 @@ DomainCriteriaTest-shouldMatchTypeWithEntityAnnotation
     1 ENTITY
   1 declared, 0 inferred, 0 left ambiguous
   com.example.LineItem: ENTITY (EXPLICIT, declared)
-    [S1] com.example.LineItem declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
+    [declared intent] com.example.LineItem declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
     derivation:
-      [S3-DECISION] ENTITY(com.example.LineItem) [decided on 1 signal at S1]
-        [S1-INTENT] ENTITY(com.example.LineItem) [S1 DECLARED_KIND(ENTITY) d0]
+      [DECISION] ENTITY(com.example.LineItem) [decided on 1 signal of declared intent]
+        [INTENT] ENTITY(com.example.LineItem) [declared intent: DECLARED_KIND(ENTITY)]
           DECLARED_KIND(com.example.LineItem) [jmolecules:org.jmolecules.ddd.annotation.Entity]
 
 DomainCriteriaTest-shouldMatchTypeWithValueObjectAnnotation
@@ -1329,13 +1337,14 @@ DomainCriteriaTest-shouldMatchTypeWithValueObjectAnnotation
     1 VALUE_OBJECT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.Money: VALUE_OBJECT (EXPLICIT, declared)
-    [S1] com.example.Money declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
-    [S4] com.example.Money reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [declared intent] com.example.Money declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
+    [local structure] com.example.Money reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.Money) [decided on 1 signal at S1, 1 at S4]
-        [S1-INTENT] VALUE_OBJECT(com.example.Money) [S1 DECLARED_KIND(VALUE_OBJECT) d0]
+      [DECISION] VALUE_OBJECT(com.example.Money) [decided on 1 signal of declared intent, 1 of local structure]
+        [INTENT] VALUE_OBJECT(com.example.Money) [declared intent: DECLARED_KIND(VALUE_OBJECT)]
           DECLARED_KIND(com.example.Money) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
-        [S4-SHAPE] VALUE_OBJECT(com.example.Money) [S4 IMMUTABLE_SHAPE(com.example.Money) d0]
+        [SHAPE] VALUE_OBJECT(com.example.Money) [local structure: IMMUTABLE_SHAPE(com.example.Money)]
 
 DomainCriteriaTest-shouldNotMatchClass
   3 types analysed
@@ -1345,10 +1354,10 @@ DomainCriteriaTest-shouldNotMatchClass
       1 UNKNOWN
   0 declared, 3 inferred, 1 left ambiguous
   com.example.Money: VALUE_OBJECT (HIGH, inferred)
-    [S4] com.example.Money reads as a VALUE_OBJECT because every field it declares is final, so its state cannot change
+    [local structure] com.example.Money reads as a VALUE_OBJECT because every field it declares is final, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.Money) [decided on 1 signal at S4]
-        [S4-SHAPE] VALUE_OBJECT(com.example.Money) [S4 IMMUTABLE_SHAPE(com.example.Money) d0]
+      [DECISION] VALUE_OBJECT(com.example.Money) [decided on 1 signal of local structure]
+        [SHAPE] VALUE_OBJECT(com.example.Money) [local structure: IMMUTABLE_SHAPE(com.example.Money)]
   com.example.Order: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.example.Order is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -1356,15 +1365,15 @@ DomainCriteriaTest-shouldNotMatchClass
       no signal about com.example.Order
   com.example.OrderId: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.OrderId reads as a VALUE_OBJECT because every field it declares is final, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a VALUE_OBJECT because every field it declares is final, so its state cannot change
     to make it explicit: com.example.OrderId reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.OrderId) [S4 SINGLE_VALUE_WRAPPER(com.example.OrderId) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.OrderId) [S4 IMMUTABLE_SHAPE(com.example.OrderId) d0]
+      [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
+        [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
 
 DomainCriteriaTest-shouldNotMatchClassNamedDomainEvent
   1 types analysed
@@ -1431,10 +1440,10 @@ DomainCriteriaTest-shouldNotMatchEnumEndingWithEvent
     1 VALUE_OBJECT
   0 declared, 1 inferred, 0 left ambiguous
   com.example.SystemEvent: VALUE_OBJECT (HIGH, inferred)
-    [S4] com.example.SystemEvent reads as a VALUE_OBJECT because it is an enum, a closed set of values
+    [local structure] com.example.SystemEvent reads as a VALUE_OBJECT because it is an enum, a closed set of values
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.SystemEvent) [decided on 1 signal at S4]
-        [S4-SHAPE] VALUE_OBJECT(com.example.SystemEvent) [S4 IMMUTABLE_SHAPE(com.example.SystemEvent) d0]
+      [DECISION] VALUE_OBJECT(com.example.SystemEvent) [decided on 1 signal of local structure]
+        [SHAPE] VALUE_OBJECT(com.example.SystemEvent) [local structure: IMMUTABLE_SHAPE(com.example.SystemEvent)]
 
 DomainCriteriaTest-shouldNotMatchInterface
   1 types analysed
@@ -1465,15 +1474,15 @@ DomainCriteriaTest-shouldNotMatchOrphanedRecord
   0 declared, 1 inferred, 1 left ambiguous
   com.example.Orphan: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.Orphan reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.Orphan reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.Orphan reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.Orphan reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.Orphan reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.Orphan) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.Orphan) [S4 SINGLE_VALUE_WRAPPER(com.example.Orphan) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.Orphan) [S4 IMMUTABLE_SHAPE(com.example.Orphan) d0]
+      [DECISION] UNCLASSIFIED(com.example.Orphan) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.Orphan) [local structure: SINGLE_VALUE_WRAPPER(com.example.Orphan)]
+        [SHAPE] VALUE_OBJECT(com.example.Orphan) [local structure: IMMUTABLE_SHAPE(com.example.Orphan)]
 
 DomainCriteriaTest-shouldNotMatchRecordEndingWithEvent
   2 types analysed
@@ -1488,15 +1497,15 @@ DomainCriteriaTest-shouldNotMatchRecordEndingWithEvent
       no signal about com.example.EventHandler
   com.example.OrderCreatedEvent: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.OrderCreatedEvent reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.OrderCreatedEvent reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.OrderCreatedEvent reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.OrderCreatedEvent reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.OrderCreatedEvent reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.OrderCreatedEvent) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.OrderCreatedEvent) [S4 SINGLE_VALUE_WRAPPER(com.example.OrderCreatedEvent) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.OrderCreatedEvent) [S4 IMMUTABLE_SHAPE(com.example.OrderCreatedEvent) d0]
+      [DECISION] UNCLASSIFIED(com.example.OrderCreatedEvent) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.OrderCreatedEvent) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderCreatedEvent)]
+        [SHAPE] VALUE_OBJECT(com.example.OrderCreatedEvent) [local structure: IMMUTABLE_SHAPE(com.example.OrderCreatedEvent)]
 
 DomainCriteriaTest-shouldNotMatchRecordEndingWithId
   2 types analysed
@@ -1511,15 +1520,15 @@ DomainCriteriaTest-shouldNotMatchRecordEndingWithId
       no signal about com.example.Order
   com.example.OrderId: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.OrderId reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.OrderId) [S4 SINGLE_VALUE_WRAPPER(com.example.OrderId) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.OrderId) [S4 IMMUTABLE_SHAPE(com.example.OrderId) d0]
+      [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
+        [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
 
 DomainCriteriaTest-shouldNotMatchRecordWithIdentityField
   2 types analysed
@@ -1533,20 +1542,20 @@ DomainCriteriaTest-shouldNotMatchRecordWithIdentityField
     derivation:
       no signal about com.example.Order
   com.example.OrderLine: VALUE_OBJECT (HIGH, inferred)
-    [S4] com.example.OrderLine reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.example.OrderLine reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.OrderLine) [decided on 1 signal at S4]
-        [S4-SHAPE] VALUE_OBJECT(com.example.OrderLine) [S4 IMMUTABLE_SHAPE(com.example.OrderLine) d0]
+      [DECISION] VALUE_OBJECT(com.example.OrderLine) [decided on 1 signal of local structure]
+        [SHAPE] VALUE_OBJECT(com.example.OrderLine) [local structure: IMMUTABLE_SHAPE(com.example.OrderLine)]
 
 DomainCriteriaTest-shouldNotMatchRecordWithMultipleComponents
   1 types analysed
     1 VALUE_OBJECT
   0 declared, 1 inferred, 0 left ambiguous
   com.example.CompoundId: VALUE_OBJECT (HIGH, inferred)
-    [S4] com.example.CompoundId reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.example.CompoundId reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.CompoundId) [decided on 1 signal at S4]
-        [S4-SHAPE] VALUE_OBJECT(com.example.CompoundId) [S4 IMMUTABLE_SHAPE(com.example.CompoundId) d0]
+      [DECISION] VALUE_OBJECT(com.example.CompoundId) [decided on 1 signal of local structure]
+        [SHAPE] VALUE_OBJECT(com.example.CompoundId) [local structure: IMMUTABLE_SHAPE(com.example.CompoundId)]
 
 DomainCriteriaTest-shouldNotMatchRecordWithoutIdSuffix
   1 types analysed
@@ -1555,15 +1564,15 @@ DomainCriteriaTest-shouldNotMatchRecordWithoutIdSuffix
   0 declared, 1 inferred, 1 left ambiguous
   com.example.OrderNumber: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.OrderNumber reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.OrderNumber reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.OrderNumber reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.OrderNumber reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.OrderNumber reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.OrderNumber) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.OrderNumber) [S4 SINGLE_VALUE_WRAPPER(com.example.OrderNumber) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.OrderNumber) [S4 IMMUTABLE_SHAPE(com.example.OrderNumber) d0]
+      [DECISION] UNCLASSIFIED(com.example.OrderNumber) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.OrderNumber) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderNumber)]
+        [SHAPE] VALUE_OBJECT(com.example.OrderNumber) [local structure: IMMUTABLE_SHAPE(com.example.OrderNumber)]
 
 DomainCriteriaTest-shouldNotMatchTypeNotInRepository
   2 types analysed
@@ -1635,41 +1644,42 @@ DomainLifecycle-aValueNoWayOutSearchesByStaysUndecided
   0 declared, 5 inferred, 1 left ambiguous
   com.acme.hangar.core.Berth: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.acme.hangar.core.Berth reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.acme.hangar.core.Berth reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.acme.hangar.core.Berth reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.acme.hangar.core.Berth reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.acme.hangar.core.Berth reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.acme.hangar.core.Berth) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.acme.hangar.core.Berth) [S4 SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Berth) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.acme.hangar.core.Berth) [S4 IMMUTABLE_SHAPE(com.acme.hangar.core.Berth) d0]
+      [DECISION] UNCLASSIFIED(com.acme.hangar.core.Berth) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.acme.hangar.core.Berth) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Berth)]
+        [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Berth) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Berth)]
   com.acme.hangar.core.Checkout: APPLICATION_SERVICE (HIGH, inferred)
-    [S3] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Ledger, through which the application reaches outside
+    [graph relation] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Ledger, through which the application reaches outside
       involving com.acme.hangar.core.Ledger
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal at S3]
-        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [S3 CALLS_DRIVEN_PORT(com.acme.hangar.core.Ledger) d0]
+      [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: CALLS_DRIVEN_PORT(com.acme.hangar.core.Ledger)]
   com.acme.hangar.core.Fleet: AGGREGATE_ROOT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Fleet is a AGGREGATE_ROOT because Ledger keeps it and hands it back, which is a lifecycle of its own
+    [graph relation] com.acme.hangar.core.Fleet is a AGGREGATE_ROOT because Ledger keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.hangar.core.Ledger
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [decided on 1 signal at S3]
-        [R1b] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [S3 MANAGED_BY(com.acme.hangar.core.Ledger) d0]
+      [DECISION] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [decided on 1 signal of graph relation]
+        [R1b] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [graph relation: MANAGED_BY(com.acme.hangar.core.Ledger)]
   com.acme.hangar.core.FleetTag: IDENTIFIER (HIGH, inferred)
-    [S3] com.acme.hangar.core.FleetTag is a IDENTIFIER because Ledger takes it to answer with Fleet, which keeps it
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.acme.hangar.core.FleetTag is a IDENTIFIER because Ledger takes it to answer with Fleet, which keeps it
       involving com.acme.hangar.core.Fleet, com.acme.hangar.core.Ledger
-    [S4] com.acme.hangar.core.FleetTag reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    [local structure] com.acme.hangar.core.FleetTag reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.acme.hangar.core.FleetTag) [decided on 1 signal at S3, 1 at S4]
-        [R2] IDENTIFIER(com.acme.hangar.core.FleetTag) [S3 SEARCHED_BY(com.acme.hangar.core.Ledger) d0]
-        [S4-SHAPE] IDENTIFIER(com.acme.hangar.core.FleetTag) [S4 SINGLE_VALUE_WRAPPER(com.acme.hangar.core.FleetTag) d0]
+      [DECISION] IDENTIFIER(com.acme.hangar.core.FleetTag) [decided on 1 signal of graph relation, 1 of local structure]
+        [R2] IDENTIFIER(com.acme.hangar.core.FleetTag) [graph relation: SEARCHED_BY(com.acme.hangar.core.Ledger)]
+        [SHAPE] IDENTIFIER(com.acme.hangar.core.FleetTag) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.FleetTag)]
   com.acme.hangar.core.Ledger: DRIVEN_PORT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
+    [graph relation] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal at S3]
-        [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [S3 CONSUMED_BY_CORE(com.acme.hangar.core.Checkout) d0]
+      [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of graph relation]
+        [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
 
 DomainLifecycle-theSubjectAWayOutKeepsIsTheAggregate
   6 types analysed
@@ -1681,42 +1691,43 @@ DomainLifecycle-theSubjectAWayOutKeepsIsTheAggregate
     1 DRIVING_ADAPTER
   0 declared, 6 inferred, 0 left ambiguous
   com.acme.hangar.core.Boarding: DRIVING_PORT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Boarding is a DRIVING_PORT because HangarDoor reaches the application through it and Checkout answers it
+    [graph relation] com.acme.hangar.core.Boarding is a DRIVING_PORT because HangarDoor reaches the application through it and Checkout answers it
       involving com.acme.hangar.web.HangarDoor, com.acme.hangar.core.Checkout
     derivation:
-      [S3-DECISION] DRIVING_PORT(com.acme.hangar.core.Boarding) [decided on 1 signal at S3]
-        [R5] DRIVING_PORT(com.acme.hangar.core.Boarding) [S3 HELD_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) d0]
+      [DECISION] DRIVING_PORT(com.acme.hangar.core.Boarding) [decided on 1 signal of graph relation]
+        [R5] DRIVING_PORT(com.acme.hangar.core.Boarding) [graph relation: HELD_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor)]
   com.acme.hangar.core.Checkout: APPLICATION_SERVICE (HIGH, inferred)
-    [S3] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Boarding, through which the outside reaches the application
+    [graph relation] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Boarding, through which the outside reaches the application
       involving com.acme.hangar.core.Boarding
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal at S3]
-        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [S3 ANSWERS_DRIVING_PORT(com.acme.hangar.core.Boarding) d0]
+      [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: ANSWERS_DRIVING_PORT(com.acme.hangar.core.Boarding)]
   com.acme.hangar.core.Fleet: AGGREGATE_ROOT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Fleet is a AGGREGATE_ROOT because Ledger keeps it and hands it back, which is a lifecycle of its own
+    [graph relation] com.acme.hangar.core.Fleet is a AGGREGATE_ROOT because Ledger keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.hangar.core.Ledger
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [decided on 1 signal at S3]
-        [R1b] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [S3 MANAGED_BY(com.acme.hangar.core.Ledger) d0]
+      [DECISION] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [decided on 1 signal of graph relation]
+        [R1b] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [graph relation: MANAGED_BY(com.acme.hangar.core.Ledger)]
   com.acme.hangar.core.FleetTag: IDENTIFIER (HIGH, inferred)
-    [S3] com.acme.hangar.core.FleetTag is a IDENTIFIER because Ledger takes it to answer with Fleet, which keeps it
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.acme.hangar.core.FleetTag is a IDENTIFIER because Ledger takes it to answer with Fleet, which keeps it
       involving com.acme.hangar.core.Fleet, com.acme.hangar.core.Ledger
-    [S4] com.acme.hangar.core.FleetTag reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    [local structure] com.acme.hangar.core.FleetTag reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.acme.hangar.core.FleetTag) [decided on 1 signal at S3, 1 at S4]
-        [R2] IDENTIFIER(com.acme.hangar.core.FleetTag) [S3 SEARCHED_BY(com.acme.hangar.core.Ledger) d0]
-        [S4-SHAPE] IDENTIFIER(com.acme.hangar.core.FleetTag) [S4 SINGLE_VALUE_WRAPPER(com.acme.hangar.core.FleetTag) d0]
+      [DECISION] IDENTIFIER(com.acme.hangar.core.FleetTag) [decided on 1 signal of graph relation, 1 of local structure]
+        [R2] IDENTIFIER(com.acme.hangar.core.FleetTag) [graph relation: SEARCHED_BY(com.acme.hangar.core.Ledger)]
+        [SHAPE] IDENTIFIER(com.acme.hangar.core.FleetTag) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.FleetTag)]
   com.acme.hangar.core.Ledger: DRIVEN_PORT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
+    [graph relation] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal at S3]
-        [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [S3 CONSUMED_BY_CORE(com.acme.hangar.core.Checkout) d0]
+      [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of graph relation]
+        [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
   com.acme.hangar.web.HangarDoor: DRIVING_ADAPTER (HIGH, inferred)
-    [S2] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
+    [framework knowledge] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
     derivation:
-      [S3-DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal at S2]
-        [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [S2 DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) d0]
+      [DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal of framework knowledge]
+        [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [framework knowledge: DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor)]
           DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) [spring:org.springframework.web.bind.annotation.RestController]
 
 DomainLifecycle-whatAWayOutAnnouncesIsAnEvent
@@ -1728,28 +1739,28 @@ DomainLifecycle-whatAWayOutAnnouncesIsAnEvent
       1 UNKNOWN
   0 declared, 4 inferred, 0 left ambiguous
   com.acme.hangar.core.Checkout: APPLICATION_SERVICE (HIGH, inferred)
-    [S3] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Wire, through which the application reaches outside
+    [graph relation] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Wire, through which the application reaches outside
       involving com.acme.hangar.core.Wire
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal at S3]
-        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [S3 CALLS_DRIVEN_PORT(com.acme.hangar.core.Wire) d0]
+      [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: CALLS_DRIVEN_PORT(com.acme.hangar.core.Wire)]
   com.acme.hangar.core.Notice: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.acme.hangar.core.Notice is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
       no signal about com.acme.hangar.core.Notice
   com.acme.hangar.core.Sailing: DOMAIN_EVENT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Sailing is a DOMAIN_EVENT because Wire carries it outward and never asks anything back
+    [graph relation] com.acme.hangar.core.Sailing is a DOMAIN_EVENT because Wire carries it outward and never asks anything back
       involving com.acme.hangar.core.Wire
     derivation:
-      [S3-DECISION] DOMAIN_EVENT(com.acme.hangar.core.Sailing) [decided on 1 signal at S3]
-        [R7] DOMAIN_EVENT(com.acme.hangar.core.Sailing) [S3 ANNOUNCED_BY(com.acme.hangar.core.Wire) d0]
+      [DECISION] DOMAIN_EVENT(com.acme.hangar.core.Sailing) [decided on 1 signal of graph relation]
+        [R7] DOMAIN_EVENT(com.acme.hangar.core.Sailing) [graph relation: ANNOUNCED_BY(com.acme.hangar.core.Wire)]
   com.acme.hangar.core.Wire: DRIVEN_PORT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Wire is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
+    [graph relation] com.acme.hangar.core.Wire is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.hangar.core.Wire) [decided on 1 signal at S3]
-        [R4] DRIVEN_PORT(com.acme.hangar.core.Wire) [S3 CONSUMED_BY_CORE(com.acme.hangar.core.Checkout) d0]
+      [DECISION] DRIVEN_PORT(com.acme.hangar.core.Wire) [decided on 1 signal of graph relation]
+        [R4] DRIVEN_PORT(com.acme.hangar.core.Wire) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
 
 DomainLifecycle-whatAnAggregateIsMadeOfWithoutIdentityIsAValue
   6 types analysed
@@ -1760,45 +1771,47 @@ DomainLifecycle-whatAnAggregateIsMadeOfWithoutIdentityIsAValue
     1 APPLICATION_SERVICE
   0 declared, 6 inferred, 0 left ambiguous
   com.acme.hangar.core.Checkout: APPLICATION_SERVICE (HIGH, inferred)
-    [S3] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Ledger, through which the application reaches outside
+    [graph relation] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Ledger, through which the application reaches outside
       involving com.acme.hangar.core.Ledger
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal at S3]
-        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [S3 CALLS_DRIVEN_PORT(com.acme.hangar.core.Ledger) d0]
+      [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: CALLS_DRIVEN_PORT(com.acme.hangar.core.Ledger)]
   com.acme.hangar.core.Fleet: AGGREGATE_ROOT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Fleet is a AGGREGATE_ROOT because Ledger keeps it and hands it back, which is a lifecycle of its own
+    [graph relation] com.acme.hangar.core.Fleet is a AGGREGATE_ROOT because Ledger keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.hangar.core.Ledger
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [decided on 1 signal at S3]
-        [R1b] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [S3 MANAGED_BY(com.acme.hangar.core.Ledger) d0]
+      [DECISION] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [decided on 1 signal of graph relation]
+        [R1b] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [graph relation: MANAGED_BY(com.acme.hangar.core.Ledger)]
   com.acme.hangar.core.FleetTag: IDENTIFIER (HIGH, inferred)
-    [S3] com.acme.hangar.core.FleetTag is a IDENTIFIER because Ledger takes it to answer with Fleet, which keeps it
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.acme.hangar.core.FleetTag is a IDENTIFIER because Ledger takes it to answer with Fleet, which keeps it
       involving com.acme.hangar.core.Fleet, com.acme.hangar.core.Ledger
-    [S4] com.acme.hangar.core.FleetTag reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    [local structure] com.acme.hangar.core.FleetTag reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.acme.hangar.core.FleetTag) [decided on 1 signal at S3, 1 at S4]
-        [R2] IDENTIFIER(com.acme.hangar.core.FleetTag) [S3 SEARCHED_BY(com.acme.hangar.core.Ledger) d0]
-        [S4-SHAPE] IDENTIFIER(com.acme.hangar.core.FleetTag) [S4 SINGLE_VALUE_WRAPPER(com.acme.hangar.core.FleetTag) d0]
+      [DECISION] IDENTIFIER(com.acme.hangar.core.FleetTag) [decided on 1 signal of graph relation, 1 of local structure]
+        [R2] IDENTIFIER(com.acme.hangar.core.FleetTag) [graph relation: SEARCHED_BY(com.acme.hangar.core.Ledger)]
+        [SHAPE] IDENTIFIER(com.acme.hangar.core.FleetTag) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.FleetTag)]
   com.acme.hangar.core.Hull: VALUE_OBJECT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Hull is a VALUE_OBJECT because Fleet is made of it and it carries no identity of its own
+    [graph relation] com.acme.hangar.core.Hull is a VALUE_OBJECT because Fleet is made of it and it carries no identity of its own
       involving com.acme.hangar.core.Fleet
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.acme.hangar.core.Hull) [decided on 1 signal at S3]
-        [R3b] VALUE_OBJECT(com.acme.hangar.core.Hull) [S3 OWNED_BY(com.acme.hangar.core.Fleet) d0]
+      [DECISION] VALUE_OBJECT(com.acme.hangar.core.Hull) [decided on 1 signal of graph relation]
+        [R3b] VALUE_OBJECT(com.acme.hangar.core.Hull) [graph relation: OWNED_BY(com.acme.hangar.core.Fleet)]
   com.acme.hangar.core.Ledger: DRIVEN_PORT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
+    [graph relation] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal at S3]
-        [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [S3 CONSUMED_BY_CORE(com.acme.hangar.core.Checkout) d0]
+      [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of graph relation]
+        [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
   com.acme.hangar.core.Manifest: VALUE_OBJECT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Manifest is a VALUE_OBJECT because Fleet is made of it and it carries no identity of its own
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.acme.hangar.core.Manifest is a VALUE_OBJECT because Fleet is made of it and it carries no identity of its own
       involving com.acme.hangar.core.Fleet
-    [S4] com.acme.hangar.core.Manifest reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.acme.hangar.core.Manifest reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.acme.hangar.core.Manifest) [decided on 1 signal at S3, 1 at S4]
-        [R3b] VALUE_OBJECT(com.acme.hangar.core.Manifest) [S3 OWNED_BY(com.acme.hangar.core.Fleet) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [S4 IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest) d0]
+      [DECISION] VALUE_OBJECT(com.acme.hangar.core.Manifest) [decided on 1 signal of graph relation, 1 of local structure]
+        [R3b] VALUE_OBJECT(com.acme.hangar.core.Manifest) [graph relation: OWNED_BY(com.acme.hangar.core.Fleet)]
+        [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest)]
 
 DomainLifecycle-whatCarriesAnIdentityOfItsOwnIsAnEntity
   7 types analysed
@@ -1810,53 +1823,56 @@ DomainLifecycle-whatCarriesAnIdentityOfItsOwnIsAnEntity
     1 APPLICATION_SERVICE
   1 declared, 6 inferred, 0 left ambiguous
   com.acme.hangar.core.Checkout: APPLICATION_SERVICE (HIGH, inferred)
-    [S3] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Ledger, through which the application reaches outside
+    [graph relation] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Ledger, through which the application reaches outside
       involving com.acme.hangar.core.Ledger
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal at S3]
-        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [S3 CALLS_DRIVEN_PORT(com.acme.hangar.core.Ledger) d0]
+      [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: CALLS_DRIVEN_PORT(com.acme.hangar.core.Ledger)]
   com.acme.hangar.core.Fleet: AGGREGATE_ROOT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Fleet is a AGGREGATE_ROOT because Ledger keeps it and hands it back, which is a lifecycle of its own
+    [graph relation] com.acme.hangar.core.Fleet is a AGGREGATE_ROOT because Ledger keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.hangar.core.Ledger
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [decided on 1 signal at S3]
-        [R1b] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [S3 MANAGED_BY(com.acme.hangar.core.Ledger) d0]
+      [DECISION] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [decided on 1 signal of graph relation]
+        [R1b] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [graph relation: MANAGED_BY(com.acme.hangar.core.Ledger)]
   com.acme.hangar.core.FleetTag: IDENTIFIER (HIGH, inferred)
-    [S3] com.acme.hangar.core.FleetTag is a IDENTIFIER because Ledger takes it to answer with Fleet, which keeps it
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.acme.hangar.core.FleetTag is a IDENTIFIER because Ledger takes it to answer with Fleet, which keeps it
       involving com.acme.hangar.core.Fleet, com.acme.hangar.core.Ledger
-    [S4] com.acme.hangar.core.FleetTag reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    [local structure] com.acme.hangar.core.FleetTag reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.acme.hangar.core.FleetTag) [decided on 1 signal at S3, 1 at S4]
-        [R2] IDENTIFIER(com.acme.hangar.core.FleetTag) [S3 SEARCHED_BY(com.acme.hangar.core.Ledger) d0]
-        [S4-SHAPE] IDENTIFIER(com.acme.hangar.core.FleetTag) [S4 SINGLE_VALUE_WRAPPER(com.acme.hangar.core.FleetTag) d0]
+      [DECISION] IDENTIFIER(com.acme.hangar.core.FleetTag) [decided on 1 signal of graph relation, 1 of local structure]
+        [R2] IDENTIFIER(com.acme.hangar.core.FleetTag) [graph relation: SEARCHED_BY(com.acme.hangar.core.Ledger)]
+        [SHAPE] IDENTIFIER(com.acme.hangar.core.FleetTag) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.FleetTag)]
   com.acme.hangar.core.Hull: ENTITY (HIGH, inferred)
-    [S3] com.acme.hangar.core.Hull is a ENTITY because Fleet is made of it and it carries an identity of its own
+    [graph relation] com.acme.hangar.core.Hull is a ENTITY because Fleet is made of it and it carries an identity of its own
       involving com.acme.hangar.core.Fleet
     derivation:
-      [S3-DECISION] ENTITY(com.acme.hangar.core.Hull) [decided on 1 signal at S3]
-        [R3a] ENTITY(com.acme.hangar.core.Hull) [S3 OWNED_BY(com.acme.hangar.core.Fleet) d0]
+      [DECISION] ENTITY(com.acme.hangar.core.Hull) [decided on 1 signal of graph relation]
+        [R3a] ENTITY(com.acme.hangar.core.Hull) [graph relation: OWNED_BY(com.acme.hangar.core.Fleet)]
   com.acme.hangar.core.HullTag: IDENTIFIER (EXPLICIT, declared)
-    [S1] com.acme.hangar.core.HullTag declares IDENTIFIER by bearing org.jmolecules.ddd.types.Identifier (pack jmolecules)
-    [S4] com.acme.hangar.core.HullTag reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [declared intent] com.acme.hangar.core.HullTag declares IDENTIFIER by bearing org.jmolecules.ddd.types.Identifier (pack jmolecules)
+    [local structure] com.acme.hangar.core.HullTag reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.acme.hangar.core.HullTag) [decided on 1 signal at S1, 1 at S4]
-        [S1-INTENT] IDENTIFIER(com.acme.hangar.core.HullTag) [S1 DECLARED_KIND(IDENTIFIER) d1]
+      [DECISION] IDENTIFIER(com.acme.hangar.core.HullTag) [decided on 1 signal of declared intent, 1 of local structure]
+        [INTENT] IDENTIFIER(com.acme.hangar.core.HullTag) [declared intent: DECLARED_KIND(IDENTIFIER), 1 steps away]
           DECLARED_KIND(com.acme.hangar.core.HullTag) [jmolecules:org.jmolecules.ddd.types.Identifier]
-        [S4-SHAPE] IDENTIFIER(com.acme.hangar.core.HullTag) [S4 SINGLE_VALUE_WRAPPER(com.acme.hangar.core.HullTag) d0]
+        [SHAPE] IDENTIFIER(com.acme.hangar.core.HullTag) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.HullTag)]
   com.acme.hangar.core.Ledger: DRIVEN_PORT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
+    [graph relation] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal at S3]
-        [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [S3 CONSUMED_BY_CORE(com.acme.hangar.core.Checkout) d0]
+      [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of graph relation]
+        [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
   com.acme.hangar.core.Manifest: VALUE_OBJECT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Manifest is a VALUE_OBJECT because Hull is made of it and it carries no identity of its own
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.acme.hangar.core.Manifest is a VALUE_OBJECT because Hull is made of it and it carries no identity of its own
       involving com.acme.hangar.core.Hull
-    [S4] com.acme.hangar.core.Manifest reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.acme.hangar.core.Manifest reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.acme.hangar.core.Manifest) [decided on 1 signal at S3, 1 at S4]
-        [R3b] VALUE_OBJECT(com.acme.hangar.core.Manifest) [S3 OWNED_BY(com.acme.hangar.core.Hull) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [S4 IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest) d0]
+      [DECISION] VALUE_OBJECT(com.acme.hangar.core.Manifest) [decided on 1 signal of graph relation, 1 of local structure]
+        [R3b] VALUE_OBJECT(com.acme.hangar.core.Manifest) [graph relation: OWNED_BY(com.acme.hangar.core.Hull)]
+        [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest)]
 
 FlexibleApplicationServiceCriteriaTest-shouldMatchPivotClass
   3 types analysed
@@ -1866,22 +1882,22 @@ FlexibleApplicationServiceCriteriaTest-shouldMatchPivotClass
       1 UNKNOWN
   0 declared, 3 inferred, 0 left ambiguous
   com.example.application.OrderService: APPLICATION_SERVICE (HIGH, inferred)
-    [S3] com.example.application.OrderService is a APPLICATION_SERVICE because it stands on OrderRepository, through which the application reaches outside
+    [graph relation] com.example.application.OrderService is a APPLICATION_SERVICE because it stands on OrderRepository, through which the application reaches outside
       involving com.example.ports.out.OrderRepository
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.example.application.OrderService) [decided on 1 signal at S3]
-        [R6] APPLICATION_SERVICE(com.example.application.OrderService) [S3 CALLS_DRIVEN_PORT(com.example.ports.out.OrderRepository) d0]
+      [DECISION] APPLICATION_SERVICE(com.example.application.OrderService) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.example.application.OrderService) [graph relation: CALLS_DRIVEN_PORT(com.example.ports.out.OrderRepository)]
   com.example.ports.in.OrderUseCases: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.example.ports.in.OrderUseCases is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
       no signal about com.example.ports.in.OrderUseCases
   com.example.ports.out.OrderRepository: DRIVEN_PORT (HIGH, inferred)
-    [S3] com.example.ports.out.OrderRepository is a DRIVEN_PORT because OrderService calls it and nothing inside the hexagon implements it
+    [graph relation] com.example.ports.out.OrderRepository is a DRIVEN_PORT because OrderService calls it and nothing inside the hexagon implements it
       involving com.example.application.OrderService
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.ports.out.OrderRepository) [decided on 1 signal at S3]
-        [R4] DRIVEN_PORT(com.example.ports.out.OrderRepository) [S3 CONSUMED_BY_CORE(com.example.application.OrderService) d0]
+      [DECISION] DRIVEN_PORT(com.example.ports.out.OrderRepository) [decided on 1 signal of graph relation]
+        [R4] DRIVEN_PORT(com.example.ports.out.OrderRepository) [graph relation: CONSUMED_BY_CORE(com.example.application.OrderService)]
 
 FlexibleApplicationServiceCriteriaTest-shouldNotMatchAbstractClass
   2 types analysed
@@ -1943,17 +1959,17 @@ FlexibleApplicationServiceCriteriaTest-shouldNotMatchOutboundOnlyClass
     1 APPLICATION_SERVICE
   0 declared, 2 inferred, 0 left ambiguous
   com.example.application.BackgroundProcessor: APPLICATION_SERVICE (HIGH, inferred)
-    [S3] com.example.application.BackgroundProcessor is a APPLICATION_SERVICE because it stands on NotificationGateway, through which the application reaches outside
+    [graph relation] com.example.application.BackgroundProcessor is a APPLICATION_SERVICE because it stands on NotificationGateway, through which the application reaches outside
       involving com.example.ports.out.NotificationGateway
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.example.application.BackgroundProcessor) [decided on 1 signal at S3]
-        [R6] APPLICATION_SERVICE(com.example.application.BackgroundProcessor) [S3 CALLS_DRIVEN_PORT(com.example.ports.out.NotificationGateway) d0]
+      [DECISION] APPLICATION_SERVICE(com.example.application.BackgroundProcessor) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.example.application.BackgroundProcessor) [graph relation: CALLS_DRIVEN_PORT(com.example.ports.out.NotificationGateway)]
   com.example.ports.out.NotificationGateway: DRIVEN_PORT (HIGH, inferred)
-    [S3] com.example.ports.out.NotificationGateway is a DRIVEN_PORT because BackgroundProcessor calls it and nothing inside the hexagon implements it
+    [graph relation] com.example.ports.out.NotificationGateway is a DRIVEN_PORT because BackgroundProcessor calls it and nothing inside the hexagon implements it
       involving com.example.application.BackgroundProcessor
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.ports.out.NotificationGateway) [decided on 1 signal at S3]
-        [R4] DRIVEN_PORT(com.example.ports.out.NotificationGateway) [S3 CONSUMED_BY_CORE(com.example.application.BackgroundProcessor) d0]
+      [DECISION] DRIVEN_PORT(com.example.ports.out.NotificationGateway) [decided on 1 signal of graph relation]
+        [R4] DRIVEN_PORT(com.example.ports.out.NotificationGateway) [graph relation: CONSUMED_BY_CORE(com.example.application.BackgroundProcessor)]
 
 GoldenFileTest-createBankingDomain
   6 types analysed
@@ -1965,50 +1981,52 @@ GoldenFileTest-createBankingDomain
     1 DRIVEN_PORT
   4 declared, 2 inferred, 0 left ambiguous
   com.example.banking.domain.Account: AGGREGATE_ROOT (HIGH, inferred)
-    [S3] com.example.banking.domain.Account is a AGGREGATE_ROOT because AccountRepository keeps it and hands it back, which is a lifecycle of its own
+    [graph relation] com.example.banking.domain.Account is a AGGREGATE_ROOT because AccountRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.example.banking.ports.out.AccountRepository
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.example.banking.domain.Account) [decided on 1 signal at S3]
-        [R1b] AGGREGATE_ROOT(com.example.banking.domain.Account) [S3 MANAGED_BY(com.example.banking.ports.out.AccountRepository) d0]
+      [DECISION] AGGREGATE_ROOT(com.example.banking.domain.Account) [decided on 1 signal of graph relation]
+        [R1b] AGGREGATE_ROOT(com.example.banking.domain.Account) [graph relation: MANAGED_BY(com.example.banking.ports.out.AccountRepository)]
   com.example.banking.domain.AccountId: IDENTIFIER (HIGH, inferred)
-    [S3] com.example.banking.domain.AccountId is a IDENTIFIER because AccountRepository takes it to answer with Account, which keeps it
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.example.banking.domain.AccountId is a IDENTIFIER because AccountRepository takes it to answer with Account, which keeps it
       involving com.example.banking.domain.Account, com.example.banking.ports.out.AccountRepository
-    [S4] com.example.banking.domain.AccountId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
+    [local structure] com.example.banking.domain.AccountId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.example.banking.domain.AccountId) [decided on 1 signal at S3, 1 at S4]
-        [R2] IDENTIFIER(com.example.banking.domain.AccountId) [S3 SEARCHED_BY(com.example.banking.ports.out.AccountRepository) d0]
-        [S4-SHAPE] IDENTIFIER(com.example.banking.domain.AccountId) [S4 SINGLE_VALUE_WRAPPER(com.example.banking.domain.AccountId) d0]
+      [DECISION] IDENTIFIER(com.example.banking.domain.AccountId) [decided on 1 signal of graph relation, 1 of local structure]
+        [R2] IDENTIFIER(com.example.banking.domain.AccountId) [graph relation: SEARCHED_BY(com.example.banking.ports.out.AccountRepository)]
+        [SHAPE] IDENTIFIER(com.example.banking.domain.AccountId) [local structure: SINGLE_VALUE_WRAPPER(com.example.banking.domain.AccountId)]
   com.example.banking.domain.Money: VALUE_OBJECT (EXPLICIT, declared)
-    [S1] com.example.banking.domain.Money declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
-    [S3] com.example.banking.domain.Money is a VALUE_OBJECT because Account is made of it and it carries no identity of its own
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [declared intent] com.example.banking.domain.Money declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
+    [graph relation] com.example.banking.domain.Money is a VALUE_OBJECT because Account is made of it and it carries no identity of its own
       involving com.example.banking.domain.Account
-    [S3] com.example.banking.domain.Money is a VALUE_OBJECT because Transaction is made of it and it carries no identity of its own
+    [graph relation] com.example.banking.domain.Money is a VALUE_OBJECT because Transaction is made of it and it carries no identity of its own
       involving com.example.banking.domain.Transaction
-    [S4] com.example.banking.domain.Money reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.example.banking.domain.Money reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.banking.domain.Money) [decided on 1 signal at S1, 2 at S3, 1 at S4]
-        [S1-INTENT] VALUE_OBJECT(com.example.banking.domain.Money) [S1 DECLARED_KIND(VALUE_OBJECT) d0]
+      [DECISION] VALUE_OBJECT(com.example.banking.domain.Money) [decided on 1 signal of declared intent, 2 of graph relation, 1 of local structure]
+        [INTENT] VALUE_OBJECT(com.example.banking.domain.Money) [declared intent: DECLARED_KIND(VALUE_OBJECT)]
           DECLARED_KIND(com.example.banking.domain.Money) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
-        [R3b] VALUE_OBJECT(com.example.banking.domain.Money) [S3 OWNED_BY(com.example.banking.domain.Account) d0]
-        [R3b] VALUE_OBJECT(com.example.banking.domain.Money) [S3 OWNED_BY(com.example.banking.domain.Transaction) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.banking.domain.Money) [S4 IMMUTABLE_SHAPE(com.example.banking.domain.Money) d0]
+        [R3b] VALUE_OBJECT(com.example.banking.domain.Money) [graph relation: OWNED_BY(com.example.banking.domain.Account)]
+        [R3b] VALUE_OBJECT(com.example.banking.domain.Money) [graph relation: OWNED_BY(com.example.banking.domain.Transaction)]
+        [SHAPE] VALUE_OBJECT(com.example.banking.domain.Money) [local structure: IMMUTABLE_SHAPE(com.example.banking.domain.Money)]
   com.example.banking.domain.Transaction: ENTITY (EXPLICIT, declared)
-    [S1] com.example.banking.domain.Transaction declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
+    [declared intent] com.example.banking.domain.Transaction declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
     derivation:
-      [S3-DECISION] ENTITY(com.example.banking.domain.Transaction) [decided on 1 signal at S1]
-        [S1-INTENT] ENTITY(com.example.banking.domain.Transaction) [S1 DECLARED_KIND(ENTITY) d0]
+      [DECISION] ENTITY(com.example.banking.domain.Transaction) [decided on 1 signal of declared intent]
+        [INTENT] ENTITY(com.example.banking.domain.Transaction) [declared intent: DECLARED_KIND(ENTITY)]
           DECLARED_KIND(com.example.banking.domain.Transaction) [jmolecules:org.jmolecules.ddd.annotation.Entity]
   com.example.banking.ports.in.TransferUseCase: DRIVING_PORT (EXPLICIT, declared)
-    [S1] com.example.banking.ports.in.TransferUseCase declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
+    [declared intent] com.example.banking.ports.in.TransferUseCase declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVING_PORT(com.example.banking.ports.in.TransferUseCase) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVING_PORT(com.example.banking.ports.in.TransferUseCase) [S1 DECLARED_KIND(DRIVING_PORT) d0]
+      [DECISION] DRIVING_PORT(com.example.banking.ports.in.TransferUseCase) [decided on 1 signal of declared intent]
+        [INTENT] DRIVING_PORT(com.example.banking.ports.in.TransferUseCase) [declared intent: DECLARED_KIND(DRIVING_PORT)]
           DECLARED_KIND(com.example.banking.ports.in.TransferUseCase) [jmolecules:org.jmolecules.architecture.hexagonal.PrimaryPort]
   com.example.banking.ports.out.AccountRepository: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.banking.ports.out.AccountRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.example.banking.ports.out.AccountRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.banking.ports.out.AccountRepository) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.banking.ports.out.AccountRepository) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.banking.ports.out.AccountRepository) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.banking.ports.out.AccountRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.banking.ports.out.AccountRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 GoldenFileTest-createCoffeeshopDomain
@@ -2020,49 +2038,52 @@ GoldenFileTest-createCoffeeshopDomain
     1 DRIVEN_PORT
   3 declared, 3 inferred, 0 left ambiguous
   com.coffeeshop.domain.order.LineItem: VALUE_OBJECT (EXPLICIT, declared)
-    [S1] com.coffeeshop.domain.order.LineItem declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
-    [S3] com.coffeeshop.domain.order.LineItem is a VALUE_OBJECT because Order is made of it and it carries no identity of its own
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [declared intent] com.coffeeshop.domain.order.LineItem declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
+    [graph relation] com.coffeeshop.domain.order.LineItem is a VALUE_OBJECT because Order is made of it and it carries no identity of its own
       involving com.coffeeshop.domain.order.Order
-    [S4] com.coffeeshop.domain.order.LineItem reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    [local structure] com.coffeeshop.domain.order.LineItem reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.coffeeshop.domain.order.LineItem) [decided on 1 signal at S1, 1 at S3, 1 at S4]
-        [S1-INTENT] VALUE_OBJECT(com.coffeeshop.domain.order.LineItem) [S1 DECLARED_KIND(VALUE_OBJECT) d0]
+      [DECISION] VALUE_OBJECT(com.coffeeshop.domain.order.LineItem) [decided on 1 signal of declared intent, 1 of graph relation, 1 of local structure]
+        [INTENT] VALUE_OBJECT(com.coffeeshop.domain.order.LineItem) [declared intent: DECLARED_KIND(VALUE_OBJECT)]
           DECLARED_KIND(com.coffeeshop.domain.order.LineItem) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
-        [R3b] VALUE_OBJECT(com.coffeeshop.domain.order.LineItem) [S3 OWNED_BY(com.coffeeshop.domain.order.Order) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.coffeeshop.domain.order.LineItem) [S4 IMMUTABLE_SHAPE(com.coffeeshop.domain.order.LineItem) d0]
+        [R3b] VALUE_OBJECT(com.coffeeshop.domain.order.LineItem) [graph relation: OWNED_BY(com.coffeeshop.domain.order.Order)]
+        [SHAPE] VALUE_OBJECT(com.coffeeshop.domain.order.LineItem) [local structure: IMMUTABLE_SHAPE(com.coffeeshop.domain.order.LineItem)]
   com.coffeeshop.domain.order.Location: VALUE_OBJECT (HIGH, inferred)
-    [S3] com.coffeeshop.domain.order.Location is a VALUE_OBJECT because Order is made of it and it carries no identity of its own
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.coffeeshop.domain.order.Location is a VALUE_OBJECT because Order is made of it and it carries no identity of its own
       involving com.coffeeshop.domain.order.Order
-    [S4] com.coffeeshop.domain.order.Location reads as a VALUE_OBJECT because it is an enum, a closed set of values
+    [local structure] com.coffeeshop.domain.order.Location reads as a VALUE_OBJECT because it is an enum, a closed set of values
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.coffeeshop.domain.order.Location) [decided on 1 signal at S3, 1 at S4]
-        [R3b] VALUE_OBJECT(com.coffeeshop.domain.order.Location) [S3 OWNED_BY(com.coffeeshop.domain.order.Order) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.coffeeshop.domain.order.Location) [S4 IMMUTABLE_SHAPE(com.coffeeshop.domain.order.Location) d0]
+      [DECISION] VALUE_OBJECT(com.coffeeshop.domain.order.Location) [decided on 1 signal of graph relation, 1 of local structure]
+        [R3b] VALUE_OBJECT(com.coffeeshop.domain.order.Location) [graph relation: OWNED_BY(com.coffeeshop.domain.order.Order)]
+        [SHAPE] VALUE_OBJECT(com.coffeeshop.domain.order.Location) [local structure: IMMUTABLE_SHAPE(com.coffeeshop.domain.order.Location)]
   com.coffeeshop.domain.order.Order: AGGREGATE_ROOT (HIGH, inferred)
-    [S3] com.coffeeshop.domain.order.Order is a AGGREGATE_ROOT because OrderRepository keeps it and hands it back, which is a lifecycle of its own
+    [graph relation] com.coffeeshop.domain.order.Order is a AGGREGATE_ROOT because OrderRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.coffeeshop.ports.out.OrderRepository
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.coffeeshop.domain.order.Order) [decided on 1 signal at S3]
-        [R1b] AGGREGATE_ROOT(com.coffeeshop.domain.order.Order) [S3 MANAGED_BY(com.coffeeshop.ports.out.OrderRepository) d0]
+      [DECISION] AGGREGATE_ROOT(com.coffeeshop.domain.order.Order) [decided on 1 signal of graph relation]
+        [R1b] AGGREGATE_ROOT(com.coffeeshop.domain.order.Order) [graph relation: MANAGED_BY(com.coffeeshop.ports.out.OrderRepository)]
   com.coffeeshop.domain.order.OrderId: IDENTIFIER (HIGH, inferred)
-    [S3] com.coffeeshop.domain.order.OrderId is a IDENTIFIER because OrderRepository takes it to answer with Order, which keeps it
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.coffeeshop.domain.order.OrderId is a IDENTIFIER because OrderRepository takes it to answer with Order, which keeps it
       involving com.coffeeshop.domain.order.Order, com.coffeeshop.ports.out.OrderRepository
-    [S4] com.coffeeshop.domain.order.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
+    [local structure] com.coffeeshop.domain.order.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.coffeeshop.domain.order.OrderId) [decided on 1 signal at S3, 1 at S4]
-        [R2] IDENTIFIER(com.coffeeshop.domain.order.OrderId) [S3 SEARCHED_BY(com.coffeeshop.ports.out.OrderRepository) d0]
-        [S4-SHAPE] IDENTIFIER(com.coffeeshop.domain.order.OrderId) [S4 SINGLE_VALUE_WRAPPER(com.coffeeshop.domain.order.OrderId) d0]
+      [DECISION] IDENTIFIER(com.coffeeshop.domain.order.OrderId) [decided on 1 signal of graph relation, 1 of local structure]
+        [R2] IDENTIFIER(com.coffeeshop.domain.order.OrderId) [graph relation: SEARCHED_BY(com.coffeeshop.ports.out.OrderRepository)]
+        [SHAPE] IDENTIFIER(com.coffeeshop.domain.order.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.coffeeshop.domain.order.OrderId)]
   com.coffeeshop.ports.in.OrderingCoffee: DRIVING_PORT (EXPLICIT, declared)
-    [S1] com.coffeeshop.ports.in.OrderingCoffee declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
+    [declared intent] com.coffeeshop.ports.in.OrderingCoffee declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVING_PORT(com.coffeeshop.ports.in.OrderingCoffee) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVING_PORT(com.coffeeshop.ports.in.OrderingCoffee) [S1 DECLARED_KIND(DRIVING_PORT) d0]
+      [DECISION] DRIVING_PORT(com.coffeeshop.ports.in.OrderingCoffee) [decided on 1 signal of declared intent]
+        [INTENT] DRIVING_PORT(com.coffeeshop.ports.in.OrderingCoffee) [declared intent: DECLARED_KIND(DRIVING_PORT)]
           DECLARED_KIND(com.coffeeshop.ports.in.OrderingCoffee) [jmolecules:org.jmolecules.architecture.hexagonal.PrimaryPort]
   com.coffeeshop.ports.out.OrderRepository: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.coffeeshop.ports.out.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.coffeeshop.ports.out.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.coffeeshop.ports.out.OrderRepository) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.coffeeshop.ports.out.OrderRepository) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.coffeeshop.ports.out.OrderRepository) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.coffeeshop.ports.out.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.coffeeshop.ports.out.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 GoldenFileTest-createEcommerceDomain
@@ -2072,64 +2093,67 @@ GoldenFileTest-createEcommerceDomain
     3 DRIVEN_PORT
   3 declared, 6 inferred, 0 left ambiguous
   com.ecommerce.customer.Customer: AGGREGATE_ROOT (HIGH, inferred)
-    [S3] com.ecommerce.customer.Customer is a AGGREGATE_ROOT because CustomerRepository keeps it and hands it back, which is a lifecycle of its own
+    [graph relation] com.ecommerce.customer.Customer is a AGGREGATE_ROOT because CustomerRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.ecommerce.customer.CustomerRepository
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.ecommerce.customer.Customer) [decided on 1 signal at S3]
-        [R1b] AGGREGATE_ROOT(com.ecommerce.customer.Customer) [S3 MANAGED_BY(com.ecommerce.customer.CustomerRepository) d0]
+      [DECISION] AGGREGATE_ROOT(com.ecommerce.customer.Customer) [decided on 1 signal of graph relation]
+        [R1b] AGGREGATE_ROOT(com.ecommerce.customer.Customer) [graph relation: MANAGED_BY(com.ecommerce.customer.CustomerRepository)]
   com.ecommerce.customer.CustomerId: IDENTIFIER (HIGH, inferred)
-    [S3] com.ecommerce.customer.CustomerId is a IDENTIFIER because CustomerRepository takes it to answer with Customer, which keeps it
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.ecommerce.customer.CustomerId is a IDENTIFIER because CustomerRepository takes it to answer with Customer, which keeps it
       involving com.ecommerce.customer.Customer, com.ecommerce.customer.CustomerRepository
-    [S4] com.ecommerce.customer.CustomerId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
+    [local structure] com.ecommerce.customer.CustomerId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.ecommerce.customer.CustomerId) [decided on 1 signal at S3, 1 at S4]
-        [R2] IDENTIFIER(com.ecommerce.customer.CustomerId) [S3 SEARCHED_BY(com.ecommerce.customer.CustomerRepository) d0]
-        [S4-SHAPE] IDENTIFIER(com.ecommerce.customer.CustomerId) [S4 SINGLE_VALUE_WRAPPER(com.ecommerce.customer.CustomerId) d0]
+      [DECISION] IDENTIFIER(com.ecommerce.customer.CustomerId) [decided on 1 signal of graph relation, 1 of local structure]
+        [R2] IDENTIFIER(com.ecommerce.customer.CustomerId) [graph relation: SEARCHED_BY(com.ecommerce.customer.CustomerRepository)]
+        [SHAPE] IDENTIFIER(com.ecommerce.customer.CustomerId) [local structure: SINGLE_VALUE_WRAPPER(com.ecommerce.customer.CustomerId)]
   com.ecommerce.customer.CustomerRepository: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.ecommerce.customer.CustomerRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.ecommerce.customer.CustomerRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.ecommerce.customer.CustomerRepository) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.ecommerce.customer.CustomerRepository) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.ecommerce.customer.CustomerRepository) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.ecommerce.customer.CustomerRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.ecommerce.customer.CustomerRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
   com.ecommerce.order.Order: AGGREGATE_ROOT (HIGH, inferred)
-    [S3] com.ecommerce.order.Order is a AGGREGATE_ROOT because OrderRepository keeps it and hands it back, which is a lifecycle of its own
+    [graph relation] com.ecommerce.order.Order is a AGGREGATE_ROOT because OrderRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.ecommerce.order.OrderRepository
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.ecommerce.order.Order) [decided on 1 signal at S3]
-        [R1b] AGGREGATE_ROOT(com.ecommerce.order.Order) [S3 MANAGED_BY(com.ecommerce.order.OrderRepository) d0]
+      [DECISION] AGGREGATE_ROOT(com.ecommerce.order.Order) [decided on 1 signal of graph relation]
+        [R1b] AGGREGATE_ROOT(com.ecommerce.order.Order) [graph relation: MANAGED_BY(com.ecommerce.order.OrderRepository)]
   com.ecommerce.order.OrderId: IDENTIFIER (HIGH, inferred)
-    [S3] com.ecommerce.order.OrderId is a IDENTIFIER because OrderRepository takes it to answer with Order, which keeps it
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.ecommerce.order.OrderId is a IDENTIFIER because OrderRepository takes it to answer with Order, which keeps it
       involving com.ecommerce.order.Order, com.ecommerce.order.OrderRepository
-    [S4] com.ecommerce.order.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
+    [local structure] com.ecommerce.order.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.ecommerce.order.OrderId) [decided on 1 signal at S3, 1 at S4]
-        [R2] IDENTIFIER(com.ecommerce.order.OrderId) [S3 SEARCHED_BY(com.ecommerce.order.OrderRepository) d0]
-        [S4-SHAPE] IDENTIFIER(com.ecommerce.order.OrderId) [S4 SINGLE_VALUE_WRAPPER(com.ecommerce.order.OrderId) d0]
+      [DECISION] IDENTIFIER(com.ecommerce.order.OrderId) [decided on 1 signal of graph relation, 1 of local structure]
+        [R2] IDENTIFIER(com.ecommerce.order.OrderId) [graph relation: SEARCHED_BY(com.ecommerce.order.OrderRepository)]
+        [SHAPE] IDENTIFIER(com.ecommerce.order.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.ecommerce.order.OrderId)]
   com.ecommerce.order.OrderRepository: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.ecommerce.order.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.ecommerce.order.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.ecommerce.order.OrderRepository) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.ecommerce.order.OrderRepository) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.ecommerce.order.OrderRepository) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.ecommerce.order.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.ecommerce.order.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
   com.ecommerce.product.Product: AGGREGATE_ROOT (HIGH, inferred)
-    [S3] com.ecommerce.product.Product is a AGGREGATE_ROOT because ProductRepository keeps it and hands it back, which is a lifecycle of its own
+    [graph relation] com.ecommerce.product.Product is a AGGREGATE_ROOT because ProductRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.ecommerce.product.ProductRepository
     derivation:
-      [S3-DECISION] AGGREGATE_ROOT(com.ecommerce.product.Product) [decided on 1 signal at S3]
-        [R1b] AGGREGATE_ROOT(com.ecommerce.product.Product) [S3 MANAGED_BY(com.ecommerce.product.ProductRepository) d0]
+      [DECISION] AGGREGATE_ROOT(com.ecommerce.product.Product) [decided on 1 signal of graph relation]
+        [R1b] AGGREGATE_ROOT(com.ecommerce.product.Product) [graph relation: MANAGED_BY(com.ecommerce.product.ProductRepository)]
   com.ecommerce.product.ProductId: IDENTIFIER (HIGH, inferred)
-    [S3] com.ecommerce.product.ProductId is a IDENTIFIER because ProductRepository takes it to answer with Product, which keeps it
+    signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
+    [graph relation] com.ecommerce.product.ProductId is a IDENTIFIER because ProductRepository takes it to answer with Product, which keeps it
       involving com.ecommerce.product.Product, com.ecommerce.product.ProductRepository
-    [S4] com.ecommerce.product.ProductId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
+    [local structure] com.ecommerce.product.ProductId reads as a IDENTIFIER because it wraps exactly one value, java.util.UUID, which is how an identity is written
     derivation:
-      [S3-DECISION] IDENTIFIER(com.ecommerce.product.ProductId) [decided on 1 signal at S3, 1 at S4]
-        [R2] IDENTIFIER(com.ecommerce.product.ProductId) [S3 SEARCHED_BY(com.ecommerce.product.ProductRepository) d0]
-        [S4-SHAPE] IDENTIFIER(com.ecommerce.product.ProductId) [S4 SINGLE_VALUE_WRAPPER(com.ecommerce.product.ProductId) d0]
+      [DECISION] IDENTIFIER(com.ecommerce.product.ProductId) [decided on 1 signal of graph relation, 1 of local structure]
+        [R2] IDENTIFIER(com.ecommerce.product.ProductId) [graph relation: SEARCHED_BY(com.ecommerce.product.ProductRepository)]
+        [SHAPE] IDENTIFIER(com.ecommerce.product.ProductId) [local structure: SINGLE_VALUE_WRAPPER(com.ecommerce.product.ProductId)]
   com.ecommerce.product.ProductRepository: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.ecommerce.product.ProductRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.ecommerce.product.ProductRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.ecommerce.product.ProductRepository) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.ecommerce.product.ProductRepository) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.ecommerce.product.ProductRepository) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.ecommerce.product.ProductRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.ecommerce.product.ProductRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 PortBoundary-contractNoRingCallsStaysSilent
@@ -2160,11 +2184,11 @@ PortBoundary-contractOnlyTheRingCallsIsNotAPort
     derivation:
       no signal about com.acme.hangar.core.Ledger
   com.acme.hangar.store.HangarBooks: DRIVEN_ADAPTER (HIGH, inferred)
-    [S2] com.acme.hangar.store.HangarBooks is a DRIVEN_ADAPTER because it holds EntityManager, which reaches outside the application (jakarta.persistence.EntityManager)
+    [framework knowledge] com.acme.hangar.store.HangarBooks is a DRIVEN_ADAPTER because it holds EntityManager, which reaches outside the application (jakarta.persistence.EntityManager)
       involving jakarta.persistence.EntityManager
     derivation:
-      [S3-DECISION] DRIVEN_ADAPTER(com.acme.hangar.store.HangarBooks) [decided on 1 signal at S2]
-        [W1-DR] DRIVEN_ADAPTER(com.acme.hangar.store.HangarBooks) [S2 INFRA_DEPENDENCY(jakarta.persistence.EntityManager) d0]
+      [DECISION] DRIVEN_ADAPTER(com.acme.hangar.store.HangarBooks) [decided on 1 signal of framework knowledge]
+        [W1-DR] DRIVEN_ADAPTER(com.acme.hangar.store.HangarBooks) [framework knowledge: INFRA_DEPENDENCY(jakarta.persistence.EntityManager)]
           INFRA_DEPENDENCY(jakarta.persistence.EntityManager) [jakarta:jakarta.persistence.EntityManager]
 
 PortBoundary-contractTheCoreAlsoWritesIsNotAPort
@@ -2175,15 +2199,15 @@ PortBoundary-contractTheCoreAlsoWritesIsNotAPort
   0 declared, 3 inferred, 1 left ambiguous
   com.acme.hangar.core.Checkout: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.acme.hangar.core.Checkout reads as a IDENTIFIER because it wraps exactly one value, com.acme.hangar.core.Ledger, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.acme.hangar.core.Checkout reads as a VALUE_OBJECT because every field it declares is final, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.acme.hangar.core.Checkout reads as a IDENTIFIER because it wraps exactly one value, com.acme.hangar.core.Ledger, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.acme.hangar.core.Checkout reads as a VALUE_OBJECT because every field it declares is final, so its state cannot change
     to make it explicit: com.acme.hangar.core.Checkout reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.acme.hangar.core.Checkout) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.acme.hangar.core.Checkout) [S4 SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Checkout) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.acme.hangar.core.Checkout) [S4 IMMUTABLE_SHAPE(com.acme.hangar.core.Checkout) d0]
+      [DECISION] UNCLASSIFIED(com.acme.hangar.core.Checkout) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.acme.hangar.core.Checkout) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Checkout)]
+        [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Checkout) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Checkout)]
   com.acme.hangar.core.Ledger: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.acme.hangar.core.Ledger is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -2201,17 +2225,17 @@ PortBoundary-contractTheCoreCallsIsADrivenPort
     1 APPLICATION_SERVICE
   0 declared, 2 inferred, 0 left ambiguous
   com.acme.hangar.core.Checkout: APPLICATION_SERVICE (HIGH, inferred)
-    [S3] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Ledger, through which the application reaches outside
+    [graph relation] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Ledger, through which the application reaches outside
       involving com.acme.hangar.core.Ledger
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal at S3]
-        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [S3 CALLS_DRIVEN_PORT(com.acme.hangar.core.Ledger) d0]
+      [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: CALLS_DRIVEN_PORT(com.acme.hangar.core.Ledger)]
   com.acme.hangar.core.Ledger: DRIVEN_PORT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
+    [graph relation] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal at S3]
-        [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [S3 CONSUMED_BY_CORE(com.acme.hangar.core.Checkout) d0]
+      [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of graph relation]
+        [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
 
 PortBoundary-contractTheRingCallsAndTheCoreWritesIsADrivingPort
   3 types analysed
@@ -2220,22 +2244,22 @@ PortBoundary-contractTheRingCallsAndTheCoreWritesIsADrivingPort
     1 DRIVING_ADAPTER
   0 declared, 3 inferred, 0 left ambiguous
   com.acme.hangar.core.Assembly: DRIVING_PORT (HIGH, inferred)
-    [S3] com.acme.hangar.core.Assembly is a DRIVING_PORT because HangarDoor reaches the application through it and AssemblyLine answers it
+    [graph relation] com.acme.hangar.core.Assembly is a DRIVING_PORT because HangarDoor reaches the application through it and AssemblyLine answers it
       involving com.acme.hangar.web.HangarDoor, com.acme.hangar.core.AssemblyLine
     derivation:
-      [S3-DECISION] DRIVING_PORT(com.acme.hangar.core.Assembly) [decided on 1 signal at S3]
-        [R5] DRIVING_PORT(com.acme.hangar.core.Assembly) [S3 HELD_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) d0]
+      [DECISION] DRIVING_PORT(com.acme.hangar.core.Assembly) [decided on 1 signal of graph relation]
+        [R5] DRIVING_PORT(com.acme.hangar.core.Assembly) [graph relation: HELD_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor)]
   com.acme.hangar.core.AssemblyLine: APPLICATION_SERVICE (HIGH, inferred)
-    [S3] com.acme.hangar.core.AssemblyLine is a APPLICATION_SERVICE because it stands on Assembly, through which the outside reaches the application
+    [graph relation] com.acme.hangar.core.AssemblyLine is a APPLICATION_SERVICE because it stands on Assembly, through which the outside reaches the application
       involving com.acme.hangar.core.Assembly
     derivation:
-      [S3-DECISION] APPLICATION_SERVICE(com.acme.hangar.core.AssemblyLine) [decided on 1 signal at S3]
-        [R6] APPLICATION_SERVICE(com.acme.hangar.core.AssemblyLine) [S3 ANSWERS_DRIVING_PORT(com.acme.hangar.core.Assembly) d0]
+      [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.AssemblyLine) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.acme.hangar.core.AssemblyLine) [graph relation: ANSWERS_DRIVING_PORT(com.acme.hangar.core.Assembly)]
   com.acme.hangar.web.HangarDoor: DRIVING_ADAPTER (HIGH, inferred)
-    [S2] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
+    [framework knowledge] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
     derivation:
-      [S3-DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal at S2]
-        [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [S2 DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) d0]
+      [DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal of framework knowledge]
+        [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [framework knowledge: DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor)]
           DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) [spring:org.springframework.web.bind.annotation.RestController]
 
 PortBoundary-declaredWayOutPlacesItsImplementer
@@ -2244,27 +2268,27 @@ PortBoundary-declaredWayOutPlacesItsImplementer
     1 DRIVEN_ADAPTER
   1 declared, 1 inferred, 0 left ambiguous
   com.acme.hangar.core.Ledger: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.acme.hangar.core.Ledger declares DRIVEN_PORT by bearing org.jmolecules.architecture.hexagonal.SecondaryPort (pack jmolecules)
+    [declared intent] com.acme.hangar.core.Ledger declares DRIVEN_PORT by bearing org.jmolecules.architecture.hexagonal.SecondaryPort (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.acme.hangar.core.Ledger) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.acme.hangar.core.Ledger) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.acme.hangar.core.Ledger) [jmolecules:org.jmolecules.architecture.hexagonal.SecondaryPort]
   com.acme.hangar.store.LedgerBook: DRIVEN_ADAPTER (HIGH, inferred)
-    [S3] com.acme.hangar.store.LedgerBook is a DRIVEN_ADAPTER because it answers Ledger, which the hexagon calls to reach outside
+    [graph relation] com.acme.hangar.store.LedgerBook is a DRIVEN_ADAPTER because it answers Ledger, which the hexagon calls to reach outside
       involving com.acme.hangar.core.Ledger
     derivation:
-      [S3-DECISION] DRIVEN_ADAPTER(com.acme.hangar.store.LedgerBook) [decided on 1 signal at S3]
-        [W1-DR2] DRIVEN_ADAPTER(com.acme.hangar.store.LedgerBook) [S3 IMPLEMENTS_DRIVEN_PORT(com.acme.hangar.core.Ledger) d0]
+      [DECISION] DRIVEN_ADAPTER(com.acme.hangar.store.LedgerBook) [decided on 1 signal of graph relation]
+        [W1-DR2] DRIVEN_ADAPTER(com.acme.hangar.store.LedgerBook) [graph relation: IMPLEMENTS_DRIVEN_PORT(com.acme.hangar.core.Ledger)]
 
 PortClassifierTest-classificationShouldBeDeterministic
   1 types analysed
     1 DRIVEN_PORT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.CustomerRepository: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.CustomerRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.example.CustomerRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.CustomerRepository) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.CustomerRepository) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.CustomerRepository) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.CustomerRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.CustomerRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 PortClassifierTest-explicitAnnotationTakesPriority
@@ -2272,10 +2296,10 @@ PortClassifierTest-explicitAnnotationTakesPriority
     1 DRIVEN_PORT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.PaymentGateway: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.PaymentGateway declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.example.PaymentGateway declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.PaymentGateway) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.PaymentGateway) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.PaymentGateway) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.PaymentGateway) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.PaymentGateway) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 PortClassifierTest-gatewayShouldBeDriven
@@ -2283,10 +2307,10 @@ PortClassifierTest-gatewayShouldBeDriven
     1 DRIVEN_PORT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.PaymentGateway: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.PaymentGateway declares DRIVEN_PORT by bearing org.jmolecules.architecture.hexagonal.SecondaryPort (pack jmolecules)
+    [declared intent] com.example.PaymentGateway declares DRIVEN_PORT by bearing org.jmolecules.architecture.hexagonal.SecondaryPort (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.PaymentGateway) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.PaymentGateway) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.PaymentGateway) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.PaymentGateway) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.PaymentGateway) [jmolecules:org.jmolecules.architecture.hexagonal.SecondaryPort]
 
 PortClassifierTest-interfaceWithUseCaseSuffixShouldNotBeDriven
@@ -2326,10 +2350,10 @@ PortClassifierTest-repositoryShouldBeDriven
     1 DRIVEN_PORT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.OrderRepository: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.example.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.OrderRepository) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.OrderRepository) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.OrderRepository) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 PortClassifierTest-shouldClassifyExplicitPrimaryPort
@@ -2337,10 +2361,10 @@ PortClassifierTest-shouldClassifyExplicitPrimaryPort
     1 DRIVING_PORT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.PlaceOrderUseCase: DRIVING_PORT (EXPLICIT, declared)
-    [S1] com.example.PlaceOrderUseCase declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
+    [declared intent] com.example.PlaceOrderUseCase declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVING_PORT(com.example.PlaceOrderUseCase) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVING_PORT(com.example.PlaceOrderUseCase) [S1 DECLARED_KIND(DRIVING_PORT) d0]
+      [DECISION] DRIVING_PORT(com.example.PlaceOrderUseCase) [decided on 1 signal of declared intent]
+        [INTENT] DRIVING_PORT(com.example.PlaceOrderUseCase) [declared intent: DECLARED_KIND(DRIVING_PORT)]
           DECLARED_KIND(com.example.PlaceOrderUseCase) [jmolecules:org.jmolecules.architecture.hexagonal.PrimaryPort]
 
 PortClassifierTest-shouldClassifyExplicitRepository
@@ -2348,10 +2372,10 @@ PortClassifierTest-shouldClassifyExplicitRepository
     1 DRIVEN_PORT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.OrderRepository: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.example.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.OrderRepository) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.OrderRepository) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.OrderRepository) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 PortClassifierTest-shouldClassifyExplicitSecondaryPort
@@ -2359,10 +2383,10 @@ PortClassifierTest-shouldClassifyExplicitSecondaryPort
     1 DRIVEN_PORT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.PaymentGateway: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.PaymentGateway declares DRIVEN_PORT by bearing org.jmolecules.architecture.hexagonal.SecondaryPort (pack jmolecules)
+    [declared intent] com.example.PaymentGateway declares DRIVEN_PORT by bearing org.jmolecules.architecture.hexagonal.SecondaryPort (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.PaymentGateway) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.PaymentGateway) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.PaymentGateway) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.PaymentGateway) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.PaymentGateway) [jmolecules:org.jmolecules.architecture.hexagonal.SecondaryPort]
 
 PortClassifierTest-shouldHandleEmptyInterface
@@ -2381,10 +2405,10 @@ PortClassifierTest-shouldHandleEnumTypes
     1 VALUE_OBJECT
   0 declared, 1 inferred, 0 left ambiguous
   com.example.OrderStatus: VALUE_OBJECT (HIGH, inferred)
-    [S4] com.example.OrderStatus reads as a VALUE_OBJECT because it is an enum, a closed set of values
+    [local structure] com.example.OrderStatus reads as a VALUE_OBJECT because it is an enum, a closed set of values
     derivation:
-      [S3-DECISION] VALUE_OBJECT(com.example.OrderStatus) [decided on 1 signal at S4]
-        [S4-SHAPE] VALUE_OBJECT(com.example.OrderStatus) [S4 IMMUTABLE_SHAPE(com.example.OrderStatus) d0]
+      [DECISION] VALUE_OBJECT(com.example.OrderStatus) [decided on 1 signal of local structure]
+        [SHAPE] VALUE_OBJECT(com.example.OrderStatus) [local structure: IMMUTABLE_SHAPE(com.example.OrderStatus)]
 
 PortClassifierTest-shouldHandleRecordTypes
   1 types analysed
@@ -2393,15 +2417,15 @@ PortClassifierTest-shouldHandleRecordTypes
   0 declared, 1 inferred, 1 left ambiguous
   com.example.OrderId: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
-    candidate IDENTIFIER (1 signal at S4)
-      [S4] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
-    candidate VALUE_OBJECT (1 signal at S4)
-      [S4] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
+    candidate IDENTIFIER (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a IDENTIFIER because it wraps exactly one value, java.lang.String, which is how an identity is written
+    candidate VALUE_OBJECT (1 signal of local structure)
+      [local structure] com.example.OrderId reads as a VALUE_OBJECT because it is a record, so its state cannot change
     to make it explicit: com.example.OrderId reads as IDENTIFIER and VALUE_OBJECT alike, and nothing separates them: declare its kind in the classification configuration, or give it the context that would settle it
     derivation:
-      [S3-DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
-        [S4-SHAPE] IDENTIFIER(com.example.OrderId) [S4 SINGLE_VALUE_WRAPPER(com.example.OrderId) d0]
-        [S4-SHAPE] VALUE_OBJECT(com.example.OrderId) [S4 IMMUTABLE_SHAPE(com.example.OrderId) d0]
+      [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
+        [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
+        [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
 
 PortClassifierTest-shouldReturnUnclassifiedForClass
   1 types analysed
@@ -2430,10 +2454,10 @@ PortClassifierTest-useCaseShouldBeDriving
     1 DRIVING_PORT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.PlaceOrderUseCase: DRIVING_PORT (EXPLICIT, declared)
-    [S1] com.example.PlaceOrderUseCase declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
+    [declared intent] com.example.PlaceOrderUseCase declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVING_PORT(com.example.PlaceOrderUseCase) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVING_PORT(com.example.PlaceOrderUseCase) [S1 DECLARED_KIND(DRIVING_PORT) d0]
+      [DECISION] DRIVING_PORT(com.example.PlaceOrderUseCase) [decided on 1 signal of declared intent]
+        [INTENT] DRIVING_PORT(com.example.PlaceOrderUseCase) [declared intent: DECLARED_KIND(DRIVING_PORT)]
           DECLARED_KIND(com.example.PlaceOrderUseCase) [jmolecules:org.jmolecules.architecture.hexagonal.PrimaryPort]
 
 PortCriteriaTest-shouldMatchInterfaceImplementingPrimaryPort
@@ -2474,10 +2498,10 @@ PortCriteriaTest-shouldMatchInterfaceWithRepositoryAnnotation
     1 DRIVEN_PORT
   1 declared, 0 inferred, 0 left ambiguous
   com.example.OrderRepository: DRIVEN_PORT (EXPLICIT, declared)
-    [S1] com.example.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
+    [declared intent] com.example.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
-      [S3-DECISION] DRIVEN_PORT(com.example.OrderRepository) [decided on 1 signal at S1]
-        [S1-INTENT] DRIVEN_PORT(com.example.OrderRepository) [S1 DECLARED_KIND(DRIVEN_PORT) d0]
+      [DECISION] DRIVEN_PORT(com.example.OrderRepository) [decided on 1 signal of declared intent]
+        [INTENT] DRIVEN_PORT(com.example.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
 
 PortCriteriaTest-shouldNotMatchDomainEventInterface

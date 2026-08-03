@@ -39,7 +39,7 @@ import java.util.Set;
 public final class ConfiguredKind implements Rule {
 
     /** The published identifier of this rule. */
-    public static final RuleId ID = RuleId.of("S1-CONFIG");
+    public static final RuleId ID = RuleId.of("CONFIG");
 
     ConfiguredKind() {
         // Stateless: everything a rule needs comes from the derivation it is handed.

@@ -31,14 +31,14 @@ class TiersTest {
     @Test
     @DisplayName("names the tier and calls one signal a signal")
     void namesTheTierAndCallsOneSignalASignal() {
-        assertThat(Tiers.carrying(List.of(at(EvidenceTier.GRAPH_RELATION)))).isEqualTo("1 signal at S3");
+        assertThat(Tiers.carrying(List.of(at(EvidenceTier.GRAPH_RELATION)))).isEqualTo("1 signal of graph relation");
     }
 
     @Test
     @DisplayName("counts the signals a tier carried")
     void countsTheSignalsATierCarried() {
         assertThat(Tiers.carrying(List.of(at(EvidenceTier.GRAPH_RELATION), at(EvidenceTier.GRAPH_RELATION))))
-                .isEqualTo("2 signals at S3");
+                .isEqualTo("2 signals of graph relation");
     }
 
     @Test
@@ -47,7 +47,16 @@ class TiersTest {
         List<Evidence> weakestFirst =
                 List.of(at(EvidenceTier.NAMING), at(EvidenceTier.GRAPH_RELATION), at(EvidenceTier.FRAMEWORK_KNOWLEDGE));
 
-        assertThat(Tiers.carrying(weakestFirst)).isEqualTo("1 signal at S2, 1 at S3, 1 at S6");
+        assertThat(Tiers.carrying(weakestFirst))
+                .isEqualTo("1 signal of framework knowledge, 1 of graph relation, 1 of naming");
+    }
+
+    @Test
+    @DisplayName("ranking the kinds of signal strongest first, as the aggregator weighs them")
+    void rankingTheKindsOfSignalStrongestFirstAsTheAggregatorWeighsThem() {
+        assertThat(Tiers.ranking())
+                .isEqualTo("declared intent > framework knowledge > graph relation > local structure"
+                        + " > topology > naming");
     }
 
     @Test

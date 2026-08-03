@@ -60,7 +60,7 @@ import java.util.TreeMap;
 public final class Aggregator {
 
     /** The published identifier of the decision step, which every verdict's proof names. */
-    public static final RuleId ID = RuleId.of("S3-DECISION");
+    public static final RuleId ID = RuleId.of("DECISION");
 
     /**
      * Beyond nine signals at one tier the case is already overwhelming, and counting further

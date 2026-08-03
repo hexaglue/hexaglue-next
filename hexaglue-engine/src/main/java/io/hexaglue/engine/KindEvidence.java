@@ -94,7 +94,8 @@ public record KindEvidence(TypeId subject, ArchKind kind, Evidence evidence, int
     }
 
     private static String render(TypeId subject, ArchKind kind, Evidence evidence, int distance) {
-        return kind + "(" + subject.qualifiedName() + ") [" + evidence.tier().code() + " " + evidence.fact() + " d"
-                + distance + "]";
+        String reach = distance == 0 ? "" : ", " + distance + " steps away";
+        return kind + "(" + subject.qualifiedName() + ") [" + Tiers.named(evidence.tier()) + ": " + evidence.fact()
+                + reach + "]";
     }
 }

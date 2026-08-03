@@ -212,7 +212,8 @@ class AggregatorTest {
                     evidence(ArchKind.ENTITY, EvidenceTier.GRAPH_RELATION, "kept by a port", 0));
 
             assertThat(verdict.proof().conclusion())
-                    .isEqualTo("ENTITY(com.acme.Order) [decided on 1 signal at S2, 1 at S3]");
+                    .isEqualTo(
+                            "ENTITY(com.acme.Order) [decided on 1 signal of framework knowledge, 1 of graph relation]");
         }
 
         @Test
@@ -222,7 +223,8 @@ class AggregatorTest {
                     decide(evidence(ArchKind.ENTITY, EvidenceTier.FRAMEWORK_KNOWLEDGE, "managed by a repo", 2));
 
             assertThat(verdict.proof().conclusion())
-                    .isEqualTo("ENTITY(com.acme.Order) [decided on 1 signal at S2, nearest 2 steps away]");
+                    .isEqualTo(
+                            "ENTITY(com.acme.Order) [decided on 1 signal of framework knowledge, nearest 2 steps away]");
         }
     }
 }

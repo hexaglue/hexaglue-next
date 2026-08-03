@@ -131,7 +131,29 @@ class ExplanationTest {
 
             assertThat(lines)
                     .contains(
-                            "  [S2] com.acme.Order is an AGGREGATE_ROOT because a repository stores and retrieves it");
+                            "  [framework knowledge] com.acme.Order is an AGGREGATE_ROOT because a repository stores and retrieves it");
+        }
+
+        @Test
+        @DisplayName("spelling out the pecking order when more than one kind of signal was weighed")
+        void spellingOutThePeckingOrderWhenMoreThanOneKindOfSignalWasWeighed() {
+            Classification weighed = Classification.builder(
+                            ArchKind.AGGREGATE_ROOT, Confidence.HIGH, Basis.INFERRED, ProofNode.fact("managed"))
+                    .evidences(List.of(
+                            evidence(EvidenceTier.FRAMEWORK_KNOWLEDGE, "REPO(x)", "a repository stores it"),
+                            evidence(EvidenceTier.LOCAL_STRUCTURE, "MUTABLE(x)", "its state changes")))
+                    .build();
+
+            assertThat(Explanation.of(aggregate(weighed)))
+                    .contains("  signals, strongest first: declared intent > framework knowledge > graph relation"
+                            + " > local structure > topology > naming");
+        }
+
+        @Test
+        @DisplayName("keeping quiet about an order no comparison ever applied")
+        void keepingQuietAboutAnOrderNoComparisonEverApplied() {
+            assertThat(Explanation.of(aggregate(decided())))
+                    .noneMatch(line -> line.contains("signals, strongest first"));
         }
 
         @Test
@@ -228,9 +250,9 @@ class ExplanationTest {
             assertThat(lines)
                     .contains(
                             "  AMBIGUOUS",
-                            "  candidate ENTITY (1 signal at S4)",
-                            "    [S4] it never changes",
-                            "  candidate VALUE_OBJECT (1 signal at S4)");
+                            "  candidate ENTITY (1 signal of local structure)",
+                            "    [local structure] it never changes",
+                            "  candidate VALUE_OBJECT (1 signal of local structure)");
         }
     }
 

@@ -51,7 +51,7 @@ import java.util.Set;
 public final class ConventionalName implements Rule {
 
     /** The published identifier of this rule. */
-    public static final RuleId ID = RuleId.of("S6-NAMING");
+    public static final RuleId ID = RuleId.of("NAMING");
 
     ConventionalName() {
         // Stateless: everything a rule needs comes from the derivation it is handed.

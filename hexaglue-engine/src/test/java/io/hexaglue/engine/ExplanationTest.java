@@ -1,0 +1,250 @@
+/*
+ * This Source Code Form is part of the HexaGlue project.
+ * Copyright (c) 2026 Scalastic
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Commercial licensing options are available for organizations wishing
+ * to use HexaGlue under terms different from the MPL 2.0.
+ * Contact: info@hexaglue.io
+ */
+
+package io.hexaglue.engine;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import io.hexaglue.model.ArchKind;
+import io.hexaglue.model.SourceLocation;
+import io.hexaglue.model.TypeId;
+import io.hexaglue.model.TypeNature;
+import io.hexaglue.model.arch.AggregateRoot;
+import io.hexaglue.model.arch.ArchType;
+import io.hexaglue.model.arch.TypeStructure;
+import io.hexaglue.model.arch.UnclassifiedType;
+import io.hexaglue.model.arch.UnclassifiedType.UnclassifiedCategory;
+import io.hexaglue.model.classification.Basis;
+import io.hexaglue.model.classification.Candidate;
+import io.hexaglue.model.classification.Classification;
+import io.hexaglue.model.classification.Confidence;
+import io.hexaglue.model.classification.Evidence;
+import io.hexaglue.model.classification.EvidenceTier;
+import io.hexaglue.model.classification.ProofNode;
+import io.hexaglue.model.classification.RemediationHint;
+import io.hexaglue.model.classification.RuleId;
+import io.hexaglue.model.code.CodeModel;
+import io.hexaglue.model.code.TypeNode;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+class ExplanationTest {
+
+    private static final TypeId ORDER = TypeId.of("com.acme.Order");
+    private static final TypeId REPOSITORY = TypeId.of("com.acme.OrderRepository");
+
+    private static TypeStructure structure() {
+        CodeModel code = CodeModel.builder()
+                .addType(TypeNode.builder(ORDER, TypeNature.CLASS).build())
+                .build();
+        return Structures.of(code).of(code.type(ORDER).orElseThrow());
+    }
+
+    private static Evidence evidence(EvidenceTier tier, String fact, String justification) {
+        return Evidence.of(tier, tier.maxConfidence(), fact, justification);
+    }
+
+    private static ArchType aggregate(Classification verdict) {
+        return new AggregateRoot(
+                ORDER,
+                structure(),
+                verdict,
+                Optional.empty(),
+                Optional.empty(),
+                List.of(),
+                List.of(),
+                List.of(),
+                Optional.empty(),
+                List.of());
+    }
+
+    private static ArchType unclassified(Classification verdict, UnclassifiedCategory category, String reason) {
+        return new UnclassifiedType(ORDER, structure(), verdict, category, Optional.ofNullable(reason));
+    }
+
+    private static Classification decided() {
+        return Classification.builder(
+                        ArchKind.AGGREGATE_ROOT,
+                        Confidence.HIGH,
+                        Basis.INFERRED,
+                        ProofNode.derived(
+                                RuleId.of("R1"),
+                                "AGGREGATE_ROOT(com.acme.Order)",
+                                ProofNode.fact("SPRING_DATA_REPOSITORY(com.acme.OrderRepository)")))
+                .evidences(List.of(evidence(
+                        EvidenceTier.FRAMEWORK_KNOWLEDGE,
+                        "SPRING_DATA_REPOSITORY(com.acme.OrderRepository)",
+                        "com.acme.Order is an AGGREGATE_ROOT because a repository stores and retrieves it")))
+                .build();
+    }
+
+    @Nested
+    @DisplayName("states the verdict")
+    class StatesTheVerdict {
+
+        @Test
+        @DisplayName("naming the type, its kind, the confidence and whether it was declared")
+        void namingTheTypeItsKindTheConfidenceAndWhetherItWasDeclared() {
+            List<String> lines = Explanation.of(aggregate(decided()));
+
+            assertThat(lines.get(0)).isEqualTo("com.acme.Order: AGGREGATE_ROOT (HIGH, inferred)");
+        }
+
+        @Test
+        @DisplayName("giving one reason per evidence, prefixed by the tier that carried it")
+        void givingOneReasonPerEvidencePrefixedByTheTierThatCarriedIt() {
+            List<String> lines = Explanation.of(aggregate(decided()));
+
+            assertThat(lines)
+                    .contains(
+                            "  [S2] com.acme.Order is an AGGREGATE_ROOT because a repository stores and retrieves it");
+        }
+
+        @Test
+        @DisplayName("pointing at the source of a signal when the model knows it")
+        void pointingAtTheSourceOfASignalWhenTheModelKnowsIt() {
+            Evidence located = new Evidence(
+                    EvidenceTier.GRAPH_RELATION,
+                    Confidence.HIGH,
+                    "MANAGED_BY(com.acme.OrderRepository)",
+                    "com.acme.Order is kept and handed back by OrderRepository",
+                    Optional.of(new SourceLocation("com/acme/Order.java", 10, 43)),
+                    List.of(REPOSITORY));
+
+            List<String> lines = Explanation.of(aggregate(Classification.builder(
+                            ArchKind.AGGREGATE_ROOT, Confidence.HIGH, Basis.INFERRED, ProofNode.fact("managed"))
+                    .evidences(List.of(located))
+                    .build()));
+
+            assertThat(lines).contains("    at com/acme/Order.java:10", "    involving com.acme.OrderRepository");
+        }
+
+        @Test
+        @DisplayName("naming the types a reason leans on, so the reader can ask about them in turn")
+        void namingTheTypesAReasonLeansOnSoTheReaderCanAskAboutThemInTurn() {
+            Evidence related = new Evidence(
+                    EvidenceTier.GRAPH_RELATION,
+                    Confidence.HIGH,
+                    "MANAGED_BY(com.acme.OrderRepository)",
+                    "com.acme.Order is kept and handed back by OrderRepository",
+                    Optional.empty(),
+                    List.of(REPOSITORY));
+
+            List<String> lines = Explanation.of(aggregate(Classification.builder(
+                            ArchKind.AGGREGATE_ROOT, Confidence.HIGH, Basis.INFERRED, ProofNode.fact("managed"))
+                    .evidences(List.of(related))
+                    .build()));
+
+            assertThat(lines).contains("    involving com.acme.OrderRepository");
+        }
+
+        @Test
+        @DisplayName("offering the remediation that would make the verdict explicit")
+        void offeringTheRemediationThatWouldMakeTheVerdictExplicit() {
+            RemediationHint hint = RemediationHint.addAnnotation(
+                    TypeId.of("org.jmolecules.ddd.annotation.AggregateRoot"), ArchKind.AGGREGATE_ROOT);
+
+            List<String> lines = Explanation.of(aggregate(Classification.builder(
+                            ArchKind.AGGREGATE_ROOT, Confidence.HIGH, Basis.INFERRED, ProofNode.fact("managed"))
+                    .remediations(List.of(hint))
+                    .build()));
+
+            assertThat(lines)
+                    .contains(
+                            "  to make it explicit: Add @org.jmolecules.ddd.annotation.AggregateRoot" + " on the type");
+        }
+    }
+
+    @Nested
+    @DisplayName("says why a type reached no kind")
+    class SaysWhyATypeReachedNoKind {
+
+        @Test
+        @DisplayName("naming the category and the reason the fallback recorded")
+        void namingTheCategoryAndTheReasonTheFallbackRecorded() {
+            Classification silent = Classification.builder(
+                            ArchKind.UNCLASSIFIED,
+                            Confidence.LOW,
+                            Basis.INFERRED,
+                            ProofNode.fact("no signal about com.acme.Order"))
+                    .build();
+
+            List<String> lines =
+                    Explanation.of(unclassified(silent, UnclassifiedCategory.UNKNOWN, "nothing in scope uses it"));
+
+            assertThat(lines)
+                    .containsExactly(
+                            "com.acme.Order: UNCLASSIFIED (LOW, inferred)", "  UNKNOWN: nothing in scope uses it");
+        }
+
+        @Test
+        @DisplayName("listing the candidates that could not be separated")
+        void listingTheCandidatesThatCouldNotBeSeparated() {
+            Evidence shape = evidence(EvidenceTier.LOCAL_STRUCTURE, "IMMUTABLE(com.acme.Order)", "it never changes");
+            Classification ambiguous = Classification.builder(
+                            ArchKind.UNCLASSIFIED, Confidence.LOW, Basis.INFERRED, ProofNode.fact("tied"))
+                    .candidates(List.of(
+                            new Candidate(ArchKind.ENTITY, 1000, List.of(shape)),
+                            new Candidate(ArchKind.VALUE_OBJECT, 1000, List.of(shape))))
+                    .build();
+
+            List<String> lines = Explanation.of(unclassified(ambiguous, UnclassifiedCategory.AMBIGUOUS, null));
+
+            assertThat(lines)
+                    .contains(
+                            "  AMBIGUOUS",
+                            "  candidate ENTITY (score 1000)",
+                            "    [S4] it never changes",
+                            "  candidate VALUE_OBJECT (score 1000)");
+        }
+    }
+
+    @Nested
+    @DisplayName("shows the derivation when asked for it")
+    class ShowsTheDerivationWhenAskedForIt {
+
+        @Test
+        @DisplayName("indenting each premise under the conclusion it served")
+        void indentingEachPremiseUnderTheConclusionItServed() {
+            List<String> lines = Explanation.withDerivation(aggregate(decided()));
+
+            assertThat(lines)
+                    .containsSubsequence(
+                            "  derivation:",
+                            "    [R1] AGGREGATE_ROOT(com.acme.Order)",
+                            "      SPRING_DATA_REPOSITORY(com.acme.OrderRepository)");
+        }
+
+        @Test
+        @DisplayName("keeping everything the plain verdict already said")
+        void keepingEverythingThePlainVerdictAlreadySaid() {
+            assertThat(Explanation.withDerivation(aggregate(decided())))
+                    .containsAll(Explanation.of(aggregate(decided())));
+        }
+    }
+
+    @Nested
+    @DisplayName("renders the same bytes twice")
+    class RendersTheSameBytesTwice {
+
+        @Test
+        @DisplayName("so a host can diff two runs without reading the model")
+        void soAHostCanDiffTwoRunsWithoutReadingTheModel() {
+            assertThat(Explanation.withDerivation(aggregate(decided())))
+                    .isEqualTo(Explanation.withDerivation(aggregate(decided())));
+        }
+    }
+}

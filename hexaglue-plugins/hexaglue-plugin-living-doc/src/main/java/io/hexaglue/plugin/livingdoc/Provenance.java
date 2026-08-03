@@ -15,8 +15,8 @@ package io.hexaglue.plugin.livingdoc;
 
 import io.hexaglue.model.arch.ArchType;
 import io.hexaglue.model.classification.Classification;
-import io.hexaglue.plugin.livingdoc.render.Markdown;
-import io.hexaglue.plugin.livingdoc.render.Table;
+import io.hexaglue.render.Markdown;
+import io.hexaglue.render.Table;
 
 /**
  * Why a type reads the way it does.

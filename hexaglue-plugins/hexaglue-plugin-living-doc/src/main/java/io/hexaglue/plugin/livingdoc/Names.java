@@ -18,7 +18,7 @@ import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.declaration.Field;
 import io.hexaglue.model.declaration.Method;
 import io.hexaglue.model.declaration.Parameter;
-import io.hexaglue.plugin.livingdoc.render.Markdown;
+import io.hexaglue.render.Markdown;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 

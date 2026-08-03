@@ -11,7 +11,7 @@
  * Contact: info@hexaglue.io
  */
 
-package io.hexaglue.plugin.livingdoc.render;
+package io.hexaglue.render;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

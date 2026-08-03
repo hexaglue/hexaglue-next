@@ -25,9 +25,9 @@ import io.hexaglue.model.arch.Identifier;
 import io.hexaglue.model.arch.Invariant;
 import io.hexaglue.model.arch.ValueObject;
 import io.hexaglue.model.declaration.Field;
-import io.hexaglue.plugin.livingdoc.render.ClassDiagram;
-import io.hexaglue.plugin.livingdoc.render.Markdown;
-import io.hexaglue.plugin.livingdoc.render.Table;
+import io.hexaglue.render.ClassDiagram;
+import io.hexaglue.render.Markdown;
+import io.hexaglue.render.Table;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -11,7 +11,7 @@
  * Contact: info@hexaglue.io
  */
 
-package io.hexaglue.plugin.livingdoc.render;
+package io.hexaglue.render;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

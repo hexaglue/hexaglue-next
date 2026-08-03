@@ -26,4 +26,4 @@
  *
  * @since 7.0.0
  */
-package io.hexaglue.plugin.livingdoc.render;
+package io.hexaglue.render;

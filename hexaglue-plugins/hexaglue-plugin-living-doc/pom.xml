@@ -27,6 +27,12 @@
             <groupId>io.hexaglue</groupId>
             <artifactId>hexaglue-spi</artifactId>
         </dependency>
+        <!-- Markdown and diagrams, written by saying what they are. Shared with the
+             audit plugin so the escaping lives in one place. -->
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-render</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

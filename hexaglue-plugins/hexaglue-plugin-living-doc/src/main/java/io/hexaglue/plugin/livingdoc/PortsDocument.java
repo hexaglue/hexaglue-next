@@ -18,9 +18,9 @@ import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.arch.ArchType;
 import io.hexaglue.model.arch.DrivenPort;
 import io.hexaglue.model.arch.DrivingPort;
-import io.hexaglue.plugin.livingdoc.render.Graph;
-import io.hexaglue.plugin.livingdoc.render.Markdown;
-import io.hexaglue.plugin.livingdoc.render.Table;
+import io.hexaglue.render.Graph;
+import io.hexaglue.render.Markdown;
+import io.hexaglue.render.Table;
 import java.util.List;
 import java.util.stream.Collectors;
 

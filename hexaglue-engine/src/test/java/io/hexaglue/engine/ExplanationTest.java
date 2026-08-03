@@ -46,15 +46,36 @@ class ExplanationTest {
     private static final TypeId ORDER = TypeId.of("com.acme.Order");
     private static final TypeId REPOSITORY = TypeId.of("com.acme.OrderRepository");
 
+    private static final SourceLocation DECLARATION = new SourceLocation("com/acme/Order.java", 10, 43);
+
     private static TypeStructure structure() {
         CodeModel code = CodeModel.builder()
-                .addType(TypeNode.builder(ORDER, TypeNature.CLASS).build())
+                .addType(TypeNode.builder(ORDER, TypeNature.CLASS)
+                        .sourceLocation(DECLARATION)
+                        .build())
                 .build();
         return Structures.of(code).of(code.type(ORDER).orElseThrow());
     }
 
     private static Evidence evidence(EvidenceTier tier, String fact, String justification) {
         return Evidence.of(tier, tier.maxConfidence(), fact, justification);
+    }
+
+    private static Evidence evidenceAt(SourceLocation location) {
+        return new Evidence(
+                EvidenceTier.GRAPH_RELATION,
+                Confidence.HIGH,
+                "MANAGED_BY(com.acme.OrderRepository)",
+                "com.acme.Order is kept and handed back by OrderRepository",
+                Optional.of(location),
+                List.of(REPOSITORY));
+    }
+
+    private static Classification withEvidence(Evidence evidence) {
+        return Classification.builder(
+                        ArchKind.AGGREGATE_ROOT, Confidence.HIGH, Basis.INFERRED, ProofNode.fact("managed"))
+                .evidences(List.of(evidence))
+                .build();
     }
 
     private static ArchType aggregate(Classification verdict) {
@@ -114,41 +135,42 @@ class ExplanationTest {
         }
 
         @Test
-        @DisplayName("pointing at the source of a signal when the model knows it")
-        void pointingAtTheSourceOfASignalWhenTheModelKnowsIt() {
-            Evidence located = new Evidence(
-                    EvidenceTier.GRAPH_RELATION,
+        @DisplayName("pointing at the source of a signal when it sits somewhere the header does not")
+        void pointingAtTheSourceOfASignalWhenItSitsSomewhereTheHeaderDoesNot() {
+            Evidence located = evidenceAt(new SourceLocation("com/acme/Order.java", 22, 22));
+
+            assertThat(Explanation.of(aggregate(withEvidence(located)))).contains("    at com/acme/Order.java:22");
+        }
+
+        @Test
+        @DisplayName("keeping quiet about a location that only repeats the declaration being explained")
+        void keepingQuietAboutALocationThatOnlyRepeatsTheDeclarationBeingExplained() {
+            Evidence onTheDeclaration = evidenceAt(DECLARATION);
+
+            assertThat(Explanation.of(aggregate(withEvidence(onTheDeclaration))))
+                    .noneMatch(line -> line.contains(" at "));
+        }
+
+        @Test
+        @DisplayName("leaving the explained type out of the types its own reason involves")
+        void leavingTheExplainedTypeOutOfTheTypesItsOwnReasonInvolves() {
+            Evidence aboutItself = new Evidence(
+                    EvidenceTier.FRAMEWORK_KNOWLEDGE,
                     Confidence.HIGH,
-                    "MANAGED_BY(com.acme.OrderRepository)",
-                    "com.acme.Order is kept and handed back by OrderRepository",
-                    Optional.of(new SourceLocation("com/acme/Order.java", 10, 43)),
-                    List.of(REPOSITORY));
+                    "DRIVING_ENTRYPOINT(com.acme.Order)",
+                    "com.acme.Order is called by the framework from outside",
+                    Optional.empty(),
+                    List.of(ORDER));
 
-            List<String> lines = Explanation.of(aggregate(Classification.builder(
-                            ArchKind.AGGREGATE_ROOT, Confidence.HIGH, Basis.INFERRED, ProofNode.fact("managed"))
-                    .evidences(List.of(located))
-                    .build()));
-
-            assertThat(lines).contains("    at com/acme/Order.java:10", "    involving com.acme.OrderRepository");
+            assertThat(Explanation.of(aggregate(withEvidence(aboutItself))))
+                    .noneMatch(line -> line.contains("involving"));
         }
 
         @Test
         @DisplayName("naming the types a reason leans on, so the reader can ask about them in turn")
         void namingTheTypesAReasonLeansOnSoTheReaderCanAskAboutThemInTurn() {
-            Evidence related = new Evidence(
-                    EvidenceTier.GRAPH_RELATION,
-                    Confidence.HIGH,
-                    "MANAGED_BY(com.acme.OrderRepository)",
-                    "com.acme.Order is kept and handed back by OrderRepository",
-                    Optional.empty(),
-                    List.of(REPOSITORY));
-
-            List<String> lines = Explanation.of(aggregate(Classification.builder(
-                            ArchKind.AGGREGATE_ROOT, Confidence.HIGH, Basis.INFERRED, ProofNode.fact("managed"))
-                    .evidences(List.of(related))
-                    .build()));
-
-            assertThat(lines).contains("    involving com.acme.OrderRepository");
+            assertThat(Explanation.of(aggregate(withEvidence(evidenceAt(DECLARATION)))))
+                    .contains("    involving com.acme.OrderRepository");
         }
 
         @Test

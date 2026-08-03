@@ -27,7 +27,6 @@ import io.hexaglue.model.classification.RemediationHint;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 /**
  * What the engine concluded about a type, and why, put into lines a host can hand to whatever it
@@ -71,12 +70,12 @@ public final class Explanation {
             lines.add(REASON_INDENT + fallback(unclassified));
         }
         for (Evidence evidence : verdict.evidences()) {
-            appendEvidence(lines, evidence, REASON_INDENT);
+            appendEvidence(lines, evidence, REASON_INDENT, type);
         }
         for (Candidate candidate : verdict.candidates()) {
             lines.add(REASON_INDENT + "candidate " + candidate.kind() + " (score " + candidate.score() + ")");
             for (Evidence evidence : candidate.evidences()) {
-                appendEvidence(lines, evidence, DETAIL_INDENT);
+                appendEvidence(lines, evidence, DETAIL_INDENT, type);
             }
         }
         for (RemediationHint hint : verdict.remediations()) {
@@ -144,14 +143,26 @@ public final class Explanation {
                 .orElseGet(() -> unclassified.category().toString());
     }
 
-    private static void appendEvidence(List<String> lines, Evidence evidence, String indent) {
+    /**
+     * Renders one reason, and under it only what the reader does not already have.
+     *
+     * <p>A reason whose location is the declaration being explained points at the line the reader
+     * started from, and a reason that names its own subject among the types it involves sends them
+     * back to where they are. Both are dropped: what is left under a reason is a place to look
+     * next, which is the only thing worth an extra line.</p>
+     */
+    private static void appendEvidence(List<String> lines, Evidence evidence, String indent, ArchType subject) {
         lines.add(indent + "[" + evidence.tier().code() + "] " + evidence.justification());
-        evidence.sourceLocation().ifPresent(location -> lines.add(indent + DERIVATION_STEP + "at " + at(location)));
-        if (!evidence.relatedTypes().isEmpty()) {
-            lines.add(indent + DERIVATION_STEP + "involving "
-                    + evidence.relatedTypes().stream()
-                            .map(TypeId::qualifiedName)
-                            .collect(Collectors.joining(", ")));
+        evidence.sourceLocation()
+                .filter(location ->
+                        !location.equals(subject.structure().sourceLocation().orElse(null)))
+                .ifPresent(location -> lines.add(indent + DERIVATION_STEP + "at " + at(location)));
+        List<String> elsewhere = evidence.relatedTypes().stream()
+                .filter(related -> !related.equals(subject.id()))
+                .map(TypeId::qualifiedName)
+                .toList();
+        if (!elsewhere.isEmpty()) {
+            lines.add(indent + DERIVATION_STEP + "involving " + String.join(", ", elsewhere));
         }
     }
 

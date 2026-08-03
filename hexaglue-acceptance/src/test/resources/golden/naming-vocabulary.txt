@@ -1,0 +1,117 @@
+Reading names against the reviewed corpus.
+Vocabulary off is the shipped posture; on adds ClassificationConfig.conventional().
+
+What this measures is the verdict, and only reviewed scenarios are scored. A move
+in the candidates behind a verdict, or in its confidence, is not visible here, and
+neither is anything outside the corpus: the examples of the previous reactor are
+frozen and not wired to this one.
+
+profile1: damage 55, gain 0, unarbitrated 0, neither 0, indifferent 0 — over 47 scenario(s) whose reading moved
+  ClassificationConfigIntegrationTest-exclusionsAndExplicitsShouldWorkTogether
+    damage  com.example.OrderId: UNCLASSIFIED -> IDENTIFIER
+  ClassificationConfigIntegrationTest-generatedInterfacesShouldBeSkippedFromPortClassification
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ClassificationConfigIntegrationTest-multipleExclusionPatternsShouldAllBeApplied
+    damage  com.example.OrderCreatedEvent: UNCLASSIFIED -> DOMAIN_EVENT
+  ClassificationConfigIntegrationTest-nonGeneratedTypesShouldBeClassifiedNormally
+    damage  com.example.OrderId: UNCLASSIFIED -> IDENTIFIER
+  ClassificationContractTest-deterministicDecision
+    damage  com.example.Order: UNCLASSIFIED -> AGGREGATE_ROOT
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ClassificationContractTest-portClassificationDeterministic
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ClassificationContractTest-priorityDominatesConfidence
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ClassificationContractTest-singlePassClassifierDeterministic
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ClassificationGoldenFilesTest-createMinimalExample
+    damage  com.example.domain.Task: UNCLASSIFIED -> AGGREGATE_ROOT
+    damage  com.example.domain.TaskId: UNCLASSIFIED -> IDENTIFIER
+    damage  com.example.ports.out.TaskRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ClassificationIntegrationTest-namingCriteriaEvidence
+    damage  com.example.ProductId: UNCLASSIFIED -> IDENTIFIER
+  ClassificationIntegrationTest-orderRepositoryShouldBeRepositoryPort
+    damage  com.example.Order: UNCLASSIFIED -> AGGREGATE_ROOT
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ClassificationIntegrationTest-orderShouldBeAggregateRootWithoutConflicts
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ClassificationIntegrationTest-orderWithRepositoryShouldBeAggregateRoot
+    damage  com.example.Order: UNCLASSIFIED -> AGGREGATE_ROOT
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ClassificationIntegrationTest-repositoryDominantEvidence
+    damage  com.example.CustomerRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ConflictDetectionTest-explicitAnnotationShouldWinWithHighConfidence
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ConflictDetectionTest-explicitAnnotationWinsWhenRepositoryDominantAlsoMatches
+    damage  com.example.CustomerRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ConflictDetectionTest-interfaceWithoutMarkersIsUnclassified
+    damage  com.example.ports.in.CustomerRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ConflictDetectionTest-recordIdShouldBeIdentifier
+    damage  com.example.ProductId: UNCLASSIFIED -> IDENTIFIER
+  ConflictDetectionTest-repositoryDominantClassificationShouldSucceed
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  ConflictDetectionTest-repositoryDominantShouldClassifyAsAggregateRoot
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  DomainClassifierTest-classificationShouldBeDeterministic
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  DomainClassifierTest-higherPriorityShouldWin
+    damage  com.example.OrderId: UNCLASSIFIED -> IDENTIFIER
+  DomainClassifierTest-shouldClassifyRecordIdAsIdentifier
+    damage  com.example.OrderId: UNCLASSIFIED -> IDENTIFIER
+  DomainClassifierTest-shouldClassifyRepositoryDominantAsAggregateRoot
+    damage  com.example.Order: UNCLASSIFIED -> AGGREGATE_ROOT
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  DomainClassifierTest-shouldClassifySubclassWhenParentIsRepositoryManaged
+    damage  com.example.Order: UNCLASSIFIED -> AGGREGATE_ROOT
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  DomainClassifierTest-shouldClassifyWithWinner
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  DomainClassifierTest-shouldHandleInterfaceTypes
+    damage  com.example.OrderService: UNCLASSIFIED -> APPLICATION_SERVICE
+  DomainCriteriaTest-shouldMatchClassEndingWithEvent
+    damage  com.example.OrderCreatedEvent: UNCLASSIFIED -> DOMAIN_EVENT
+  DomainCriteriaTest-shouldMatchRecordWithSingleComponentAndIdSuffix
+    damage  com.example.OrderId: UNCLASSIFIED -> IDENTIFIER
+  DomainCriteriaTest-shouldMatchRecordWrappingUUID
+    damage  com.example.CustomerId: UNCLASSIFIED -> IDENTIFIER
+  DomainCriteriaTest-shouldMatchTypeUsedInRepositoryWithIdField
+    damage  com.example.Order: UNCLASSIFIED -> AGGREGATE_ROOT
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  DomainCriteriaTest-shouldNotMatchClass
+    damage  com.example.OrderId: UNCLASSIFIED -> IDENTIFIER
+  DomainCriteriaTest-shouldNotMatchClassNamedDomainEvent
+    damage  com.example.DomainEvent: UNCLASSIFIED -> DOMAIN_EVENT
+  DomainCriteriaTest-shouldNotMatchInterfaceEndingWithEvent
+    damage  com.example.ApplicationEvent: UNCLASSIFIED -> DOMAIN_EVENT
+  DomainCriteriaTest-shouldNotMatchRecordEndingWithId
+    damage  com.example.OrderId: UNCLASSIFIED -> IDENTIFIER
+  DomainCriteriaTest-shouldNotMatchTypeNotInRepository
+    damage  com.example.OrderService: UNCLASSIFIED -> APPLICATION_SERVICE
+  DomainCriteriaTest-shouldNotMatchTypeWithoutIdField
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  FlexibleApplicationServiceCriteriaTest-shouldNotMatchAbstractClass
+    damage  com.example.application.AbstractService: UNCLASSIFIED -> APPLICATION_SERVICE
+  FlexibleApplicationServiceCriteriaTest-shouldNotMatchInboundOnlyClass
+    damage  com.example.application.SimpleQueryHandler: UNCLASSIFIED -> QUERY_HANDLER
+  FlexibleApplicationServiceCriteriaTest-shouldNotMatchNonCoreAppClass
+    damage  com.example.application.PlainService: UNCLASSIFIED -> APPLICATION_SERVICE
+  PortClassifierTest-interfaceWithUseCaseSuffixShouldNotBeDriven
+    damage  com.example.PlaceOrderUseCase: UNCLASSIFIED -> DRIVING_PORT
+  PortClassifierTest-shouldHandleRecordTypes
+    damage  com.example.OrderId: UNCLASSIFIED -> IDENTIFIER
+  PortCriteriaTest-shouldMatchInterfaceImplementingSecondaryPort
+    damage  com.example.PaymentGateway: UNCLASSIFIED -> DRIVEN_PORT
+  PortCriteriaTest-shouldMatchInterfaceWithMethods
+    damage  com.example.ports.in.OrderUseCase: UNCLASSIFIED -> DRIVING_PORT
+  PortCriteriaTest-shouldNotMatchDomainEventInterface
+    damage  com.example.domain.shared.DomainEvent: UNCLASSIFIED -> DOMAIN_EVENT
+  PortCriteriaTest-shouldNotMatchInterfaceWithoutAnnotation
+    damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
+  PortCriteriaTest-shouldNotMatchMarkerInterface
+    damage  com.example.DomainEvent: UNCLASSIFIED -> DOMAIN_EVENT
+
+profile2: damage 0, gain 0, unarbitrated 0, neither 0, indifferent 0 — over 0 scenario(s) whose reading moved
+  nothing moved
+
+profile3: damage 0, gain 0, unarbitrated 0, neither 0, indifferent 0 — over 0 scenario(s) whose reading moved
+  nothing moved

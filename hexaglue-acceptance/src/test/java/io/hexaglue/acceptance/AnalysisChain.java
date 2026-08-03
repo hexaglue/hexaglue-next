@@ -44,18 +44,34 @@ import java.util.Optional;
 public final class AnalysisChain implements AnalysisRunner {
 
     /**
-     * Runs the chain and answers with the model.
+     * Runs the chain under the default posture and answers with the model.
      *
      * @param sources the root of the Java sources to read
      * @param basePackage the package the analysis is scoped to
      * @return the classified model
      */
     static ArchModel modelOf(Path sources, String basePackage) {
+        return modelOf(sources, basePackage, ClassificationConfig.defaults());
+    }
+
+    /**
+     * Runs the chain under a stated classification posture and answers with the model.
+     *
+     * <p>The posture is a parameter because one question about the engine can only be asked by
+     * running it twice: what reading names actually buys, measured by giving the same sources the
+     * vocabulary and then taking it away.</p>
+     *
+     * @param sources the root of the Java sources to read
+     * @param basePackage the package the analysis is scoped to
+     * @param classification what the user declares and what vocabulary they opt into
+     * @return the classified model
+     */
+    static ArchModel modelOf(Path sources, String basePackage, ClassificationConfig classification) {
         AnalysisScope scope = new AnalysisScope(Optional.of(basePackage), List.of(), List.of());
         CodeModel code = SpoonFrontend.analyze(
                 FrontendRequest.builder().sourceRoot(sources).scope(scope).build());
-        HexaGlueConfig config = new HexaGlueConfig(
-                scope, ClassificationConfig.defaults(), ValidationConfig.defaults(), GenerationConfig.defaults());
+        HexaGlueConfig config =
+                new HexaGlueConfig(scope, classification, ValidationConfig.defaults(), GenerationConfig.defaults());
         return Analysis.analyze(EngineContext.of(code, KnowledgePacks.embedded(), config));
     }
 

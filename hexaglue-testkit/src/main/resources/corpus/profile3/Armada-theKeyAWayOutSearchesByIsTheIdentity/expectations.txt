@@ -1,0 +1,24 @@
+# Armada-theKeyAWayOutSearchesByIsTheIdentity
+#
+# Authored for the profile with no vocabulary. Not one name here is a role: a yard, a hull, a
+# tag, a quartermaster. Nothing is annotated, nothing extends a framework, and no package
+# names a layer.
+
+# The hexagon still reads, because every verdict comes from a position. The interface is a
+# way out because a type that is not on the ring calls it and nobody inside implements it.
+# Its trade is keeping fleets — the signatures converge on one type, handed back and handed
+# in — so the type it keeps has a life of its own. The class holding it stands between the
+# outside and that way out, which is the application layer.
+#
+# The wrapper is the point of the scenario. A record around a single UUID reads, on its shape
+# alone, as either an identity or a value: two candidates and nothing between them. What
+# settles it is that the way out searches by it, and the method searching by it hands back the
+# fleet. No suffix was consulted, and none would have been available.
+#
+# The hull is what is left: kept by the aggregate, carrying no identity of its own, so a value.
+status: reviewed
+expect: com.acme.armada.yard.Fleets = DRIVEN_PORT
+expect: com.acme.armada.yard.Quartermaster = APPLICATION_SERVICE
+expect: com.acme.armada.yard.Fleet = AGGREGATE_ROOT
+expect: com.acme.armada.yard.FleetTag = IDENTIFIER
+expect: com.acme.armada.yard.Hull = VALUE_OBJECT

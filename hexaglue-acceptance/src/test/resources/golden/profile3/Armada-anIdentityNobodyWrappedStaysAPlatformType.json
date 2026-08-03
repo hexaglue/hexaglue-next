@@ -1,0 +1,50 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.acme.armada.dock.Convoy",
+      "kind": "AGGREGATE_ROOT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "identity": null,
+      "entities": [],
+      "valueObjects": [],
+      "domainEvents": [],
+      "drivenPort": "com.acme.armada.dock.Convoys",
+      "properties": [
+        {
+          "name": "route",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "tag",
+          "type": "java.util.UUID",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [
+    {
+      "qualifiedName": "com.acme.armada.dock.Harbourmaster",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
+    {
+      "qualifiedName": "com.acme.armada.dock.Convoys",
+      "direction": "DRIVEN",
+      "portType": "REPOSITORY",
+      "managedAggregate": "com.acme.armada.dock.Convoy",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["all", "find", "keep"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": []
+}

@@ -1,0 +1,17 @@
+# Armada-whatTheCoreAnnouncesIsAnEvent
+#
+# A one-way contract, and the immutable news the core hands it. Nothing is called an event,
+# a publisher or a listener.
+
+# What the interface is for is read from the shape of its signatures: one method, returning
+# nothing, taking a type of the application that cannot be changed once made. A way out that
+# only ever accepts and never answers is announcing rather than storing or asking, and what
+# it is handed is therefore news about the domain.
+#
+# The counter-case lives elsewhere in the corpus and matters here: a marker interface, with no
+# caller and no method, announces nothing and stays undecided. Being immutable is not enough
+# to be news; being handed to something whose whole trade is one-way is.
+status: reviewed
+expect: com.acme.armada.yard.Trumpets = DRIVEN_PORT
+expect: com.acme.armada.yard.FleetLaunched = DOMAIN_EVENT
+expect: com.acme.armada.yard.Herald = APPLICATION_SERVICE

@@ -1,0 +1,47 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.acme.armada.yard.FleetLaunched",
+      "kind": "DOMAIN_EVENT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "identity": null,
+      "sourceAggregate": null,
+      "properties": [
+        {
+          "name": "designation",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "when",
+          "type": "java.time.Instant",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [
+    {
+      "qualifiedName": "com.acme.armada.yard.Herald",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
+    {
+      "qualifiedName": "com.acme.armada.yard.Trumpets",
+      "direction": "DRIVEN",
+      "portType": "EVENT_PUBLISHER",
+      "managedAggregate": null,
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["sound"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": []
+}

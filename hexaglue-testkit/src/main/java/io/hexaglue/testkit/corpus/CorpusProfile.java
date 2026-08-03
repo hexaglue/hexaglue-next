@@ -37,7 +37,14 @@ public enum CorpusProfile {
      * coupled to its storage, and the engine has to read the roles as if the mapping were not
      * there — and report the coupling separately.
      */
-    PROFILE_2("profile2");
+    PROFILE_2("profile2"),
+
+    /**
+     * An application with no naming convention to lean on: no suffix that names a role, no package
+     * that names a layer, identifiers held as bare platform types or as wrappers nothing but a
+     * lookup can tell from a value. What is left to read is position, which is the whole claim.
+     */
+    PROFILE_3("profile3");
 
     private final String directory;
 

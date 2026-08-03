@@ -1,0 +1,19 @@
+# Armada-aNameThatPointsTheWrongWayIsNotRead
+#
+# Two names pointing the wrong way: a class whose suffix promises a store, and an interface
+# that is one without saying so.
+
+# The interface carries no word a reader could lean on, and lands as a way out anyway,
+# because a type of the core calls it and nobody inside implements it. Its trade is neither
+# keeping one type nor announcing — its signatures answer as much as they accept — so it is
+# the general case, a way out to something else.
+#
+# The class named after a store is read by what it is, which is a final field with a reader in
+# front of it: a wrapper, and a wrapper alone cannot say whether it is an identity or a value.
+# Two readings stand with nothing between them, and the report says so instead of picking the
+# one its name suggests. That is the whole scenario: the suffix is not evidence, and being
+# unable to decide is stated rather than papered over.
+status: reviewed
+expect: com.acme.armada.log.Bookkeeping = DRIVEN_PORT
+expect: com.acme.armada.log.Ledger = APPLICATION_SERVICE
+expect: com.acme.armada.log.FleetRepository = UNCLASSIFIED

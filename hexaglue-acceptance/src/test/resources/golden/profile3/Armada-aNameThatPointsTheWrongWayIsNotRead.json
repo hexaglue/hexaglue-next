@@ -1,0 +1,31 @@
+{
+  "domain": [],
+  "application": [
+    {
+      "qualifiedName": "com.acme.armada.log.Ledger",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
+    {
+      "qualifiedName": "com.acme.armada.log.Bookkeeping",
+      "direction": "DRIVEN",
+      "portType": "GATEWAY",
+      "managedAggregate": null,
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["read", "write"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": [
+    {
+      "qualifiedName": "com.acme.armada.log.FleetRepository",
+      "category": "AMBIGUOUS",
+      "reason": "two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT"
+    }
+  ]
+}

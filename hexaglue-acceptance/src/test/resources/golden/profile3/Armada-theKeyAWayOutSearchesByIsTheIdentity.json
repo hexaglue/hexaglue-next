@@ -1,0 +1,93 @@
+{
+  "domain": [
+    {
+      "qualifiedName": "com.acme.armada.yard.Fleet",
+      "kind": "AGGREGATE_ROOT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "identity": {
+        "field": "tag",
+        "type": "com.acme.armada.yard.FleetTag",
+        "effectiveType": "java.util.UUID"
+      },
+      "entities": [],
+      "valueObjects": ["com.acme.armada.yard.Hull"],
+      "domainEvents": [],
+      "drivenPort": "com.acme.armada.yard.Fleets",
+      "properties": [
+        {
+          "name": "hulls",
+          "type": "java.util.List",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "tag",
+          "type": "com.acme.armada.yard.FleetTag",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "yard",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.acme.armada.yard.FleetTag",
+      "kind": "IDENTIFIER",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "wrappedType": "java.util.UUID",
+      "properties": [
+        {
+          "name": "value",
+          "type": "java.util.UUID",
+          "cardinality": "SINGLE"
+        }
+      ]
+    },
+    {
+      "qualifiedName": "com.acme.armada.yard.Hull",
+      "kind": "VALUE_OBJECT",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "RECORD",
+      "properties": [
+        {
+          "name": "berths",
+          "type": "int",
+          "cardinality": "SINGLE"
+        },
+        {
+          "name": "designation",
+          "type": "java.lang.String",
+          "cardinality": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "application": [
+    {
+      "qualifiedName": "com.acme.armada.yard.Quartermaster",
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
+    {
+      "qualifiedName": "com.acme.armada.yard.Fleets",
+      "direction": "DRIVEN",
+      "portType": "REPOSITORY",
+      "managedAggregate": "com.acme.armada.yard.Fleet",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["all", "find", "keep"]
+    }
+  ],
+  "adapters": [],
+  "unclassified": []
+}

@@ -1,0 +1,3 @@
+com/acme/armada/yard/FleetLaunched.java
+com/acme/armada/yard/Trumpets.java
+com/acme/armada/yard/Herald.java

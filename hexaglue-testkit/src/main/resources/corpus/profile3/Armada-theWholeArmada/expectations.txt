@@ -1,0 +1,33 @@
+# Armada-theWholeArmada
+#
+# Ten types, four waves, and not one name that says what anything is. A yard, a dock, a gate;
+# a quartermaster, a locker, some trumpets. The only framework symbols in the whole scenario
+# are the two that place the ring: what answers HTTP, and what talks to a database.
+
+# Both sides of the hexagon read, and each side reads from the other. The controller is on the
+# ring because the framework calls it; the locker is on the ring because it holds a database
+# client. The contract the controller holds is a way in, since the core implements it and the
+# ring calls it. The contract the core calls is a way out, since nothing inside implements it —
+# what does implement it turned out to be on the ring, which is what allows the reading. The
+# class implementing the one and calling the others is the application layer, and it is the
+# only thing standing between them.
+#
+# The domain follows from the ways out. What the storing one keeps has a life of its own; the
+# key it searches by is that life's identity, which settles a duel that a record around a UUID
+# could not settle alone; what the aggregate is made of and carries no identity is a value;
+# what the one-way contract is handed is news.
+#
+# One limit is visible in the snapshot rather than in the claims: both operations of the way in
+# are recorded as questions, including the one that assembles a fleet. Telling a command from a
+# query is not something the shape of a signature can do, and no name here offers to help.
+status: reviewed
+expect: com.acme.armada.gate.Gate = DRIVING_ADAPTER
+expect: com.acme.armada.dock.Locker = DRIVEN_ADAPTER
+expect: com.acme.armada.yard.Boarding = DRIVING_PORT
+expect: com.acme.armada.yard.Fleets = DRIVEN_PORT
+expect: com.acme.armada.yard.Trumpets = DRIVEN_PORT
+expect: com.acme.armada.yard.Quartermaster = APPLICATION_SERVICE
+expect: com.acme.armada.yard.Fleet = AGGREGATE_ROOT
+expect: com.acme.armada.yard.FleetTag = IDENTIFIER
+expect: com.acme.armada.yard.Hull = VALUE_OBJECT
+expect: com.acme.armada.yard.FleetLaunched = DOMAIN_EVENT

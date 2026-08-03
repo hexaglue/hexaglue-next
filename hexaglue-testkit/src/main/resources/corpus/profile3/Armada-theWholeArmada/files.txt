@@ -1,0 +1,10 @@
+com/acme/armada/yard/FleetTag.java
+com/acme/armada/yard/Hull.java
+com/acme/armada/yard/Fleet.java
+com/acme/armada/yard/FleetLaunched.java
+com/acme/armada/yard/Fleets.java
+com/acme/armada/yard/Trumpets.java
+com/acme/armada/yard/Boarding.java
+com/acme/armada/yard/Quartermaster.java
+com/acme/armada/dock/Locker.java
+com/acme/armada/gate/Gate.java

@@ -1,0 +1,19 @@
+# Armada-anIdentityNobodyWrappedStaysAPlatformType
+#
+# The same shape as the scenario next door, with the wrapper taken away: the convoy is found
+# by a bare java.util.UUID.
+
+# Everything above the identity is unchanged — the interface is still a way out, the type it
+# keeps still has a life of its own, the class holding it is still the application layer.
+# What disappears is the verdict on the key, and only that: java.util.UUID is not a type of
+# this application, so there is nothing here to give a verdict to.
+#
+# This is the honest shape of the limit rather than a gap: an aggregate found by a platform
+# type is a perfectly ordinary application, and the report says what it can say about it. The
+# claim below states the absence itself, so that a future rule inventing a verdict for
+# java.util.UUID would be caught here.
+status: reviewed
+expect: com.acme.armada.dock.Convoys = DRIVEN_PORT
+expect: com.acme.armada.dock.Harbourmaster = APPLICATION_SERVICE
+expect: com.acme.armada.dock.Convoy = AGGREGATE_ROOT
+expect: java.util.UUID = NO VERDICT

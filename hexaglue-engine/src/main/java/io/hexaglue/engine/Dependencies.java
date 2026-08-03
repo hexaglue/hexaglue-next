@@ -14,12 +14,14 @@
 package io.hexaglue.engine;
 
 import io.hexaglue.model.Modifier;
+import io.hexaglue.model.TypeId;
 import io.hexaglue.model.TypeNature;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.Edge;
 import io.hexaglue.model.code.EdgeKind;
 import io.hexaglue.model.code.TypeNode;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +29,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.connectivity.GabowStrongConnectivityInspector;
 import org.jgrapht.graph.DefaultEdge;
@@ -69,14 +72,21 @@ public final class Dependencies {
 
     private final Map<String, Set<String>> outgoing;
     private final Map<String, Set<String>> incoming;
+    private final Map<TypeId, Set<TypeId>> usedByType;
+    private final Map<TypeId, Set<TypeId>> usersOfType;
     private final Map<String, Stability> stabilities;
     private final List<List<String>> cycles;
 
     private Dependencies(
-            Map<String, Set<String>> dependencies, Map<String, Integer> types, Map<String, Integer> abstractTypes) {
+            Map<String, Set<String>> dependencies,
+            Map<TypeId, Set<TypeId>> references,
+            Map<String, Integer> types,
+            Map<String, Integer> abstractTypes) {
         this.outgoing = dependencies;
         this.incoming = reverse(dependencies);
-        this.cycles = cyclesOf(dependencies);
+        this.usedByType = references;
+        this.usersOfType = reverse(references);
+        this.cycles = knotsOf(dependencies);
         this.stabilities = measure(dependencies, this.incoming, types, abstractTypes);
     }
 
@@ -100,49 +110,54 @@ public final class Dependencies {
 
         Map<String, Set<String>> dependencies = new TreeMap<>();
         types.keySet().forEach(name -> dependencies.put(name, new TreeSet<>()));
+        Map<TypeId, Set<TypeId>> references = new TreeMap<>();
+        perimeter.types().forEach(node -> references.put(node.id(), new TreeSet<>()));
         for (Edge edge : code.edges()) {
             if (!COUPLING.contains(edge.kind())
                     || !perimeter.contains(edge.source())
-                    || !perimeter.contains(edge.target())) {
+                    || !perimeter.contains(edge.target())
+                    || edge.source().equals(edge.target())) {
                 continue;
             }
+            references.computeIfAbsent(edge.source(), id -> new TreeSet<>()).add(edge.target());
             String from = edge.source().packageName();
             String to = edge.target().packageName();
             if (!from.equals(to)) {
                 dependencies.computeIfAbsent(from, name -> new TreeSet<>()).add(to);
             }
         }
-        return new Dependencies(dependencies, types, abstractTypes);
+        return new Dependencies(dependencies, references, types, abstractTypes);
     }
 
     private static boolean isAbstract(TypeNode node) {
         return node.nature() == TypeNature.INTERFACE || node.modifiers().contains(Modifier.ABSTRACT);
     }
 
-    private static Map<String, Set<String>> reverse(Map<String, Set<String>> dependencies) {
-        Map<String, Set<String>> dependents = new TreeMap<>();
-        dependencies.keySet().forEach(name -> dependents.put(name, new TreeSet<>()));
-        dependencies.forEach((from, targets) -> targets.forEach(
-                to -> dependents.computeIfAbsent(to, name -> new TreeSet<>()).add(from)));
-        return dependents;
+    private static <T extends Comparable<T>> Map<T, Set<T>> reverse(Map<T, Set<T>> forward) {
+        Map<T, Set<T>> backward = new TreeMap<>();
+        forward.keySet().forEach(node -> backward.put(node, new TreeSet<>()));
+        forward.forEach((from, targets) -> targets.forEach(
+                to -> backward.computeIfAbsent(to, node -> new TreeSet<>()).add(from)));
+        return backward;
     }
 
     /**
-     * A knot of packages that reach each other is one fact, not one fact per path through it —
-     * which is what a strongly connected component gives and what walking every path does not.
+     * A knot of nodes that reach each other is one fact, not one fact per path through it — which
+     * is what a strongly connected component gives and what walking every path does not.
+     *
+     * <p>The same reading answers for packages and for any set of types, so there is one of it.</p>
      */
-    private static List<List<String>> cyclesOf(Map<String, Set<String>> dependencies) {
-        Graph<String, DefaultEdge> graph = new SimpleDirectedGraph<>(DefaultEdge.class);
-        dependencies.keySet().forEach(graph::addVertex);
-        dependencies.forEach((from, targets) -> targets.forEach(to -> graph.addEdge(from, to)));
-        List<List<String>> cycles = new ArrayList<>();
-        new GabowStrongConnectivityInspector<>(graph)
+    private static <T extends Comparable<T>> List<List<T>> knotsOf(Map<T, Set<T>> edges) {
+        Graph<T, DefaultEdge> graph = new SimpleDirectedGraph<>(DefaultEdge.class);
+        edges.keySet().forEach(graph::addVertex);
+        edges.forEach((from, targets) ->
+                targets.stream().filter(graph::containsVertex).forEach(to -> graph.addEdge(from, to)));
+        return new GabowStrongConnectivityInspector<>(graph)
                 .stronglyConnectedSets().stream()
                         .filter(component -> component.size() > 1)
                         .map(component -> List.copyOf(new TreeSet<>(component)))
                         .sorted((left, right) -> left.get(0).compareTo(right.get(0)))
-                        .forEach(cycles::add);
-        return List.copyOf(cycles);
+                        .toList();
     }
 
     private static Map<String, Stability> measure(
@@ -198,6 +213,48 @@ public final class Dependencies {
      */
     public List<List<String>> cycles() {
         return List.copyOf(cycles);
+    }
+
+    /**
+     * Returns the types one type names — in a supertype, a field, a signature or a call.
+     *
+     * @param type the type
+     * @return what it uses, in identity order
+     */
+    public List<TypeId> usedBy(TypeId type) {
+        return List.copyOf(usedByType.getOrDefault(type, Set.of()));
+    }
+
+    /**
+     * Returns the types that name one type.
+     *
+     * @param type the type
+     * @return what uses it, in identity order
+     */
+    public List<TypeId> usersOf(TypeId type) {
+        return List.copyOf(usersOfType.getOrDefault(type, Set.of()));
+    }
+
+    /**
+     * Returns the knots inside a chosen set of types, each knot once.
+     *
+     * <p>Only the references between the chosen types count: asking about the aggregate roots says
+     * whether the aggregates depend on each other in a circle, whatever the types between them
+     * do.</p>
+     *
+     * @param types the types to look among
+     * @return the knots, types in identity order and knots in the order of their first type
+     */
+    public List<List<TypeId>> knotsAmong(Collection<TypeId> types) {
+        Objects.requireNonNull(types, "types must not be null");
+        Set<TypeId> chosen = new TreeSet<>(types);
+        Map<TypeId, Set<TypeId>> induced = new TreeMap<>();
+        chosen.forEach(type -> induced.put(
+                type,
+                usedByType.getOrDefault(type, Set.of()).stream()
+                        .filter(chosen::contains)
+                        .collect(Collectors.toCollection(TreeSet::new))));
+        return knotsOf(induced);
     }
 
     /**

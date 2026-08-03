@@ -13,7 +13,10 @@
 
 package io.hexaglue.engine;
 
+import io.hexaglue.engine.finding.Findings;
+import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.finding.Diagnostic;
+import io.hexaglue.model.finding.Finding;
 import io.hexaglue.model.finding.DiagnosticSeverity;
 import io.hexaglue.model.finding.IssueCode;
 import java.util.ArrayList;
@@ -62,7 +65,12 @@ public final class Analysis {
         Objects.requireNonNull(context, "context must not be null");
         Verdicts verdicts = Classifier.classify(rules, context);
         FactBase facts = Saturation.saturate(rules, context.withVerdicts(verdicts));
-        return new AnalysisResult(Assembly.assemble(context, facts, verdicts), leftUnclassified(context));
+        ArchModel model = Assembly.assemble(context, facts, verdicts);
+        List<Finding> findings = Findings.of(
+                model,
+                Dependencies.of(context.code(), context.perimeter()),
+                context.config().classification());
+        return new AnalysisResult(model, findings, leftUnclassified(context));
     }
 
     /**

@@ -15,6 +15,7 @@ package io.hexaglue.engine;
 
 import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.finding.Diagnostic;
+import io.hexaglue.model.finding.Finding;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,18 +32,26 @@ import java.util.Objects;
  * <p>A diagnostic is never a verdict: no rule consumes this list, and the model is exactly what it
  * would have been without it.</p>
  *
+ * <p>The findings travel with the model for the same reason the diagnostics do: they are what this
+ * run concluded, and the two things that consume them — the gate that fails a build and the report
+ * that explains it — must be looking at the same list. A judgement computed twice is a judgement
+ * that will differ once.</p>
+ *
  * @param model the classified model, one entry per type of the perimeter
+ * @param findings what the checks made of that model, in a stable order
  * @param diagnostics what was read and not classified, in type order
  * @since 7.0.0
  */
-public record AnalysisResult(ArchModel model, List<Diagnostic> diagnostics) {
+public record AnalysisResult(ArchModel model, List<Finding> findings, List<Diagnostic> diagnostics) {
 
     /**
-     * Validates both components and copies the diagnostics.
+     * Validates every component and copies the lists.
      */
     public AnalysisResult {
         Objects.requireNonNull(model, "model must not be null");
+        Objects.requireNonNull(findings, "findings must not be null");
         Objects.requireNonNull(diagnostics, "diagnostics must not be null");
+        findings = List.copyOf(findings);
         diagnostics = List.copyOf(diagnostics);
     }
 }

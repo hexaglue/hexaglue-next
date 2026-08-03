@@ -20,6 +20,8 @@ import io.hexaglue.model.classification.Basis;
 import io.hexaglue.model.classification.Candidate;
 import io.hexaglue.model.classification.Classification;
 import io.hexaglue.model.config.ValidationConfig;
+import io.hexaglue.model.finding.Finding;
+import io.hexaglue.model.finding.Severity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -33,8 +35,10 @@ import java.util.Objects;
  * classification of every analyzed type, ports included — a boundary the analysis is unsure about
  * is exactly the kind of uncertainty a build wants to hear about.</p>
  *
- * <p>Only the classification is read: the per-code thresholds of the configuration apply to audit
- * findings, which this analysis does not produce.</p>
+ * <p>Findings are held to the same place. A code the configuration arms is a code that refuses the
+ * build once a finding of it reaches the stated severity; a code nobody armed says nothing,
+ * whatever it found. That is one mechanism, not two: the same judgement the report displays is the
+ * one that fails a build, so a build cannot pass while its report condemns it.</p>
  *
  * <p>A refusal carries the type it is about rather than a copy of what to do next, so a host that
  * wants to say more can explain that very type — and the remediation it prints is the one the
@@ -61,7 +65,20 @@ public record Validation(List<Refusal> refusals) {
      * @return the refusals, empty when the model passed
      */
     public static Validation of(ArchModel model, ValidationConfig gates) {
+        return of(model, List.of(), gates);
+    }
+
+    /**
+     * Holds a classified model and what the checks made of it to the configured gates.
+     *
+     * @param model the classified model
+     * @param findings what the checks found
+     * @param gates the conditions the model is held to
+     * @return the refusals, empty when the model passed
+     */
+    public static Validation of(ArchModel model, List<Finding> findings, ValidationConfig gates) {
         Objects.requireNonNull(model, "model must not be null");
+        Objects.requireNonNull(findings, "findings must not be null");
         Objects.requireNonNull(gates, "gates must not be null");
         List<Refusal> refusals = new ArrayList<>();
         for (ArchType type : model.types()) {
@@ -82,7 +99,32 @@ public record Validation(List<Refusal> refusals) {
                 refusals.add(new Refusal(type, Gate.INFERRED, "the kind was deduced, not stated by the sources"));
             }
         }
+        refusals.addAll(refused(model, findings, gates));
         return new Validation(refusals);
+    }
+
+    /**
+     * A finding refuses a build only where the configuration armed its code, and only once it
+     * reaches the severity stated there. Everything else it found is for the report to show.
+     *
+     * <p>The reason carries the finding's own words rather than a sentence about findings in
+     * general: a build that stops has to say what it stopped on, and the check that found it
+     * already wrote that down.</p>
+     */
+    private static List<Refusal> refused(ArchModel model, List<Finding> findings, ValidationConfig gates) {
+        List<Refusal> refusals = new ArrayList<>();
+        for (Finding finding : findings) {
+            Severity threshold = gates.findingThresholds().get(finding.code());
+            if (threshold == null || !finding.severity().isAtLeast(threshold)) {
+                continue;
+            }
+            model.type(finding.subject())
+                    .ifPresent(subject -> refusals.add(new Refusal(
+                            subject,
+                            Gate.FINDING,
+                            finding.code().value() + " (" + finding.severity() + "): " + finding.message())));
+        }
+        return refusals;
     }
 
     /**

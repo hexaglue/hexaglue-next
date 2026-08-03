@@ -23,6 +23,7 @@ import io.hexaglue.knowledge.KnowledgePacks;
 import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.config.HexaGlueConfig;
 import io.hexaglue.model.finding.Diagnostic;
+import io.hexaglue.model.finding.Finding;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -56,25 +57,33 @@ final class ProjectAnalysis {
         ArchModel model = analysed.model();
         List<Diagnostic> diagnostics = new ArrayList<>(read.diagnostics());
         diagnostics.addAll(analysed.diagnostics());
-        return new Result(model, diagnostics, Validation.of(model, config.validation()));
+        return new Result(
+                model,
+                analysed.findings(),
+                diagnostics,
+                Validation.of(model, analysed.findings(), config.validation()));
     }
 
     /**
      * What one run produced.
      *
      * @param model the classified model
+     * @param findings what the checks made of it
      * @param diagnostics what was left out, by the reading then by the perimeter of the verdicts
-     * @param validation what the gates made of the model
+     * @param validation what the gates made of the model and of the findings
      */
-    record Result(ArchModel model, List<Diagnostic> diagnostics, Validation validation) {
+    record Result(
+            ArchModel model, List<Finding> findings, List<Diagnostic> diagnostics, Validation validation) {
 
         /**
          * Validates and copies the components.
          */
         Result {
             Objects.requireNonNull(model, "model must not be null");
+            Objects.requireNonNull(findings, "findings must not be null");
             Objects.requireNonNull(diagnostics, "diagnostics must not be null");
             Objects.requireNonNull(validation, "validation must not be null");
+            findings = List.copyOf(findings);
             diagnostics = List.copyOf(diagnostics);
         }
     }

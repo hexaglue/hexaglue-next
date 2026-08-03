@@ -34,5 +34,19 @@ public enum Severity {
     MINOR,
 
     /** Informational only, no action required. */
-    INFO
+    INFO;
+
+    /**
+     * Returns whether this severity is at least as serious as the given one.
+     *
+     * <p>Declaration order runs from the most serious down, so "at least" reads the enum the other
+     * way round — which is exactly the sort of thing a caller gets wrong once and never notices.
+     * There is one of these, and every gate uses it.</p>
+     *
+     * @param threshold the severity to compare against
+     * @return true when this severity is the threshold or worse
+     */
+    public boolean isAtLeast(Severity threshold) {
+        return ordinal() <= threshold.ordinal();
+    }
 }

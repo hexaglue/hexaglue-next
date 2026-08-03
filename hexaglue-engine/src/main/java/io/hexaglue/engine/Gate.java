@@ -20,7 +20,9 @@ package io.hexaglue.engine;
  *
  * <p>The declaration order is the order refusals are reported in, from the type having no kind at
  * all to the kind being deduced rather than stated: what a reader should look at first comes
- * first.</p>
+ * first. The last one is about the architecture rather than about the reading of it, and comes
+ * last for that reason — a model nobody could classify is worth hearing about before a model that
+ * was classified and found wanting.</p>
  *
  * @since 7.0.0
  */
@@ -36,5 +38,8 @@ public enum Gate {
     AMBIGUOUS,
 
     /** The kind was deduced where the configuration requires the sources to state it. */
-    INFERRED
+    INFERRED,
+
+    /** An audit finding reached the severity the configuration arms its code at. */
+    FINDING
 }

@@ -14,7 +14,6 @@
 package io.hexaglue.maven;
 
 import io.hexaglue.model.config.HexaGlueConfig;
-import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.spi.HexaGluePlugin;
 import io.hexaglue.spi.PluginDiscovery;
 import io.hexaglue.spi.PluginRun;
@@ -121,13 +120,11 @@ public class ReactorReportMojo extends AbstractMojo {
             log.info("HexaGlue found no backend on the classpath; nothing to report");
             return;
         }
-        List<MavenProject> modules = session.getProjects();
-        log.info("HexaGlue is reading " + modules.size() + " module(s) of the reactor as one");
-
-        ProjectAnalysis.Result analysed = ProjectAnalysis.runReactor(modules, config);
-        say(analysed.diagnostics(), log);
+        log.info("HexaGlue is reading the whole reactor as one analysis");
+        ProjectAnalysis.Result analysed = ProjectAnalysis.runReactor(session.getProjects(), config);
+        Diagnostics.report(analysed.diagnostics(), log);
         log.info("HexaGlue laid out " + analysed.model().moduleTopology().size()
-                + " module(s) of it, being the ones with a declared role");
+                + " module(s) of it, being the ones whose role the project declares");
         PluginRun run = ProjectAnalysis.contribute(analysed, plugins, options);
 
         Path output = output(reactor);
@@ -144,19 +141,5 @@ public class ReactorReportMojo extends AbstractMojo {
             return Path.of(reactor.getBuild().getDirectory(), DEFAULT_OUTPUT);
         }
         return Path.of(reportDirectory);
-    }
-
-    /**
-     * Says what the reading and the classification left out. On a reactor this is where a module
-     * whose role nobody declared gets named: the layout of the build is what the aggregated report
-     * is written against, and a module missing from it silently would make the report look complete.
-     */
-    private static void say(List<Diagnostic> diagnostics, Log log) {
-        for (Diagnostic diagnostic : diagnostics) {
-            switch (diagnostic.severity()) {
-                case ERROR, WARNING -> log.warn(diagnostic.code().value() + ": " + diagnostic.message());
-                default -> log.debug(diagnostic.code().value() + ": " + diagnostic.message());
-            }
-        }
     }
 }

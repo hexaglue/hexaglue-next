@@ -1,8 +1,9 @@
 def log = new File(basedir, 'build.log').text
 def output = new File(basedir, 'target/hexaglue')
 
-assert log.contains('module(s) of the reactor as one') : 'the goal should say it read the reactor in one pass: ' + log
-assert log.count('module(s) of the reactor as one') == 1 : 'the reactor should be read once, not once per module: ' + log
+assert log.contains('reading the whole reactor as one analysis') : 'the goal should say it read the reactor in one pass: ' + log
+assert log.count('reading the whole reactor as one analysis') == 1 : 'the reactor should be read once, not once per module: ' + log
+assert log.contains('laid out 2 module(s)') : 'the goal should say how many modules it could lay out: ' + log
 
 def audit = new File(output, 'report/architecture-audit.md')
 assert audit.exists() : 'one report should be written for the whole reactor: ' + output.list()

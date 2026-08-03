@@ -100,6 +100,7 @@ public class ReportMojo extends AbstractMojo {
             return;
         }
         ProjectAnalysis.Result analysed = ProjectAnalysis.run(project, config);
+        Diagnostics.report(analysed.diagnostics(), log);
         PluginRun run = ProjectAnalysis.contribute(analysed, plugins, options);
 
         Documents.report(run, log);

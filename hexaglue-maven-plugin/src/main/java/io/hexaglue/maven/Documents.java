@@ -13,7 +13,6 @@
 
 package io.hexaglue.maven;
 
-import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.spi.Document;
 import io.hexaglue.spi.PluginRun;
 import java.io.IOException;
@@ -46,9 +45,7 @@ final class Documents {
      */
     static void report(PluginRun run, Log log) {
         Objects.requireNonNull(run, "run must not be null");
-        for (Diagnostic diagnostic : run.diagnostics()) {
-            log.warn(diagnostic.code().value() + ": " + diagnostic.message());
-        }
+        Diagnostics.report(run.diagnostics(), log);
         if (!run.skipped().isEmpty()) {
             log.warn("HexaGlue skipped " + String.join(", ", run.skipped()));
         }

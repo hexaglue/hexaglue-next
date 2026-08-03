@@ -19,9 +19,6 @@ import io.hexaglue.engine.Validation;
 import io.hexaglue.model.config.AnalysisScope;
 import io.hexaglue.model.config.HexaGlueConfig;
 import io.hexaglue.model.config.ValidationConfig;
-import io.hexaglue.model.finding.Diagnostic;
-import io.hexaglue.model.finding.DiagnosticSeverity;
-import java.util.List;
 import java.util.Optional;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
@@ -91,7 +88,7 @@ public class ValidateMojo extends AbstractMojo {
         HexaGlueConfig stated = ConfigLoader.read(project.getBasedir().toPath());
         ProjectAnalysis.Result result =
                 ProjectAnalysis.run(project, configuration(stated, basePackage, failOnUnclassified));
-        report(result.diagnostics());
+        Diagnostics.report(result.diagnostics(), log);
         Explanation.of(Outcome.of(result.model())).forEach(log::info);
 
         Validation validation = result.validation();
@@ -149,27 +146,5 @@ public class ValidateMojo extends AbstractMojo {
                 .orElseGet(stated::analysis);
         return new HexaGlueConfig(
                 scope, stated.classification(), stated.validation(), stated.generation(), stated.modules());
-    }
-
-    /**
-     * Says what the reading left out.
-     *
-     * <p>A degraded reading is said once and plainly, because it is rare and it explains wrong
-     * verdicts. What was deliberately left out is counted rather than listed: a perimeter doing its
-     * job leaves out most of a code base, and a build log burying its own conclusions under
-     * thousands of expected exclusions says less than one that offers them on request.</p>
-     */
-    private void report(List<Diagnostic> diagnostics) {
-        Log log = getLog();
-        long expected = diagnostics.stream()
-                .filter(diagnostic -> diagnostic.severity() == DiagnosticSeverity.INFO)
-                .count();
-        diagnostics.stream()
-                .filter(diagnostic -> diagnostic.severity() != DiagnosticSeverity.INFO)
-                .forEach(diagnostic -> log.warn(diagnostic.code() + ": " + diagnostic.message()));
-        if (expected > 0) {
-            log.info(expected + " type(s) were not analysed; run with -X to see which and why");
-        }
-        diagnostics.forEach(diagnostic -> log.debug(diagnostic.code() + ": " + diagnostic.message()));
     }
 }

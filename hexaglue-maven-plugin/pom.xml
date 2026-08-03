@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.hexaglue</groupId>
+        <artifactId>hexaglue-parent</artifactId>
+        <version>7.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>hexaglue-maven-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+
+    <name>HexaGlue Maven Plugin</name>
+    <description>The build host: reads the project's sources and configuration, runs the analysis, applies the validation gates and logs what the engine concluded. The only module that sees Maven.</description>
+
+    <properties>
+        <hexaglue.root>${project.basedir}/..</hexaglue.root>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-frontend</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-knowledge</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-engine</artifactId>
+        </dependency>
+        <!-- Reads hexaglue.yaml. The binding on top of it is strict: an unknown key
+             is an error, so a mistyped configuration fails the build instead of
+             silently applying a default nobody asked for. -->
+        <dependency>
+            <groupId>org.snakeyaml</groupId>
+            <artifactId>snakeyaml-engine</artifactId>
+        </dependency>
+
+        <!-- The Maven APIs, allowed here and only here. -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugin-tools</groupId>
+            <artifactId>maven-plugin-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
+                        <arg>--should-stop=ifError=FLOW</arg>
+                        <!-- A goal's parameters are fields the build injects before the goal
+                             runs, so they are initialized outside any constructor this module
+                             writes. Everything else stays under the reactor-wide nullness
+                             analysis. -->
+                        <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/generated-(test-)?sources/.* -Xep:NullAway:ERROR -XepOpt:NullAway:AnnotatedPackages=io.hexaglue -XepOpt:NullAway:JSpecifyMode=true -XepOpt:NullAway:ExcludedFieldAnnotations=org.apache.maven.plugins.annotations.Parameter</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>${maven-plugin-plugin.version}</version>
+                <configuration>
+                    <goalPrefix>hexaglue</goalPrefix>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>check</id>
+                        <configuration>
+                            <!-- A goal class is the seam between the build and the analysis:
+                                 parameters in, log lines and an exit condition out. What it does
+                                 is proven by running an actual build, which the integration
+                                 tests do; a unit test standing in for one would only prove that
+                                 the adapter calls a logger. Everything the goal delegates to is
+                                 held to the reactor's coverage floor like any other code. -->
+                            <excludes>
+                                <exclude>io/hexaglue/maven/*Mojo.class</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <!-- Overrides the reactor-wide ban: the Maven APIs are allowed here,
+                         and only here. -->
+                    <execution>
+                        <id>enforce-module-boundaries</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>org.projectlombok:lombok</exclude>
+                                    </excludes>
+                                    <message>Module boundary violation: Lombok is allowed nowhere.</message>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                    <!-- The parser reaches this module transitively, because the host is what
+                         runs the frontend. What the boundary actually forbids is this module
+                         parsing anything itself, so what is checked here is that it does not
+                         declare the parser: it hands over source roots and a classpath, and
+                         receives a code model. -->
+                    <execution>
+                        <id>enforce-parser-not-declared</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <searchTransitive>false</searchTransitive>
+                                    <excludes>
+                                        <exclude>fr.inria.gforge.spoon:*</exclude>
+                                    </excludes>
+                                    <message>Module boundary violation: the host must not declare the parser; it is the frontend's, and the boundary between them is the code model.</message>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

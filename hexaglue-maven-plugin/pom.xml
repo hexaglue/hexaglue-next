@@ -37,6 +37,12 @@
             <groupId>io.hexaglue</groupId>
             <artifactId>hexaglue-engine</artifactId>
         </dependency>
+        <!-- The plugin contract: this host discovers the backends a project installed
+             and runs them. It writes what they hand over; they write nothing. -->
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-spi</artifactId>
+        </dependency>
         <!-- Reads hexaglue.yaml. The binding on top of it is strict: an unknown key
              is an error, so a mistyped configuration fails the build instead of
              silently applying a default nobody asked for. -->

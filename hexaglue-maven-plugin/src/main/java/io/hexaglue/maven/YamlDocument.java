@@ -192,6 +192,39 @@ final class YamlDocument {
     }
 
     /**
+     * Returns the mappings a mapping of mappings holds under a key.
+     *
+     * <p>Unlike every other reading here, the inner keys are not checked against anything: they
+     * belong to a plugin, and only that plugin knows its own vocabulary. It refuses what it does
+     * not declare, which is where a misspelt option is caught — one stage later, but by whoever
+     * can name the alternatives.</p>
+     *
+     * @param key the key holding the mapping of mappings
+     * @return the inner mappings by name, in document order, empty when the key is unstated
+     */
+    Map<String, Map<String, String>> sections(String key) {
+        Object stated = fields.get(key);
+        if (stated == null) {
+            return Map.of();
+        }
+        Map<String, Map<String, String>> sections = new LinkedHashMap<>();
+        mapping(stated)
+                .orElseThrow(() -> failure(origin, STRUCTURE_INVALID, "must state '" + key + "' as a mapping"))
+                .forEach((name, value) -> {
+                    Map<String, String> options = new LinkedHashMap<>();
+                    mapping(value)
+                            .orElseThrow(() -> failure(
+                                    origin,
+                                    STRUCTURE_INVALID,
+                                    "must state '" + key + "." + name + "' as a mapping of its options"))
+                            .forEach((option, setting) ->
+                                    options.put(option, setting(key + "." + name + "." + option, setting)));
+                    sections.put(name, options);
+                });
+        return sections;
+    }
+
+    /**
      * Returns the lists of texts a mapping of text to list holds under a key.
      *
      * @param key the key holding the mapping
@@ -237,6 +270,22 @@ final class YamlDocument {
      */
     ConfigException failure(IssueCode code, String message, Throwable cause) {
         return failure(origin, code, message, cause);
+    }
+
+    /**
+     * Reads a plugin option, where {@code true} and {@code 5} are what an author naturally writes
+     * and text is what a plugin reads. The strictness that matters here belongs to the plugin: it
+     * declared which options it answers to, and it says what shape each one must have.
+     */
+    private String setting(String key, Object value) {
+        if (value instanceof String || value instanceof Boolean || value instanceof Number) {
+            return String.valueOf(value);
+        }
+        throw failure(
+                origin,
+                STRUCTURE_INVALID,
+                "must state '" + key + "' as a single value, but stated "
+                        + (value == null ? "nothing" : value.getClass().getSimpleName()));
     }
 
     private String scalar(String key, Object value) {

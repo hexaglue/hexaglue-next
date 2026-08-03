@@ -73,7 +73,7 @@ verify: ## Tests + quality (incremental, no clean)
 	$(QUALITY_AGGREGATE)
 
 integration: ## Run the plugin integration tests only
-	@mvn -pl hexaglue-maven-plugin -am install -DskipTests -q && mvn -pl hexaglue-maven-plugin invoker:install invoker:run
+	@mvn install -DskipTests -Djacoco.skip=true -q && mvn -pl hexaglue-maven-plugin invoker:install invoker:run
 
 ci: clean verify ## Full CI pipeline
 

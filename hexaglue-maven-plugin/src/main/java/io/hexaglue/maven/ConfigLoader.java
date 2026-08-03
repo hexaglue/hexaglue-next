@@ -86,6 +86,9 @@ final class ConfigLoader {
     private static final String VALIDATION = "validation";
     private static final String GENERATION = "generation";
 
+    /** Where a project states what it asks of each backend, keyed by plugin identifier. */
+    private static final String PLUGINS = "plugins";
+
     private static final String BASE_PACKAGE = "basePackage";
     private static final String INCLUDE_PACKAGES = "includePackages";
     private static final String EXCLUDE_PACKAGES = "excludePackages";
@@ -97,7 +100,7 @@ final class ConfigLoader {
     private static final String ALLOW_INFERRED = "allowInferred";
     private static final String FINDINGS = "findings";
 
-    private static final List<String> ROOT_KEYS = sorted(ANALYSIS, CLASSIFICATION, VALIDATION, GENERATION);
+    private static final List<String> ROOT_KEYS = sorted(ANALYSIS, CLASSIFICATION, VALIDATION, GENERATION, PLUGINS);
     private static final List<String> ANALYSIS_KEYS = sorted(BASE_PACKAGE, INCLUDE_PACKAGES, EXCLUDE_PACKAGES);
     private static final List<String> CLASSIFICATION_KEYS = sorted(EXPLICIT, NAMING_SUFFIXES);
     private static final List<String> VALIDATION_KEYS =
@@ -105,6 +108,24 @@ final class ConfigLoader {
     private static final List<String> GENERATION_KEYS = sorted(MIN_CONFIDENCE);
 
     private ConfigLoader() {}
+
+    /**
+     * Reads the configuration a project states beside its POM.
+     *
+     * @param projectDir the directory of the project being built
+     * @return what the document states, or the documented defaults when there is none
+     * @throws ConfigException when a document is there and cannot be honoured as written
+     */
+    static Map<String, Map<String, String>> readPluginOptions(Path projectDir) {
+        Objects.requireNonNull(projectDir, "projectDir must not be null");
+        for (String name : DOCUMENT_NAMES) {
+            Path document = projectDir.resolve(name);
+            if (Files.isRegularFile(document)) {
+                return pluginOptions(name, text(document, name));
+            }
+        }
+        return Map.of();
+    }
 
     /**
      * Reads the configuration a project states beside its POM.
@@ -122,6 +143,35 @@ final class ConfigLoader {
             }
         }
         return HexaGlueConfig.defaults();
+    }
+
+    /**
+     * Reads a configuration from its YAML text.
+     *
+     * @param origin where the document comes from, named in every diagnostic
+     * @param yaml the document text
+     * @return what the document states
+     * @throws ConfigException when the document cannot be honoured as written
+     */
+    /**
+     * Reads what the document asks of each backend.
+     *
+     * <p>The inner keys are left alone on purpose: only a plugin knows its own vocabulary, and it
+     * refuses what it does not declare — with the alternatives named, which nothing here could
+     * do.</p>
+     *
+     * @param origin where the document comes from, named in every diagnostic
+     * @param yaml the document text
+     * @return the stated options by plugin identifier, empty when the document states none
+     * @throws ConfigException when the document cannot be honoured as written
+     */
+    static Map<String, Map<String, String>> pluginOptions(String origin, String yaml) {
+        YamlDocument document = YamlDocument.parse(origin, yaml);
+        if (document.isEmpty()) {
+            return Map.of();
+        }
+        document.rejectUnknownKeys("the document", ROOT_KEYS);
+        return document.sections(PLUGINS);
     }
 
     /**

@@ -15,7 +15,9 @@ package io.hexaglue.maven;
 
 import io.hexaglue.engine.Analysis;
 import io.hexaglue.engine.AnalysisResult;
+import io.hexaglue.engine.Dependencies;
 import io.hexaglue.engine.EngineContext;
+import io.hexaglue.engine.Perimeter;
 import io.hexaglue.engine.Validation;
 import io.hexaglue.frontend.FrontendResult;
 import io.hexaglue.frontend.SpoonFrontend;
@@ -24,8 +26,13 @@ import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.config.HexaGlueConfig;
 import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.model.finding.Finding;
+import io.hexaglue.spi.HexaGluePlugin;
+import io.hexaglue.spi.Measurements;
+import io.hexaglue.spi.PluginExecutor;
+import io.hexaglue.spi.PluginRun;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.apache.maven.project.MavenProject;
 
@@ -57,11 +64,33 @@ final class ProjectAnalysis {
         ArchModel model = analysed.model();
         List<Diagnostic> diagnostics = new ArrayList<>(read.diagnostics());
         diagnostics.addAll(analysed.diagnostics());
+        Dependencies dependencies = Dependencies.of(read.code(), Perimeter.of(read.code(), config.analysis()));
         return new Result(
                 model,
                 analysed.findings(),
+                new Measurements(dependencies.stabilities(), dependencies.cycles()),
                 diagnostics,
                 Validation.of(model, analysed.findings(), config.validation()));
+    }
+
+    /**
+     * Runs the discovered backends over what one analysis concluded.
+     *
+     * <p>The measures the report shows are the ones the engine took; handing them over rather than
+     * letting a plugin walk the references again is what keeps a report from disagreeing with the
+     * gate that read the same codebase.</p>
+     *
+     * @param analysed what the analysis concluded
+     * @param plugins the backends found on the classpath
+     * @param options what the document asks of each of them
+     * @return what the backends produced and what the run refused
+     */
+    static PluginRun contribute(
+            Result analysed, List<HexaGluePlugin> plugins, Map<String, Map<String, String>> options) {
+        Objects.requireNonNull(analysed, "analysed must not be null");
+        Objects.requireNonNull(plugins, "plugins must not be null");
+        Objects.requireNonNull(options, "options must not be null");
+        return PluginExecutor.run(plugins, analysed.model(), analysed.findings(), analysed.measurements(), options);
     }
 
     /**
@@ -69,10 +98,16 @@ final class ProjectAnalysis {
      *
      * @param model the classified model
      * @param findings what the checks made of it
+     * @param measurements what was measured about the shape of the codebase
      * @param diagnostics what was left out, by the reading then by the perimeter of the verdicts
      * @param validation what the gates made of the model and of the findings
      */
-    record Result(ArchModel model, List<Finding> findings, List<Diagnostic> diagnostics, Validation validation) {
+    record Result(
+            ArchModel model,
+            List<Finding> findings,
+            Measurements measurements,
+            List<Diagnostic> diagnostics,
+            Validation validation) {
 
         /**
          * Validates and copies the components.
@@ -80,6 +115,7 @@ final class ProjectAnalysis {
         Result {
             Objects.requireNonNull(model, "model must not be null");
             Objects.requireNonNull(findings, "findings must not be null");
+            Objects.requireNonNull(measurements, "measurements must not be null");
             Objects.requireNonNull(diagnostics, "diagnostics must not be null");
             Objects.requireNonNull(validation, "validation must not be null");
             findings = List.copyOf(findings);

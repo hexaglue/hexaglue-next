@@ -119,13 +119,7 @@ public class ValidateMojo extends AbstractMojo {
      * @return the configuration of this run
      */
     static HexaGlueConfig configuration(HexaGlueConfig stated, String basePackage, Boolean failOnUnclassified) {
-        AnalysisScope scope = Optional.ofNullable(basePackage)
-                .filter(pkg -> !pkg.isBlank())
-                .map(pkg -> new AnalysisScope(
-                        Optional.of(pkg),
-                        stated.analysis().includePackages(),
-                        stated.analysis().excludePackages()))
-                .orElseGet(stated::analysis);
+        AnalysisScope scope = scopedTo(stated, basePackage).analysis();
         ValidationConfig gates = Optional.ofNullable(failOnUnclassified)
                 .map(fail -> ValidationConfig.builder()
                         .failOnUnclassified(fail)
@@ -136,6 +130,24 @@ public class ValidateMojo extends AbstractMojo {
                         .build())
                 .orElseGet(stated::validation);
         return new HexaGlueConfig(scope, stated.classification(), gates, stated.generation());
+    }
+
+    /**
+     * Applies the package a build scopes the analysis to, when it states one.
+     *
+     * @param stated what the configuration document states
+     * @param basePackage the package the analysis is scoped to, null or blank when unset
+     * @return the configuration of this run
+     */
+    static HexaGlueConfig scopedTo(HexaGlueConfig stated, String basePackage) {
+        AnalysisScope scope = Optional.ofNullable(basePackage)
+                .filter(pkg -> !pkg.isBlank())
+                .map(pkg -> new AnalysisScope(
+                        Optional.of(pkg),
+                        stated.analysis().includePackages(),
+                        stated.analysis().excludePackages()))
+                .orElseGet(stated::analysis);
+        return new HexaGlueConfig(scope, stated.classification(), stated.validation(), stated.generation());
     }
 
     /**

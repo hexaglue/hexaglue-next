@@ -1,0 +1,8 @@
+analysis:
+  basePackage: com.example.shop
+
+plugins:
+  io.hexaglue.audit:
+    outputDirectory: report
+  io.hexaglue.living-doc:
+    generateDiagrams: false

@@ -61,6 +61,11 @@ public final class AdapterCollaborator implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads the type an entry point delegates to as the application service it is";
+    }
+
+    @Override
     public Set<Predicate> reads() {
         return Set.of(Predicate.KNOWLEDGE);
     }

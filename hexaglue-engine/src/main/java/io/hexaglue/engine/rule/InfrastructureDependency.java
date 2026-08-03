@@ -70,6 +70,11 @@ public final class InfrastructureDependency implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads a type that holds a tool reaching outside the hexagon as the driven adapter it is";
+    }
+
+    @Override
     public Set<Predicate> reads() {
         return Set.of(Predicate.KNOWLEDGE);
     }

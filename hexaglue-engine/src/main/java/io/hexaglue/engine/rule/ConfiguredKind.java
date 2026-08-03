@@ -51,6 +51,11 @@ public final class ConfiguredKind implements Rule {
     }
 
     @Override
+    public String title() {
+        return "takes the kind the user wrote in the configuration";
+    }
+
+    @Override
     public Set<Predicate> writes() {
         return Set.of(Predicate.EVIDENCE);
     }

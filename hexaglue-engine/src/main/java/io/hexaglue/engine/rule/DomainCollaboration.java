@@ -62,6 +62,11 @@ public final class DomainCollaboration implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads behaviour the domain owns but no single type of it can hold as the domain service it is";
+    }
+
+    @Override
     public Set<Predicate> writes() {
         return Set.of(Predicate.EVIDENCE);
     }

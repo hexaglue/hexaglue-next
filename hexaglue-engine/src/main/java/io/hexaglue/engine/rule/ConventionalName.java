@@ -63,6 +63,11 @@ public final class ConventionalName implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads what a type is called, against the vocabulary the user configured";
+    }
+
+    @Override
     public Set<Predicate> writes() {
         return Set.of(Predicate.EVIDENCE);
     }

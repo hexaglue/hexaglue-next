@@ -51,6 +51,11 @@ public final class FrameworkEntryPoint implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads a type the framework calls from outside as the driving adapter it is";
+    }
+
+    @Override
     public Set<Predicate> reads() {
         return Set.of(Predicate.KNOWLEDGE);
     }

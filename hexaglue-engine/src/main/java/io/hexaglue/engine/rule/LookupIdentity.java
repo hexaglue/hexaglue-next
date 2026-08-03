@@ -62,6 +62,11 @@ public final class LookupIdentity implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads the key a way out searches an aggregate by as the identity of that aggregate";
+    }
+
+    @Override
     public Set<Predicate> reads() {
         return Lifecycle.SOURCES;
     }

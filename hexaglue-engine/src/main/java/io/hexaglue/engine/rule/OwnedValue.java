@@ -50,6 +50,11 @@ public final class OwnedValue implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads a part of an aggregate that carries no identity as the value it is";
+    }
+
+    @Override
     public Set<Predicate> writes() {
         return Set.of(Predicate.EVIDENCE, Predicate.RELATION);
     }

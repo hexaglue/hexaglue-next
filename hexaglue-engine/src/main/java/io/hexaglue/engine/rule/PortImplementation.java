@@ -56,6 +56,11 @@ public final class PortImplementation implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads what fulfils an established way out as the driven adapter it is";
+    }
+
+    @Override
     public Set<Predicate> writes() {
         return Set.of(Predicate.EVIDENCE);
     }

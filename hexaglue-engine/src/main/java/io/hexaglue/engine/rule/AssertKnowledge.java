@@ -48,6 +48,11 @@ public final class AssertKnowledge implements Rule {
     }
 
     @Override
+    public String title() {
+        return "records what the knowledge packs recognize on every type of the model";
+    }
+
+    @Override
     public Set<Predicate> writes() {
         return Set.of(Predicate.KNOWLEDGE);
     }

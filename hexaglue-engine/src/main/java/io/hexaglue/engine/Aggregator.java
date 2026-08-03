@@ -63,6 +63,13 @@ public final class Aggregator {
     public static final RuleId ID = RuleId.of("DECISION");
 
     /**
+     * What the decision step does, in the terms {@link Rule#title()} uses. The aggregator is not a
+     * rule — deliberately, see above — but it names itself in every proof, so a reader meeting it
+     * there is owed the same sentence as for anything else they meet there.
+     */
+    public static final String TITLE = "weighs every signal held about a type and commits to one kind";
+
+    /**
      * Beyond nine signals at one tier the case is already overwhelming, and counting further
      * would let a pile of weak signals overflow into the weight of a stronger tier.
      */

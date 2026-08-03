@@ -66,6 +66,11 @@ class ClassifierTest {
         }
 
         @Override
+        public String title() {
+            return "a rule written for a test";
+        }
+
+        @Override
         public Set<Predicate> writes() {
             return Set.of(Predicate.EVIDENCE);
         }
@@ -160,6 +165,11 @@ class ClassifierTest {
                 @Override
                 public RuleId id() {
                     return RuleId.of("TEST-OSCILLATING");
+                }
+
+                @Override
+                public String title() {
+                    return "a rule written for a test";
                 }
 
                 @Override

@@ -25,10 +25,13 @@ import io.hexaglue.model.classification.Evidence;
 import io.hexaglue.model.classification.EvidenceTier;
 import io.hexaglue.model.classification.ProofNode;
 import io.hexaglue.model.classification.RemediationHint;
+import io.hexaglue.model.classification.RuleId;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -131,7 +134,31 @@ public final class Explanation {
         List<String> lines = new ArrayList<>(of(type));
         lines.add(REASON_INDENT + "derivation:");
         appendProof(lines, type.classification().proof(), DERIVATION_INDENT);
+        appendRules(lines, type.classification().proof());
         return List.copyOf(lines);
+    }
+
+    /**
+     * Says what each rule named in the tree does, once per rule, in the order the tree first named
+     * it.
+     *
+     * <p>Under the tree rather than inside it: a proof that fires the same rule four times would
+     * repeat the sentence four times, and a title on every node would bury the derivation it is
+     * supposed to make readable. A proof that derived nothing names no rule and gets no block.</p>
+     */
+    private static void appendRules(List<String> lines, ProofNode proof) {
+        Map<RuleId, String> cited = new LinkedHashMap<>();
+        collectRules(proof, cited);
+        if (cited.isEmpty()) {
+            return;
+        }
+        lines.add(REASON_INDENT + "rules cited:");
+        cited.forEach((id, title) -> lines.add(DERIVATION_INDENT + id + ": " + title));
+    }
+
+    private static void collectRules(ProofNode node, Map<RuleId, String> cited) {
+        node.rule().ifPresent(id -> Titles.of(id).ifPresent(title -> cited.putIfAbsent(id, title)));
+        node.premises().forEach(premise -> collectRules(premise, cited));
     }
 
     /**

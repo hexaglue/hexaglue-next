@@ -62,6 +62,11 @@ public final class ExposedContract implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads a contract the core fulfils and the outer ring calls as the driving port it is";
+    }
+
+    @Override
     public Set<Predicate> writes() {
         return Set.of(Predicate.EVIDENCE);
     }

@@ -69,6 +69,11 @@ public final class PortSignatures implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads what trade a driven port plies from the shape of the signatures it declares";
+    }
+
+    @Override
     public Set<Predicate> reads() {
         return Set.of(Predicate.KNOWLEDGE);
     }

@@ -60,6 +60,11 @@ public final class PublishedEvent implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads what the domain announces as the domain event it is";
+    }
+
+    @Override
     public Set<Predicate> reads() {
         return Set.of(Predicate.PORT_ROLE);
     }

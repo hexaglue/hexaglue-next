@@ -41,6 +41,19 @@ public interface Rule {
     RuleId id();
 
     /**
+     * Returns what this rule concludes, in one lower-case phrase, for a reader who meets its
+     * identifier in a proof and has no reason to know what {@code R1} stands for.
+     *
+     * <p>Required rather than defaulted, and held here rather than in a table elsewhere: a title
+     * that lives beside the logic is corrected by whoever changes the logic, where a catalogue of
+     * descriptions maintained apart would go stale the first time a rule was rewritten.</p>
+     *
+     * @return the title, such as {@code reads the type a way out stores and retrieves as the
+     *     aggregate it is}
+     */
+    String title();
+
+    /**
      * Returns the predicates this rule consumes. A rule reading nothing is a seed: it depends
      * only on the context, so it runs once.
      *

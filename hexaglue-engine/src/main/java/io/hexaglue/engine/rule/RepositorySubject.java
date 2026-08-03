@@ -61,6 +61,11 @@ public final class RepositorySubject implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads a Spring Data repository declaration for everything it says";
+    }
+
+    @Override
     public Set<Predicate> reads() {
         return Set.of(Predicate.KNOWLEDGE);
     }

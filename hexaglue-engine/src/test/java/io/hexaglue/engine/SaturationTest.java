@@ -75,6 +75,11 @@ class SaturationTest {
         }
 
         @Override
+        public String title() {
+            return "a rule written for a test";
+        }
+
+        @Override
         public Set<Predicate> reads() {
             return reads;
         }
@@ -169,6 +174,11 @@ class SaturationTest {
                 }
 
                 @Override
+                public String title() {
+                    return "a rule written for a test";
+                }
+
+                @Override
                 public Set<Predicate> writes() {
                     return Set.of(Predicate.KNOWLEDGE);
                 }
@@ -194,6 +204,11 @@ class SaturationTest {
                 @Override
                 public RuleId id() {
                     return RuleId.of("ENDLESS");
+                }
+
+                @Override
+                public String title() {
+                    return "a rule written for a test";
                 }
 
                 @Override

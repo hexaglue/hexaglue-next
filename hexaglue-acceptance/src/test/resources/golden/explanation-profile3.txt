@@ -11,6 +11,9 @@ Armada-aNameThatPointsTheWrongWayIsNotRead
     derivation:
       [DECISION] DRIVEN_PORT(com.acme.armada.log.Bookkeeping) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.acme.armada.log.Bookkeeping) [graph relation: CONSUMED_BY_CORE(com.acme.armada.log.Ledger)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
   com.acme.armada.log.FleetRepository: UNCLASSIFIED (LOW, inferred)
     AMBIGUOUS: two readings were left standing with nothing between them: IDENTIFIER and VALUE_OBJECT
     candidate IDENTIFIER (1 signal of local structure)
@@ -22,12 +25,18 @@ Armada-aNameThatPointsTheWrongWayIsNotRead
       [DECISION] UNCLASSIFIED(com.acme.armada.log.FleetRepository) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.acme.armada.log.FleetRepository) [local structure: SINGLE_VALUE_WRAPPER(com.acme.armada.log.FleetRepository)]
         [SHAPE] VALUE_OBJECT(com.acme.armada.log.FleetRepository) [local structure: IMMUTABLE_SHAPE(com.acme.armada.log.FleetRepository)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.armada.log.Ledger: APPLICATION_SERVICE (HIGH, inferred)
     [graph relation] com.acme.armada.log.Ledger is a APPLICATION_SERVICE because it stands on Bookkeeping, through which the application reaches outside
       involving com.acme.armada.log.Bookkeeping
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.armada.log.Ledger) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.acme.armada.log.Ledger) [graph relation: CALLS_DRIVEN_PORT(com.acme.armada.log.Bookkeeping)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
 
 Armada-anIdentityNobodyWrappedStaysAPlatformType
   3 types analysed
@@ -41,18 +50,27 @@ Armada-anIdentityNobodyWrappedStaysAPlatformType
     derivation:
       [DECISION] AGGREGATE_ROOT(com.acme.armada.dock.Convoy) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.acme.armada.dock.Convoy) [graph relation: MANAGED_BY(com.acme.armada.dock.Convoys)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.acme.armada.dock.Convoys: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.acme.armada.dock.Convoys is a DRIVEN_PORT because Harbourmaster calls it and nothing inside the hexagon implements it
       involving com.acme.armada.dock.Harbourmaster
     derivation:
       [DECISION] DRIVEN_PORT(com.acme.armada.dock.Convoys) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.acme.armada.dock.Convoys) [graph relation: CONSUMED_BY_CORE(com.acme.armada.dock.Harbourmaster)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
   com.acme.armada.dock.Harbourmaster: APPLICATION_SERVICE (HIGH, inferred)
     [graph relation] com.acme.armada.dock.Harbourmaster is a APPLICATION_SERVICE because it stands on Convoys, through which the application reaches outside
       involving com.acme.armada.dock.Convoys
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.armada.dock.Harbourmaster) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.acme.armada.dock.Harbourmaster) [graph relation: CALLS_DRIVEN_PORT(com.acme.armada.dock.Convoys)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
 
 Armada-theKeyAWayOutSearchesByIsTheIdentity
   5 types analysed
@@ -68,6 +86,9 @@ Armada-theKeyAWayOutSearchesByIsTheIdentity
     derivation:
       [DECISION] AGGREGATE_ROOT(com.acme.armada.yard.Fleet) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.acme.armada.yard.Fleet) [graph relation: MANAGED_BY(com.acme.armada.yard.Fleets)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.acme.armada.yard.FleetTag: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.acme.armada.yard.FleetTag is a IDENTIFIER because Fleets takes it to answer with Fleet, which keeps it
@@ -77,12 +98,19 @@ Armada-theKeyAWayOutSearchesByIsTheIdentity
       [DECISION] IDENTIFIER(com.acme.armada.yard.FleetTag) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.acme.armada.yard.FleetTag) [graph relation: SEARCHED_BY(com.acme.armada.yard.Fleets)]
         [SHAPE] IDENTIFIER(com.acme.armada.yard.FleetTag) [local structure: SINGLE_VALUE_WRAPPER(com.acme.armada.yard.FleetTag)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.armada.yard.Fleets: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.acme.armada.yard.Fleets is a DRIVEN_PORT because Quartermaster calls it and nothing inside the hexagon implements it
       involving com.acme.armada.yard.Quartermaster
     derivation:
       [DECISION] DRIVEN_PORT(com.acme.armada.yard.Fleets) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.acme.armada.yard.Fleets) [graph relation: CONSUMED_BY_CORE(com.acme.armada.yard.Quartermaster)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
   com.acme.armada.yard.Hull: VALUE_OBJECT (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.acme.armada.yard.Hull is a VALUE_OBJECT because Fleet is made of it and it carries no identity of its own
@@ -92,12 +120,19 @@ Armada-theKeyAWayOutSearchesByIsTheIdentity
       [DECISION] VALUE_OBJECT(com.acme.armada.yard.Hull) [decided on 1 signal of graph relation, 1 of local structure]
         [R3b] VALUE_OBJECT(com.acme.armada.yard.Hull) [graph relation: OWNED_BY(com.acme.armada.yard.Fleet)]
         [SHAPE] VALUE_OBJECT(com.acme.armada.yard.Hull) [local structure: IMMUTABLE_SHAPE(com.acme.armada.yard.Hull)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R3b: reads a part of an aggregate that carries no identity as the value it is
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.armada.yard.Quartermaster: APPLICATION_SERVICE (HIGH, inferred)
     [graph relation] com.acme.armada.yard.Quartermaster is a APPLICATION_SERVICE because it stands on Fleets, through which the application reaches outside
       involving com.acme.armada.yard.Fleets
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.armada.yard.Quartermaster) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.acme.armada.yard.Quartermaster) [graph relation: CALLS_DRIVEN_PORT(com.acme.armada.yard.Fleets)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
 
 Armada-theWholeArmada
   10 types analysed
@@ -122,30 +157,46 @@ Armada-theWholeArmada
         [W1-DR] DRIVEN_ADAPTER(com.acme.armada.dock.Locker) [framework knowledge: INFRA_DEPENDENCY(org.springframework.jdbc.core.JdbcTemplate)]
           INFRA_DEPENDENCY(org.springframework.jdbc.core.JdbcTemplate) [spring:org.springframework.jdbc.core.JdbcTemplate]
         [W1-DR2] DRIVEN_ADAPTER(com.acme.armada.dock.Locker) [graph relation: IMPLEMENTS_DRIVEN_PORT(com.acme.armada.yard.Fleets)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      W1-DR: reads a type that holds a tool reaching outside the hexagon as the driven adapter it is
+      W1-DR2: reads what fulfils an established way out as the driven adapter it is
   com.acme.armada.gate.Gate: DRIVING_ADAPTER (HIGH, inferred)
     [framework knowledge] com.acme.armada.gate.Gate is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
     derivation:
       [DECISION] DRIVING_ADAPTER(com.acme.armada.gate.Gate) [decided on 1 signal of framework knowledge]
         [W1-DA] DRIVING_ADAPTER(com.acme.armada.gate.Gate) [framework knowledge: DRIVING_ENTRYPOINT(com.acme.armada.gate.Gate)]
           DRIVING_ENTRYPOINT(com.acme.armada.gate.Gate) [spring:org.springframework.web.bind.annotation.RestController]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      W1-DA: reads a type the framework calls from outside as the driving adapter it is
   com.acme.armada.yard.Boarding: DRIVING_PORT (HIGH, inferred)
     [graph relation] com.acme.armada.yard.Boarding is a DRIVING_PORT because Gate reaches the application through it and Quartermaster answers it
       involving com.acme.armada.gate.Gate, com.acme.armada.yard.Quartermaster
     derivation:
       [DECISION] DRIVING_PORT(com.acme.armada.yard.Boarding) [decided on 1 signal of graph relation]
         [R5] DRIVING_PORT(com.acme.armada.yard.Boarding) [graph relation: HELD_BY_DRIVING_ADAPTER(com.acme.armada.gate.Gate)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R5: reads a contract the core fulfils and the outer ring calls as the driving port it is
   com.acme.armada.yard.Fleet: AGGREGATE_ROOT (HIGH, inferred)
     [graph relation] com.acme.armada.yard.Fleet is a AGGREGATE_ROOT because Fleets keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.armada.yard.Fleets
     derivation:
       [DECISION] AGGREGATE_ROOT(com.acme.armada.yard.Fleet) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.acme.armada.yard.Fleet) [graph relation: MANAGED_BY(com.acme.armada.yard.Fleets)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.acme.armada.yard.FleetLaunched: DOMAIN_EVENT (HIGH, inferred)
     [graph relation] com.acme.armada.yard.FleetLaunched is a DOMAIN_EVENT because Trumpets carries it outward and never asks anything back
       involving com.acme.armada.yard.Trumpets
     derivation:
       [DECISION] DOMAIN_EVENT(com.acme.armada.yard.FleetLaunched) [decided on 1 signal of graph relation]
         [R7] DOMAIN_EVENT(com.acme.armada.yard.FleetLaunched) [graph relation: ANNOUNCED_BY(com.acme.armada.yard.Trumpets)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R7: reads what the domain announces as the domain event it is
   com.acme.armada.yard.FleetTag: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.acme.armada.yard.FleetTag is a IDENTIFIER because Fleets takes it to answer with Fleet, which keeps it
@@ -155,12 +206,19 @@ Armada-theWholeArmada
       [DECISION] IDENTIFIER(com.acme.armada.yard.FleetTag) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.acme.armada.yard.FleetTag) [graph relation: SEARCHED_BY(com.acme.armada.yard.Fleets)]
         [SHAPE] IDENTIFIER(com.acme.armada.yard.FleetTag) [local structure: SINGLE_VALUE_WRAPPER(com.acme.armada.yard.FleetTag)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.armada.yard.Fleets: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.acme.armada.yard.Fleets is a DRIVEN_PORT because Quartermaster calls it and nothing inside the hexagon implements it
       involving com.acme.armada.yard.Quartermaster
     derivation:
       [DECISION] DRIVEN_PORT(com.acme.armada.yard.Fleets) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.acme.armada.yard.Fleets) [graph relation: CONSUMED_BY_CORE(com.acme.armada.yard.Quartermaster)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
   com.acme.armada.yard.Hull: VALUE_OBJECT (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.acme.armada.yard.Hull is a VALUE_OBJECT because Fleet is made of it and it carries no identity of its own
@@ -170,18 +228,28 @@ Armada-theWholeArmada
       [DECISION] VALUE_OBJECT(com.acme.armada.yard.Hull) [decided on 1 signal of graph relation, 1 of local structure]
         [R3b] VALUE_OBJECT(com.acme.armada.yard.Hull) [graph relation: OWNED_BY(com.acme.armada.yard.Fleet)]
         [SHAPE] VALUE_OBJECT(com.acme.armada.yard.Hull) [local structure: IMMUTABLE_SHAPE(com.acme.armada.yard.Hull)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R3b: reads a part of an aggregate that carries no identity as the value it is
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.armada.yard.Quartermaster: APPLICATION_SERVICE (HIGH, inferred)
     [graph relation] com.acme.armada.yard.Quartermaster is a APPLICATION_SERVICE because it stands on Boarding, through which the outside reaches the application
       involving com.acme.armada.yard.Boarding
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.armada.yard.Quartermaster) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.acme.armada.yard.Quartermaster) [graph relation: ANSWERS_DRIVING_PORT(com.acme.armada.yard.Boarding)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
   com.acme.armada.yard.Trumpets: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.acme.armada.yard.Trumpets is a DRIVEN_PORT because Quartermaster calls it and nothing inside the hexagon implements it
       involving com.acme.armada.yard.Quartermaster
     derivation:
       [DECISION] DRIVEN_PORT(com.acme.armada.yard.Trumpets) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.acme.armada.yard.Trumpets) [graph relation: CONSUMED_BY_CORE(com.acme.armada.yard.Quartermaster)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
 
 Armada-whatTheCoreAnnouncesIsAnEvent
   3 types analysed
@@ -195,16 +263,25 @@ Armada-whatTheCoreAnnouncesIsAnEvent
     derivation:
       [DECISION] DOMAIN_EVENT(com.acme.armada.yard.FleetLaunched) [decided on 1 signal of graph relation]
         [R7] DOMAIN_EVENT(com.acme.armada.yard.FleetLaunched) [graph relation: ANNOUNCED_BY(com.acme.armada.yard.Trumpets)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R7: reads what the domain announces as the domain event it is
   com.acme.armada.yard.Herald: APPLICATION_SERVICE (HIGH, inferred)
     [graph relation] com.acme.armada.yard.Herald is a APPLICATION_SERVICE because it stands on Trumpets, through which the application reaches outside
       involving com.acme.armada.yard.Trumpets
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.armada.yard.Herald) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.acme.armada.yard.Herald) [graph relation: CALLS_DRIVEN_PORT(com.acme.armada.yard.Trumpets)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
   com.acme.armada.yard.Trumpets: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.acme.armada.yard.Trumpets is a DRIVEN_PORT because Herald calls it and nothing inside the hexagon implements it
       involving com.acme.armada.yard.Herald
     derivation:
       [DECISION] DRIVEN_PORT(com.acme.armada.yard.Trumpets) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.acme.armada.yard.Trumpets) [graph relation: CONSUMED_BY_CORE(com.acme.armada.yard.Herald)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
 

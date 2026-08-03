@@ -54,6 +54,11 @@ public final class ConsumedContract implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads a contract the core calls and nothing inside fulfils as the driven port it is";
+    }
+
+    @Override
     public Set<Predicate> writes() {
         return Set.of(Predicate.EVIDENCE);
     }

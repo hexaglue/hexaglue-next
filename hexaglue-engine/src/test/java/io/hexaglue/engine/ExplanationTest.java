@@ -35,6 +35,7 @@ import io.hexaglue.model.classification.RemediationHint;
 import io.hexaglue.model.classification.RuleId;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.TypeNode;
+import io.hexaglue.model.config.AnalysisScope;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -94,6 +95,25 @@ class ExplanationTest {
 
     private static ArchType unclassified(Classification verdict, UnclassifiedCategory category, String reason) {
         return new UnclassifiedType(ORDER, structure(), verdict, category, Optional.ofNullable(reason));
+    }
+
+    private static Perimeter perimeterOf(TypeId id) {
+        return Perimeter.of(
+                CodeModel.builder()
+                        .addType(TypeNode.builder(id, TypeNature.CLASS).build())
+                        .build(),
+                AnalysisScope.everything());
+    }
+
+    private static FactBase factsAbout(TypeId id) {
+        FactBase facts = new FactBase();
+        facts.add(new KindEvidence(
+                id,
+                ArchKind.AGGREGATE_ROOT,
+                evidence(EvidenceTier.FRAMEWORK_KNOWLEDGE, "REPO(x)", "a repository stores it"),
+                0,
+                ProofNode.fact("REPO(x)")));
+        return facts;
     }
 
     private static Classification decided() {
@@ -277,6 +297,36 @@ class ExplanationTest {
         void keepingEverythingThePlainVerdictAlreadySaid() {
             assertThat(Explanation.withDerivation(aggregate(decided())))
                     .containsAll(Explanation.of(aggregate(decided())));
+        }
+
+        @Test
+        @DisplayName("saying what each rule it names actually does, once per rule")
+        void sayingWhatEachRuleItNamesActuallyDoesOncePerRule() {
+            assertThat(Explanation.withDerivation(aggregate(decided())))
+                    .containsSubsequence(
+                            "  rules cited:",
+                            "    R1: reads a Spring Data repository declaration for everything it says");
+        }
+
+        @Test
+        @DisplayName("naming the decision step too, which is where every verdict ends")
+        void namingTheDecisionStepTooWhichIsWhereEveryVerdictEnds() {
+            Classification decided = Aggregator.decide(factsAbout(ORDER), perimeterOf(ORDER))
+                    .verdict(ORDER)
+                    .orElseThrow();
+
+            assertThat(Explanation.withDerivation(aggregate(decided)))
+                    .contains("    DECISION: weighs every signal held about a type and commits to one kind");
+        }
+
+        @Test
+        @DisplayName("citing nothing when the verdict rests on an observation no rule derived")
+        void citingNothingWhenTheVerdictRestsOnAnObservationNoRuleDerived() {
+            Classification observed = Classification.builder(
+                            ArchKind.AGGREGATE_ROOT, Confidence.HIGH, Basis.INFERRED, ProofNode.fact("just observed"))
+                    .build();
+
+            assertThat(Explanation.withDerivation(aggregate(observed))).noneMatch(line -> line.contains("rules cited"));
         }
     }
 

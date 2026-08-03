@@ -53,6 +53,11 @@ public final class OwnedEntity implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads a part of an aggregate that carries an identity of its own as the entity it is";
+    }
+
+    @Override
     public Set<Predicate> writes() {
         return Set.of(Predicate.EVIDENCE, Predicate.RELATION);
     }

@@ -53,6 +53,11 @@ public final class ManagedAggregate implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads the type a way out stores and retrieves as the aggregate it is";
+    }
+
+    @Override
     public Set<Predicate> reads() {
         return Lifecycle.SOURCES;
     }

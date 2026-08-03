@@ -59,6 +59,11 @@ public final class LocalShape implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads what the shape of a declaration says, on its own, about the kind of type it is";
+    }
+
+    @Override
     public Set<Predicate> writes() {
         return Set.of(Predicate.EVIDENCE);
     }

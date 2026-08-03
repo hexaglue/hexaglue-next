@@ -15,6 +15,9 @@ AdapterRing-httpEntryPointIsADrivingAdapter
       [DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal of framework knowledge]
         [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [framework knowledge: DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor)]
           DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) [spring:org.springframework.web.bind.annotation.RestController]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      W1-DA: reads a type the framework calls from outside as the driving adapter it is
 
 AdapterRing-neutralDependencyIsNotAWayOut
   1 types analysed
@@ -45,6 +48,9 @@ AdapterRing-persistenceHolderIsADrivenAdapter
       [DECISION] DRIVEN_ADAPTER(com.acme.hangar.store.HangarBooks) [decided on 1 signal of framework knowledge]
         [W1-DR] DRIVEN_ADAPTER(com.acme.hangar.store.HangarBooks) [framework knowledge: INFRA_DEPENDENCY(jakarta.persistence.EntityManager)]
           INFRA_DEPENDENCY(jakarta.persistence.EntityManager) [jakarta:jakarta.persistence.EntityManager]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      W1-DR: reads a type that holds a tool reaching outside the hexagon as the driven adapter it is
 
 AdapterRing-plumbingBelongsToNoRing
   2 types analysed
@@ -98,6 +104,9 @@ ApplicationLayer-aStereotypeNobodyReachesForSaysNothing
       [DECISION] UNCLASSIFIED(com.acme.hangar.core.Manifest) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.acme.hangar.core.Manifest) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Manifest)]
         [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 ApplicationLayer-behaviourAcrossTwoDomainTypesIsADomainService
   4 types analysed
@@ -117,22 +126,34 @@ ApplicationLayer-behaviourAcrossTwoDomainTypesIsADomainService
       [DECISION] UNCLASSIFIED(com.acme.hangar.core.Checkout) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.acme.hangar.core.Checkout) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Checkout)]
         [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Checkout) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Checkout)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.hangar.core.Dispatch: DOMAIN_SERVICE (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Dispatch is a DOMAIN_SERVICE because it keeps nothing that can change, reaches nothing outside, and works across Manifest and Fleet
       involving com.acme.hangar.core.Manifest, com.acme.hangar.core.Fleet
     derivation:
       [DECISION] DOMAIN_SERVICE(com.acme.hangar.core.Dispatch) [decided on 1 signal of graph relation]
         [R8] DOMAIN_SERVICE(com.acme.hangar.core.Dispatch) [graph relation: SPANS_DOMAIN_TYPES(2)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R8: reads behaviour the domain owns but no single type of it can hold as the domain service it is
   com.acme.hangar.core.Fleet: VALUE_OBJECT (HIGH, inferred)
     [local structure] com.acme.hangar.core.Fleet reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
       [DECISION] VALUE_OBJECT(com.acme.hangar.core.Fleet) [decided on 1 signal of local structure]
         [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Fleet) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Fleet)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.hangar.core.Manifest: VALUE_OBJECT (HIGH, inferred)
     [local structure] com.acme.hangar.core.Manifest reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
       [DECISION] VALUE_OBJECT(com.acme.hangar.core.Manifest) [decided on 1 signal of local structure]
         [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 ApplicationLayer-behaviourThatRemembersIsNotADomainService
   4 types analysed
@@ -152,6 +173,9 @@ ApplicationLayer-behaviourThatRemembersIsNotADomainService
       [DECISION] UNCLASSIFIED(com.acme.hangar.core.Checkout) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.acme.hangar.core.Checkout) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Checkout)]
         [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Checkout) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Checkout)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.hangar.core.Dispatch: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.acme.hangar.core.Dispatch is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -162,11 +186,17 @@ ApplicationLayer-behaviourThatRemembersIsNotADomainService
     derivation:
       [DECISION] VALUE_OBJECT(com.acme.hangar.core.Fleet) [decided on 1 signal of local structure]
         [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Fleet) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Fleet)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.hangar.core.Manifest: VALUE_OBJECT (HIGH, inferred)
     [local structure] com.acme.hangar.core.Manifest reads as a VALUE_OBJECT because it is a record, so its state cannot change
     derivation:
       [DECISION] VALUE_OBJECT(com.acme.hangar.core.Manifest) [decided on 1 signal of local structure]
         [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 ApplicationLayer-theTypeAnEntryPointHandsTheWorkToIsTheApplication
   2 types analysed
@@ -179,12 +209,18 @@ ApplicationLayer-theTypeAnEntryPointHandsTheWorkToIsTheApplication
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Dispatch) [decided on 1 signal of graph relation]
         [R6b] APPLICATION_SERVICE(com.acme.hangar.core.Dispatch) [graph relation: REACHED_FROM_THE_RING(com.acme.hangar.web.HangarDoor)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6b: reads the type an entry point delegates to as the application service it is
   com.acme.hangar.web.HangarDoor: DRIVING_ADAPTER (HIGH, inferred)
     [framework knowledge] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
     derivation:
       [DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal of framework knowledge]
         [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [framework knowledge: DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor)]
           DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) [spring:org.springframework.web.bind.annotation.RestController]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      W1-DA: reads a type the framework calls from outside as the driving adapter it is
 
 ApplicationLayer-theTypeBetweenTwoPortsIsTheApplication
   4 types analysed
@@ -199,24 +235,36 @@ ApplicationLayer-theTypeBetweenTwoPortsIsTheApplication
     derivation:
       [DECISION] DRIVING_PORT(com.acme.hangar.core.Boarding) [decided on 1 signal of graph relation]
         [R5] DRIVING_PORT(com.acme.hangar.core.Boarding) [graph relation: HELD_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R5: reads a contract the core fulfils and the outer ring calls as the driving port it is
   com.acme.hangar.core.Checkout: APPLICATION_SERVICE (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Boarding, through which the outside reaches the application
       involving com.acme.hangar.core.Boarding
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: ANSWERS_DRIVING_PORT(com.acme.hangar.core.Boarding)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
   com.acme.hangar.core.Ledger: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
       [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
   com.acme.hangar.web.HangarDoor: DRIVING_ADAPTER (HIGH, inferred)
     [framework knowledge] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
     derivation:
       [DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal of framework knowledge]
         [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [framework knowledge: DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor)]
           DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) [spring:org.springframework.web.bind.annotation.RestController]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      W1-DA: reads a type the framework calls from outside as the driving adapter it is
 
 ClassificationConfigIntegrationTest-exclusionsAndExplicitsShouldWorkTogether
   3 types analysed
@@ -245,6 +293,9 @@ ClassificationConfigIntegrationTest-exclusionsAndExplicitsShouldWorkTogether
       [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
         [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 ClassificationConfigIntegrationTest-explicitClassificationShouldHaveHighestPriority
   1 types analysed
@@ -256,6 +307,9 @@ ClassificationConfigIntegrationTest-explicitClassificationShouldHaveHighestPrior
       [DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal of declared intent]
         [INTENT] AGGREGATE_ROOT(com.example.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 ClassificationConfigIntegrationTest-explicitClassificationShouldOverrideCriteriaBased
   1 types analysed
@@ -344,6 +398,9 @@ ClassificationConfigIntegrationTest-nonGeneratedTypesShouldBeClassifiedNormally
       [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
         [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 ClassificationConfigIntegrationTest-typesMatchingExcludePatternsShouldBeSkipped
   2 types analysed
@@ -409,6 +466,9 @@ ClassificationContractTest-portPriorityDominatesConfidence
       [DECISION] DRIVEN_PORT(com.example.OrderRepository) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 ClassificationContractTest-priorityDominatesConfidence
   2 types analysed
@@ -422,6 +482,9 @@ ClassificationContractTest-priorityDominatesConfidence
       [DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal of declared intent]
         [INTENT] AGGREGATE_ROOT(com.example.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.example.OrderRepository: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.example.OrderRepository is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -481,12 +544,18 @@ ClassificationGoldenFilesTest-createApplicationServiceExample
     derivation:
       [DECISION] APPLICATION_SERVICE(com.example.order.application.OrderService) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.example.order.application.OrderService) [graph relation: CALLS_DRIVEN_PORT(com.example.order.ports.out.OrderRepository)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
   com.example.order.domain.Order: AGGREGATE_ROOT (HIGH, inferred)
     [graph relation] com.example.order.domain.Order is a AGGREGATE_ROOT because OrderRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.example.order.ports.out.OrderRepository
     derivation:
       [DECISION] AGGREGATE_ROOT(com.example.order.domain.Order) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.example.order.domain.Order) [graph relation: MANAGED_BY(com.example.order.ports.out.OrderRepository)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.example.order.domain.OrderId: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.example.order.domain.OrderId is a IDENTIFIER because OrderRepository takes it to answer with Order, which keeps it
@@ -496,6 +565,10 @@ ClassificationGoldenFilesTest-createApplicationServiceExample
       [DECISION] IDENTIFIER(com.example.order.domain.OrderId) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.example.order.domain.OrderId) [graph relation: SEARCHED_BY(com.example.order.ports.out.OrderRepository)]
         [SHAPE] IDENTIFIER(com.example.order.domain.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.order.domain.OrderId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.example.order.ports.in.OrderUseCases: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.example.order.ports.in.OrderUseCases is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -507,6 +580,9 @@ ClassificationGoldenFilesTest-createApplicationServiceExample
     derivation:
       [DECISION] DRIVEN_PORT(com.example.order.ports.out.OrderRepository) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.example.order.ports.out.OrderRepository) [graph relation: CONSUMED_BY_CORE(com.example.order.application.OrderService)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
 
 ClassificationGoldenFilesTest-createBankingExample
   6 types analysed
@@ -523,6 +599,9 @@ ClassificationGoldenFilesTest-createBankingExample
     derivation:
       [DECISION] AGGREGATE_ROOT(com.example.banking.domain.Account) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.example.banking.domain.Account) [graph relation: MANAGED_BY(com.example.banking.ports.out.AccountRepository)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.example.banking.domain.AccountId: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.example.banking.domain.AccountId is a IDENTIFIER because AccountRepository takes it to answer with Account, which keeps it
@@ -532,6 +611,10 @@ ClassificationGoldenFilesTest-createBankingExample
       [DECISION] IDENTIFIER(com.example.banking.domain.AccountId) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.example.banking.domain.AccountId) [graph relation: SEARCHED_BY(com.example.banking.ports.out.AccountRepository)]
         [SHAPE] IDENTIFIER(com.example.banking.domain.AccountId) [local structure: SINGLE_VALUE_WRAPPER(com.example.banking.domain.AccountId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.example.banking.domain.Money: VALUE_OBJECT (EXPLICIT, declared)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [declared intent] com.example.banking.domain.Money declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
@@ -547,24 +630,38 @@ ClassificationGoldenFilesTest-createBankingExample
         [R3b] VALUE_OBJECT(com.example.banking.domain.Money) [graph relation: OWNED_BY(com.example.banking.domain.Account)]
         [R3b] VALUE_OBJECT(com.example.banking.domain.Money) [graph relation: OWNED_BY(com.example.banking.domain.Transaction)]
         [SHAPE] VALUE_OBJECT(com.example.banking.domain.Money) [local structure: IMMUTABLE_SHAPE(com.example.banking.domain.Money)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
+      R3b: reads a part of an aggregate that carries no identity as the value it is
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.example.banking.domain.Transaction: ENTITY (EXPLICIT, declared)
     [declared intent] com.example.banking.domain.Transaction declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
     derivation:
       [DECISION] ENTITY(com.example.banking.domain.Transaction) [decided on 1 signal of declared intent]
         [INTENT] ENTITY(com.example.banking.domain.Transaction) [declared intent: DECLARED_KIND(ENTITY)]
           DECLARED_KIND(com.example.banking.domain.Transaction) [jmolecules:org.jmolecules.ddd.annotation.Entity]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.example.banking.ports.in.TransferUseCase: DRIVING_PORT (EXPLICIT, declared)
     [declared intent] com.example.banking.ports.in.TransferUseCase declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
     derivation:
       [DECISION] DRIVING_PORT(com.example.banking.ports.in.TransferUseCase) [decided on 1 signal of declared intent]
         [INTENT] DRIVING_PORT(com.example.banking.ports.in.TransferUseCase) [declared intent: DECLARED_KIND(DRIVING_PORT)]
           DECLARED_KIND(com.example.banking.ports.in.TransferUseCase) [jmolecules:org.jmolecules.architecture.hexagonal.PrimaryPort]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.example.banking.ports.out.AccountRepository: DRIVEN_PORT (EXPLICIT, declared)
     [declared intent] com.example.banking.ports.out.AccountRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
       [DECISION] DRIVEN_PORT(com.example.banking.ports.out.AccountRepository) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.banking.ports.out.AccountRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.banking.ports.out.AccountRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 ClassificationGoldenFilesTest-createMinimalExample
   4 types analysed
@@ -588,6 +685,9 @@ ClassificationGoldenFilesTest-createMinimalExample
       [DECISION] UNCLASSIFIED(com.example.domain.TaskId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.domain.TaskId) [local structure: SINGLE_VALUE_WRAPPER(com.example.domain.TaskId)]
         [SHAPE] VALUE_OBJECT(com.example.domain.TaskId) [local structure: IMMUTABLE_SHAPE(com.example.domain.TaskId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.example.ports.in.TaskUseCases: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.example.ports.in.TaskUseCases is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -613,6 +713,9 @@ ClassificationIntegrationTest-coffeeShopDomainClassification
       [DECISION] ENTITY(com.coffeeshop.order.LineItem) [decided on 1 signal of declared intent]
         [INTENT] ENTITY(com.coffeeshop.order.LineItem) [declared intent: DECLARED_KIND(ENTITY)]
           DECLARED_KIND(com.coffeeshop.order.LineItem) [jmolecules:org.jmolecules.ddd.annotation.Entity]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.coffeeshop.order.Location: VALUE_OBJECT (EXPLICIT, declared)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [declared intent] com.coffeeshop.order.Location declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
@@ -625,6 +728,11 @@ ClassificationIntegrationTest-coffeeShopDomainClassification
           DECLARED_KIND(com.coffeeshop.order.Location) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
         [R3b] VALUE_OBJECT(com.coffeeshop.order.Location) [graph relation: OWNED_BY(com.coffeeshop.order.Order)]
         [SHAPE] VALUE_OBJECT(com.coffeeshop.order.Location) [local structure: IMMUTABLE_SHAPE(com.coffeeshop.order.Location)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
+      R3b: reads a part of an aggregate that carries no identity as the value it is
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.coffeeshop.order.Order: AGGREGATE_ROOT (EXPLICIT, declared)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [declared intent] com.coffeeshop.order.Order declares AGGREGATE_ROOT by bearing org.jmolecules.ddd.annotation.AggregateRoot (pack jmolecules)
@@ -635,6 +743,10 @@ ClassificationIntegrationTest-coffeeShopDomainClassification
         [INTENT] AGGREGATE_ROOT(com.coffeeshop.order.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.coffeeshop.order.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
         [R1b] AGGREGATE_ROOT(com.coffeeshop.order.Order) [graph relation: MANAGED_BY(com.coffeeshop.order.OrderRepository)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.coffeeshop.order.OrderId: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.coffeeshop.order.OrderId is a IDENTIFIER because OrderRepository takes it to answer with Order, which keeps it
@@ -644,12 +756,19 @@ ClassificationIntegrationTest-coffeeShopDomainClassification
       [DECISION] IDENTIFIER(com.coffeeshop.order.OrderId) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.coffeeshop.order.OrderId) [graph relation: SEARCHED_BY(com.coffeeshop.order.OrderRepository)]
         [SHAPE] IDENTIFIER(com.coffeeshop.order.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.coffeeshop.order.OrderId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.coffeeshop.order.OrderRepository: DRIVEN_PORT (EXPLICIT, declared)
     [declared intent] com.coffeeshop.order.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
       [DECISION] DRIVEN_PORT(com.coffeeshop.order.OrderRepository) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.coffeeshop.order.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.coffeeshop.order.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 ClassificationIntegrationTest-explicitAnnotationsOverrideHeuristics
   1 types analysed
@@ -661,6 +780,9 @@ ClassificationIntegrationTest-explicitAnnotationsOverrideHeuristics
       [DECISION] VALUE_OBJECT(com.example.Money) [decided on 1 signal of declared intent]
         [INTENT] VALUE_OBJECT(com.example.Money) [declared intent: DECLARED_KIND(VALUE_OBJECT)]
           DECLARED_KIND(com.example.Money) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 ClassificationIntegrationTest-namingCriteriaEvidence
   1 types analysed
@@ -678,6 +800,9 @@ ClassificationIntegrationTest-namingCriteriaEvidence
       [DECISION] UNCLASSIFIED(com.example.ProductId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.ProductId) [local structure: SINGLE_VALUE_WRAPPER(com.example.ProductId)]
         [SHAPE] VALUE_OBJECT(com.example.ProductId) [local structure: IMMUTABLE_SHAPE(com.example.ProductId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 ClassificationIntegrationTest-orderRepositoryShouldBeRepositoryPort
   2 types analysed
@@ -745,18 +870,27 @@ ClassificationIntegrationTest-portsInOutClassification
       [DECISION] DRIVEN_PORT(com.example.infrastructure.PaymentGateway) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.infrastructure.PaymentGateway) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.infrastructure.PaymentGateway) [jmolecules:org.jmolecules.architecture.hexagonal.SecondaryPort]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.example.ports.in.PlaceOrderUseCase: DRIVING_PORT (EXPLICIT, declared)
     [declared intent] com.example.ports.in.PlaceOrderUseCase declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
     derivation:
       [DECISION] DRIVING_PORT(com.example.ports.in.PlaceOrderUseCase) [decided on 1 signal of declared intent]
         [INTENT] DRIVING_PORT(com.example.ports.in.PlaceOrderUseCase) [declared intent: DECLARED_KIND(DRIVING_PORT)]
           DECLARED_KIND(com.example.ports.in.PlaceOrderUseCase) [jmolecules:org.jmolecules.architecture.hexagonal.PrimaryPort]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.example.ports.out.OrderRepository: DRIVEN_PORT (EXPLICIT, declared)
     [declared intent] com.example.ports.out.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
       [DECISION] DRIVEN_PORT(com.example.ports.out.OrderRepository) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.ports.out.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.ports.out.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 ClassificationIntegrationTest-repositoryAnnotationClassification
   1 types analysed
@@ -768,6 +902,9 @@ ClassificationIntegrationTest-repositoryAnnotationClassification
       [DECISION] DRIVEN_PORT(com.example.CustomerStore) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.CustomerStore) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.CustomerStore) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 ClassificationIntegrationTest-repositoryDominantEvidence
   2 types analysed
@@ -814,6 +951,9 @@ ConflictDetectionTest-conflictingExplicitAnnotationsWithSamePriority
           DECLARED_KIND(com.example.Ambiguous) [jmolecules:org.jmolecules.ddd.annotation.Entity]
         [INTENT] VALUE_OBJECT(com.example.Ambiguous) [declared intent: DECLARED_KIND(VALUE_OBJECT)]
           DECLARED_KIND(com.example.Ambiguous) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 ConflictDetectionTest-enumShouldBeClassifiedAsValueObjectForDomainClassifier
   1 types analysed
@@ -824,6 +964,9 @@ ConflictDetectionTest-enumShouldBeClassifiedAsValueObjectForDomainClassifier
     derivation:
       [DECISION] VALUE_OBJECT(com.example.Color) [decided on 1 signal of local structure]
         [SHAPE] VALUE_OBJECT(com.example.Color) [local structure: IMMUTABLE_SHAPE(com.example.Color)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 ConflictDetectionTest-explicitAnnotationShouldWinWithHighConfidence
   2 types analysed
@@ -837,6 +980,9 @@ ConflictDetectionTest-explicitAnnotationShouldWinWithHighConfidence
       [DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal of declared intent]
         [INTENT] AGGREGATE_ROOT(com.example.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.example.OrderRepository: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.example.OrderRepository is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -855,6 +1001,9 @@ ConflictDetectionTest-explicitAnnotationWinsWhenRepositoryDominantAlsoMatches
       [DECISION] AGGREGATE_ROOT(com.example.Customer) [decided on 1 signal of declared intent]
         [INTENT] AGGREGATE_ROOT(com.example.Customer) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Customer) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.example.CustomerRepository: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.example.CustomerRepository is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -871,6 +1020,9 @@ ConflictDetectionTest-explicitRepositoryShouldClassifyPortCorrectly
       [DECISION] DRIVEN_PORT(com.example.PaymentGateway) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.PaymentGateway) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.PaymentGateway) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 ConflictDetectionTest-interfaceWithoutMarkersIsUnclassified
   1 types analysed
@@ -921,6 +1073,9 @@ ConflictDetectionTest-recordIdShouldBeIdentifier
       [DECISION] UNCLASSIFIED(com.example.ProductId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.ProductId) [local structure: SINGLE_VALUE_WRAPPER(com.example.ProductId)]
         [SHAPE] VALUE_OBJECT(com.example.ProductId) [local structure: IMMUTABLE_SHAPE(com.example.ProductId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 ConflictDetectionTest-repositoryDominantClassificationShouldSucceed
   2 types analysed
@@ -980,6 +1135,9 @@ DomainClassifierTest-explicitAnnotationClassifiesWithoutConflict
       [DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal of declared intent]
         [INTENT] AGGREGATE_ROOT(com.example.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 DomainClassifierTest-explicitAnnotationShouldWinOverHeuristic
   1 types analysed
@@ -991,6 +1149,9 @@ DomainClassifierTest-explicitAnnotationShouldWinOverHeuristic
       [DECISION] ENTITY(com.example.Customer) [decided on 1 signal of declared intent]
         [INTENT] ENTITY(com.example.Customer) [declared intent: DECLARED_KIND(ENTITY)]
           DECLARED_KIND(com.example.Customer) [jmolecules:org.jmolecules.ddd.annotation.Entity]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 DomainClassifierTest-higherPriorityShouldWin
   1 types analysed
@@ -1008,6 +1169,9 @@ DomainClassifierTest-higherPriorityShouldWin
       [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
         [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainClassifierTest-shouldClassifyEnumTypesAsValueObject
   1 types analysed
@@ -1018,6 +1182,9 @@ DomainClassifierTest-shouldClassifyEnumTypesAsValueObject
     derivation:
       [DECISION] VALUE_OBJECT(com.example.OrderStatus) [decided on 1 signal of local structure]
         [SHAPE] VALUE_OBJECT(com.example.OrderStatus) [local structure: IMMUTABLE_SHAPE(com.example.OrderStatus)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainClassifierTest-shouldClassifyExplicitAggregateRoot
   1 types analysed
@@ -1029,6 +1196,9 @@ DomainClassifierTest-shouldClassifyExplicitAggregateRoot
       [DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal of declared intent]
         [INTENT] AGGREGATE_ROOT(com.example.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 DomainClassifierTest-shouldClassifyExplicitEntity
   1 types analysed
@@ -1040,6 +1210,9 @@ DomainClassifierTest-shouldClassifyExplicitEntity
       [DECISION] ENTITY(com.example.LineItem) [decided on 1 signal of declared intent]
         [INTENT] ENTITY(com.example.LineItem) [declared intent: DECLARED_KIND(ENTITY)]
           DECLARED_KIND(com.example.LineItem) [jmolecules:org.jmolecules.ddd.annotation.Entity]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 DomainClassifierTest-shouldClassifyExplicitValueObject
   1 types analysed
@@ -1054,6 +1227,10 @@ DomainClassifierTest-shouldClassifyExplicitValueObject
         [INTENT] VALUE_OBJECT(com.example.Money) [declared intent: DECLARED_KIND(VALUE_OBJECT)]
           DECLARED_KIND(com.example.Money) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
         [SHAPE] VALUE_OBJECT(com.example.Money) [local structure: IMMUTABLE_SHAPE(com.example.Money)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainClassifierTest-shouldClassifyRecordIdAsIdentifier
   1 types analysed
@@ -1071,6 +1248,9 @@ DomainClassifierTest-shouldClassifyRecordIdAsIdentifier
       [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
         [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainClassifierTest-shouldClassifyRepositoryDominantAsAggregateRoot
   2 types analysed
@@ -1100,6 +1280,9 @@ DomainClassifierTest-shouldClassifySubclassWhenParentHasAnnotation
       [DECISION] AGGREGATE_ROOT(com.example.BaseOrder) [decided on 1 signal of declared intent]
         [INTENT] AGGREGATE_ROOT(com.example.BaseOrder) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.BaseOrder) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.example.PremiumOrder: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.example.PremiumOrder is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -1228,6 +1411,9 @@ DomainCriteriaTest-shouldMatchRecordEndingWithEvent
     derivation:
       [DECISION] VALUE_OBJECT(com.example.PaymentReceivedEvent) [decided on 1 signal of local structure]
         [SHAPE] VALUE_OBJECT(com.example.PaymentReceivedEvent) [local structure: IMMUTABLE_SHAPE(com.example.PaymentReceivedEvent)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldMatchRecordWithSingleComponentAndIdSuffix
   1 types analysed
@@ -1245,6 +1431,9 @@ DomainCriteriaTest-shouldMatchRecordWithSingleComponentAndIdSuffix
       [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
         [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldMatchRecordWithoutIdentityReferencedByOtherType
   2 types analysed
@@ -1262,6 +1451,9 @@ DomainCriteriaTest-shouldMatchRecordWithoutIdentityReferencedByOtherType
     derivation:
       [DECISION] VALUE_OBJECT(com.example.ShippingRate) [decided on 1 signal of local structure]
         [SHAPE] VALUE_OBJECT(com.example.ShippingRate) [local structure: IMMUTABLE_SHAPE(com.example.ShippingRate)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldMatchRecordWrappingUUID
   1 types analysed
@@ -1279,6 +1471,9 @@ DomainCriteriaTest-shouldMatchRecordWrappingUUID
       [DECISION] UNCLASSIFIED(com.example.CustomerId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.CustomerId) [local structure: SINGLE_VALUE_WRAPPER(com.example.CustomerId)]
         [SHAPE] VALUE_OBJECT(com.example.CustomerId) [local structure: IMMUTABLE_SHAPE(com.example.CustomerId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldMatchTypeImplementingIdentifierInterface
   1 types analysed
@@ -1293,6 +1488,10 @@ DomainCriteriaTest-shouldMatchTypeImplementingIdentifierInterface
         [INTENT] IDENTIFIER(com.example.OrderId) [declared intent: DECLARED_KIND(IDENTIFIER), 1 steps away]
           DECLARED_KIND(com.example.OrderId) [jmolecules:org.jmolecules.ddd.types.Identifier]
         [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldMatchTypeUsedInRepositoryWithIdField
   2 types analysed
@@ -1320,6 +1519,9 @@ DomainCriteriaTest-shouldMatchTypeWithAggregateRootAnnotation
       [DECISION] AGGREGATE_ROOT(com.example.Order) [decided on 1 signal of declared intent]
         [INTENT] AGGREGATE_ROOT(com.example.Order) [declared intent: DECLARED_KIND(AGGREGATE_ROOT)]
           DECLARED_KIND(com.example.Order) [jmolecules:org.jmolecules.ddd.annotation.AggregateRoot]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 DomainCriteriaTest-shouldMatchTypeWithEntityAnnotation
   1 types analysed
@@ -1331,6 +1533,9 @@ DomainCriteriaTest-shouldMatchTypeWithEntityAnnotation
       [DECISION] ENTITY(com.example.LineItem) [decided on 1 signal of declared intent]
         [INTENT] ENTITY(com.example.LineItem) [declared intent: DECLARED_KIND(ENTITY)]
           DECLARED_KIND(com.example.LineItem) [jmolecules:org.jmolecules.ddd.annotation.Entity]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 DomainCriteriaTest-shouldMatchTypeWithValueObjectAnnotation
   1 types analysed
@@ -1345,6 +1550,10 @@ DomainCriteriaTest-shouldMatchTypeWithValueObjectAnnotation
         [INTENT] VALUE_OBJECT(com.example.Money) [declared intent: DECLARED_KIND(VALUE_OBJECT)]
           DECLARED_KIND(com.example.Money) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
         [SHAPE] VALUE_OBJECT(com.example.Money) [local structure: IMMUTABLE_SHAPE(com.example.Money)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldNotMatchClass
   3 types analysed
@@ -1358,6 +1567,9 @@ DomainCriteriaTest-shouldNotMatchClass
     derivation:
       [DECISION] VALUE_OBJECT(com.example.Money) [decided on 1 signal of local structure]
         [SHAPE] VALUE_OBJECT(com.example.Money) [local structure: IMMUTABLE_SHAPE(com.example.Money)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.example.Order: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.example.Order is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -1374,6 +1586,9 @@ DomainCriteriaTest-shouldNotMatchClass
       [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
         [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldNotMatchClassNamedDomainEvent
   1 types analysed
@@ -1444,6 +1659,9 @@ DomainCriteriaTest-shouldNotMatchEnumEndingWithEvent
     derivation:
       [DECISION] VALUE_OBJECT(com.example.SystemEvent) [decided on 1 signal of local structure]
         [SHAPE] VALUE_OBJECT(com.example.SystemEvent) [local structure: IMMUTABLE_SHAPE(com.example.SystemEvent)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldNotMatchInterface
   1 types analysed
@@ -1483,6 +1701,9 @@ DomainCriteriaTest-shouldNotMatchOrphanedRecord
       [DECISION] UNCLASSIFIED(com.example.Orphan) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.Orphan) [local structure: SINGLE_VALUE_WRAPPER(com.example.Orphan)]
         [SHAPE] VALUE_OBJECT(com.example.Orphan) [local structure: IMMUTABLE_SHAPE(com.example.Orphan)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldNotMatchRecordEndingWithEvent
   2 types analysed
@@ -1506,6 +1727,9 @@ DomainCriteriaTest-shouldNotMatchRecordEndingWithEvent
       [DECISION] UNCLASSIFIED(com.example.OrderCreatedEvent) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.OrderCreatedEvent) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderCreatedEvent)]
         [SHAPE] VALUE_OBJECT(com.example.OrderCreatedEvent) [local structure: IMMUTABLE_SHAPE(com.example.OrderCreatedEvent)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldNotMatchRecordEndingWithId
   2 types analysed
@@ -1529,6 +1753,9 @@ DomainCriteriaTest-shouldNotMatchRecordEndingWithId
       [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
         [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldNotMatchRecordWithIdentityField
   2 types analysed
@@ -1546,6 +1773,9 @@ DomainCriteriaTest-shouldNotMatchRecordWithIdentityField
     derivation:
       [DECISION] VALUE_OBJECT(com.example.OrderLine) [decided on 1 signal of local structure]
         [SHAPE] VALUE_OBJECT(com.example.OrderLine) [local structure: IMMUTABLE_SHAPE(com.example.OrderLine)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldNotMatchRecordWithMultipleComponents
   1 types analysed
@@ -1556,6 +1786,9 @@ DomainCriteriaTest-shouldNotMatchRecordWithMultipleComponents
     derivation:
       [DECISION] VALUE_OBJECT(com.example.CompoundId) [decided on 1 signal of local structure]
         [SHAPE] VALUE_OBJECT(com.example.CompoundId) [local structure: IMMUTABLE_SHAPE(com.example.CompoundId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldNotMatchRecordWithoutIdSuffix
   1 types analysed
@@ -1573,6 +1806,9 @@ DomainCriteriaTest-shouldNotMatchRecordWithoutIdSuffix
       [DECISION] UNCLASSIFIED(com.example.OrderNumber) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.OrderNumber) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderNumber)]
         [SHAPE] VALUE_OBJECT(com.example.OrderNumber) [local structure: IMMUTABLE_SHAPE(com.example.OrderNumber)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainCriteriaTest-shouldNotMatchTypeNotInRepository
   2 types analysed
@@ -1653,18 +1889,27 @@ DomainLifecycle-aValueNoWayOutSearchesByStaysUndecided
       [DECISION] UNCLASSIFIED(com.acme.hangar.core.Berth) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.acme.hangar.core.Berth) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Berth)]
         [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Berth) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Berth)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.hangar.core.Checkout: APPLICATION_SERVICE (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Ledger, through which the application reaches outside
       involving com.acme.hangar.core.Ledger
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: CALLS_DRIVEN_PORT(com.acme.hangar.core.Ledger)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
   com.acme.hangar.core.Fleet: AGGREGATE_ROOT (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Fleet is a AGGREGATE_ROOT because Ledger keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.hangar.core.Ledger
     derivation:
       [DECISION] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [graph relation: MANAGED_BY(com.acme.hangar.core.Ledger)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.acme.hangar.core.FleetTag: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.acme.hangar.core.FleetTag is a IDENTIFIER because Ledger takes it to answer with Fleet, which keeps it
@@ -1674,12 +1919,19 @@ DomainLifecycle-aValueNoWayOutSearchesByStaysUndecided
       [DECISION] IDENTIFIER(com.acme.hangar.core.FleetTag) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.acme.hangar.core.FleetTag) [graph relation: SEARCHED_BY(com.acme.hangar.core.Ledger)]
         [SHAPE] IDENTIFIER(com.acme.hangar.core.FleetTag) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.FleetTag)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.hangar.core.Ledger: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
       [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
 
 DomainLifecycle-theSubjectAWayOutKeepsIsTheAggregate
   6 types analysed
@@ -1696,18 +1948,27 @@ DomainLifecycle-theSubjectAWayOutKeepsIsTheAggregate
     derivation:
       [DECISION] DRIVING_PORT(com.acme.hangar.core.Boarding) [decided on 1 signal of graph relation]
         [R5] DRIVING_PORT(com.acme.hangar.core.Boarding) [graph relation: HELD_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R5: reads a contract the core fulfils and the outer ring calls as the driving port it is
   com.acme.hangar.core.Checkout: APPLICATION_SERVICE (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Checkout is a APPLICATION_SERVICE because it stands on Boarding, through which the outside reaches the application
       involving com.acme.hangar.core.Boarding
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: ANSWERS_DRIVING_PORT(com.acme.hangar.core.Boarding)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
   com.acme.hangar.core.Fleet: AGGREGATE_ROOT (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Fleet is a AGGREGATE_ROOT because Ledger keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.hangar.core.Ledger
     derivation:
       [DECISION] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [graph relation: MANAGED_BY(com.acme.hangar.core.Ledger)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.acme.hangar.core.FleetTag: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.acme.hangar.core.FleetTag is a IDENTIFIER because Ledger takes it to answer with Fleet, which keeps it
@@ -1717,18 +1978,28 @@ DomainLifecycle-theSubjectAWayOutKeepsIsTheAggregate
       [DECISION] IDENTIFIER(com.acme.hangar.core.FleetTag) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.acme.hangar.core.FleetTag) [graph relation: SEARCHED_BY(com.acme.hangar.core.Ledger)]
         [SHAPE] IDENTIFIER(com.acme.hangar.core.FleetTag) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.FleetTag)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.hangar.core.Ledger: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
       [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
   com.acme.hangar.web.HangarDoor: DRIVING_ADAPTER (HIGH, inferred)
     [framework knowledge] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
     derivation:
       [DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal of framework knowledge]
         [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [framework knowledge: DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor)]
           DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) [spring:org.springframework.web.bind.annotation.RestController]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      W1-DA: reads a type the framework calls from outside as the driving adapter it is
 
 DomainLifecycle-whatAWayOutAnnouncesIsAnEvent
   4 types analysed
@@ -1744,6 +2015,9 @@ DomainLifecycle-whatAWayOutAnnouncesIsAnEvent
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: CALLS_DRIVEN_PORT(com.acme.hangar.core.Wire)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
   com.acme.hangar.core.Notice: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.acme.hangar.core.Notice is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -1755,12 +2029,18 @@ DomainLifecycle-whatAWayOutAnnouncesIsAnEvent
     derivation:
       [DECISION] DOMAIN_EVENT(com.acme.hangar.core.Sailing) [decided on 1 signal of graph relation]
         [R7] DOMAIN_EVENT(com.acme.hangar.core.Sailing) [graph relation: ANNOUNCED_BY(com.acme.hangar.core.Wire)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R7: reads what the domain announces as the domain event it is
   com.acme.hangar.core.Wire: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Wire is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
       [DECISION] DRIVEN_PORT(com.acme.hangar.core.Wire) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.acme.hangar.core.Wire) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
 
 DomainLifecycle-whatAnAggregateIsMadeOfWithoutIdentityIsAValue
   6 types analysed
@@ -1776,12 +2056,18 @@ DomainLifecycle-whatAnAggregateIsMadeOfWithoutIdentityIsAValue
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: CALLS_DRIVEN_PORT(com.acme.hangar.core.Ledger)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
   com.acme.hangar.core.Fleet: AGGREGATE_ROOT (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Fleet is a AGGREGATE_ROOT because Ledger keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.hangar.core.Ledger
     derivation:
       [DECISION] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [graph relation: MANAGED_BY(com.acme.hangar.core.Ledger)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.acme.hangar.core.FleetTag: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.acme.hangar.core.FleetTag is a IDENTIFIER because Ledger takes it to answer with Fleet, which keeps it
@@ -1791,18 +2077,28 @@ DomainLifecycle-whatAnAggregateIsMadeOfWithoutIdentityIsAValue
       [DECISION] IDENTIFIER(com.acme.hangar.core.FleetTag) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.acme.hangar.core.FleetTag) [graph relation: SEARCHED_BY(com.acme.hangar.core.Ledger)]
         [SHAPE] IDENTIFIER(com.acme.hangar.core.FleetTag) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.FleetTag)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.hangar.core.Hull: VALUE_OBJECT (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Hull is a VALUE_OBJECT because Fleet is made of it and it carries no identity of its own
       involving com.acme.hangar.core.Fleet
     derivation:
       [DECISION] VALUE_OBJECT(com.acme.hangar.core.Hull) [decided on 1 signal of graph relation]
         [R3b] VALUE_OBJECT(com.acme.hangar.core.Hull) [graph relation: OWNED_BY(com.acme.hangar.core.Fleet)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R3b: reads a part of an aggregate that carries no identity as the value it is
   com.acme.hangar.core.Ledger: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
       [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
   com.acme.hangar.core.Manifest: VALUE_OBJECT (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.acme.hangar.core.Manifest is a VALUE_OBJECT because Fleet is made of it and it carries no identity of its own
@@ -1812,6 +2108,10 @@ DomainLifecycle-whatAnAggregateIsMadeOfWithoutIdentityIsAValue
       [DECISION] VALUE_OBJECT(com.acme.hangar.core.Manifest) [decided on 1 signal of graph relation, 1 of local structure]
         [R3b] VALUE_OBJECT(com.acme.hangar.core.Manifest) [graph relation: OWNED_BY(com.acme.hangar.core.Fleet)]
         [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R3b: reads a part of an aggregate that carries no identity as the value it is
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 DomainLifecycle-whatCarriesAnIdentityOfItsOwnIsAnEntity
   7 types analysed
@@ -1828,12 +2128,18 @@ DomainLifecycle-whatCarriesAnIdentityOfItsOwnIsAnEntity
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: CALLS_DRIVEN_PORT(com.acme.hangar.core.Ledger)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
   com.acme.hangar.core.Fleet: AGGREGATE_ROOT (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Fleet is a AGGREGATE_ROOT because Ledger keeps it and hands it back, which is a lifecycle of its own
       involving com.acme.hangar.core.Ledger
     derivation:
       [DECISION] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.acme.hangar.core.Fleet) [graph relation: MANAGED_BY(com.acme.hangar.core.Ledger)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.acme.hangar.core.FleetTag: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.acme.hangar.core.FleetTag is a IDENTIFIER because Ledger takes it to answer with Fleet, which keeps it
@@ -1843,12 +2149,19 @@ DomainLifecycle-whatCarriesAnIdentityOfItsOwnIsAnEntity
       [DECISION] IDENTIFIER(com.acme.hangar.core.FleetTag) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.acme.hangar.core.FleetTag) [graph relation: SEARCHED_BY(com.acme.hangar.core.Ledger)]
         [SHAPE] IDENTIFIER(com.acme.hangar.core.FleetTag) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.FleetTag)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.hangar.core.Hull: ENTITY (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Hull is a ENTITY because Fleet is made of it and it carries an identity of its own
       involving com.acme.hangar.core.Fleet
     derivation:
       [DECISION] ENTITY(com.acme.hangar.core.Hull) [decided on 1 signal of graph relation]
         [R3a] ENTITY(com.acme.hangar.core.Hull) [graph relation: OWNED_BY(com.acme.hangar.core.Fleet)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R3a: reads a part of an aggregate that carries an identity of its own as the entity it is
   com.acme.hangar.core.HullTag: IDENTIFIER (EXPLICIT, declared)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [declared intent] com.acme.hangar.core.HullTag declares IDENTIFIER by bearing org.jmolecules.ddd.types.Identifier (pack jmolecules)
@@ -1858,12 +2171,19 @@ DomainLifecycle-whatCarriesAnIdentityOfItsOwnIsAnEntity
         [INTENT] IDENTIFIER(com.acme.hangar.core.HullTag) [declared intent: DECLARED_KIND(IDENTIFIER), 1 steps away]
           DECLARED_KIND(com.acme.hangar.core.HullTag) [jmolecules:org.jmolecules.ddd.types.Identifier]
         [SHAPE] IDENTIFIER(com.acme.hangar.core.HullTag) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.HullTag)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.hangar.core.Ledger: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
       [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
   com.acme.hangar.core.Manifest: VALUE_OBJECT (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.acme.hangar.core.Manifest is a VALUE_OBJECT because Hull is made of it and it carries no identity of its own
@@ -1873,6 +2193,10 @@ DomainLifecycle-whatCarriesAnIdentityOfItsOwnIsAnEntity
       [DECISION] VALUE_OBJECT(com.acme.hangar.core.Manifest) [decided on 1 signal of graph relation, 1 of local structure]
         [R3b] VALUE_OBJECT(com.acme.hangar.core.Manifest) [graph relation: OWNED_BY(com.acme.hangar.core.Hull)]
         [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Manifest) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Manifest)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R3b: reads a part of an aggregate that carries no identity as the value it is
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 FlexibleApplicationServiceCriteriaTest-shouldMatchPivotClass
   3 types analysed
@@ -1887,6 +2211,9 @@ FlexibleApplicationServiceCriteriaTest-shouldMatchPivotClass
     derivation:
       [DECISION] APPLICATION_SERVICE(com.example.application.OrderService) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.example.application.OrderService) [graph relation: CALLS_DRIVEN_PORT(com.example.ports.out.OrderRepository)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
   com.example.ports.in.OrderUseCases: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.example.ports.in.OrderUseCases is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -1898,6 +2225,9 @@ FlexibleApplicationServiceCriteriaTest-shouldMatchPivotClass
     derivation:
       [DECISION] DRIVEN_PORT(com.example.ports.out.OrderRepository) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.example.ports.out.OrderRepository) [graph relation: CONSUMED_BY_CORE(com.example.application.OrderService)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
 
 FlexibleApplicationServiceCriteriaTest-shouldNotMatchAbstractClass
   2 types analysed
@@ -1964,12 +2294,18 @@ FlexibleApplicationServiceCriteriaTest-shouldNotMatchOutboundOnlyClass
     derivation:
       [DECISION] APPLICATION_SERVICE(com.example.application.BackgroundProcessor) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.example.application.BackgroundProcessor) [graph relation: CALLS_DRIVEN_PORT(com.example.ports.out.NotificationGateway)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
   com.example.ports.out.NotificationGateway: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.example.ports.out.NotificationGateway is a DRIVEN_PORT because BackgroundProcessor calls it and nothing inside the hexagon implements it
       involving com.example.application.BackgroundProcessor
     derivation:
       [DECISION] DRIVEN_PORT(com.example.ports.out.NotificationGateway) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.example.ports.out.NotificationGateway) [graph relation: CONSUMED_BY_CORE(com.example.application.BackgroundProcessor)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
 
 GoldenFileTest-createBankingDomain
   6 types analysed
@@ -1986,6 +2322,9 @@ GoldenFileTest-createBankingDomain
     derivation:
       [DECISION] AGGREGATE_ROOT(com.example.banking.domain.Account) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.example.banking.domain.Account) [graph relation: MANAGED_BY(com.example.banking.ports.out.AccountRepository)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.example.banking.domain.AccountId: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.example.banking.domain.AccountId is a IDENTIFIER because AccountRepository takes it to answer with Account, which keeps it
@@ -1995,6 +2334,10 @@ GoldenFileTest-createBankingDomain
       [DECISION] IDENTIFIER(com.example.banking.domain.AccountId) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.example.banking.domain.AccountId) [graph relation: SEARCHED_BY(com.example.banking.ports.out.AccountRepository)]
         [SHAPE] IDENTIFIER(com.example.banking.domain.AccountId) [local structure: SINGLE_VALUE_WRAPPER(com.example.banking.domain.AccountId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.example.banking.domain.Money: VALUE_OBJECT (EXPLICIT, declared)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [declared intent] com.example.banking.domain.Money declares VALUE_OBJECT by bearing org.jmolecules.ddd.annotation.ValueObject (pack jmolecules)
@@ -2010,24 +2353,38 @@ GoldenFileTest-createBankingDomain
         [R3b] VALUE_OBJECT(com.example.banking.domain.Money) [graph relation: OWNED_BY(com.example.banking.domain.Account)]
         [R3b] VALUE_OBJECT(com.example.banking.domain.Money) [graph relation: OWNED_BY(com.example.banking.domain.Transaction)]
         [SHAPE] VALUE_OBJECT(com.example.banking.domain.Money) [local structure: IMMUTABLE_SHAPE(com.example.banking.domain.Money)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
+      R3b: reads a part of an aggregate that carries no identity as the value it is
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.example.banking.domain.Transaction: ENTITY (EXPLICIT, declared)
     [declared intent] com.example.banking.domain.Transaction declares ENTITY by bearing org.jmolecules.ddd.annotation.Entity (pack jmolecules)
     derivation:
       [DECISION] ENTITY(com.example.banking.domain.Transaction) [decided on 1 signal of declared intent]
         [INTENT] ENTITY(com.example.banking.domain.Transaction) [declared intent: DECLARED_KIND(ENTITY)]
           DECLARED_KIND(com.example.banking.domain.Transaction) [jmolecules:org.jmolecules.ddd.annotation.Entity]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.example.banking.ports.in.TransferUseCase: DRIVING_PORT (EXPLICIT, declared)
     [declared intent] com.example.banking.ports.in.TransferUseCase declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
     derivation:
       [DECISION] DRIVING_PORT(com.example.banking.ports.in.TransferUseCase) [decided on 1 signal of declared intent]
         [INTENT] DRIVING_PORT(com.example.banking.ports.in.TransferUseCase) [declared intent: DECLARED_KIND(DRIVING_PORT)]
           DECLARED_KIND(com.example.banking.ports.in.TransferUseCase) [jmolecules:org.jmolecules.architecture.hexagonal.PrimaryPort]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.example.banking.ports.out.AccountRepository: DRIVEN_PORT (EXPLICIT, declared)
     [declared intent] com.example.banking.ports.out.AccountRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
       [DECISION] DRIVEN_PORT(com.example.banking.ports.out.AccountRepository) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.banking.ports.out.AccountRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.banking.ports.out.AccountRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 GoldenFileTest-createCoffeeshopDomain
   6 types analysed
@@ -2049,6 +2406,11 @@ GoldenFileTest-createCoffeeshopDomain
           DECLARED_KIND(com.coffeeshop.domain.order.LineItem) [jmolecules:org.jmolecules.ddd.annotation.ValueObject]
         [R3b] VALUE_OBJECT(com.coffeeshop.domain.order.LineItem) [graph relation: OWNED_BY(com.coffeeshop.domain.order.Order)]
         [SHAPE] VALUE_OBJECT(com.coffeeshop.domain.order.LineItem) [local structure: IMMUTABLE_SHAPE(com.coffeeshop.domain.order.LineItem)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
+      R3b: reads a part of an aggregate that carries no identity as the value it is
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.coffeeshop.domain.order.Location: VALUE_OBJECT (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.coffeeshop.domain.order.Location is a VALUE_OBJECT because Order is made of it and it carries no identity of its own
@@ -2058,12 +2420,19 @@ GoldenFileTest-createCoffeeshopDomain
       [DECISION] VALUE_OBJECT(com.coffeeshop.domain.order.Location) [decided on 1 signal of graph relation, 1 of local structure]
         [R3b] VALUE_OBJECT(com.coffeeshop.domain.order.Location) [graph relation: OWNED_BY(com.coffeeshop.domain.order.Order)]
         [SHAPE] VALUE_OBJECT(com.coffeeshop.domain.order.Location) [local structure: IMMUTABLE_SHAPE(com.coffeeshop.domain.order.Location)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R3b: reads a part of an aggregate that carries no identity as the value it is
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.coffeeshop.domain.order.Order: AGGREGATE_ROOT (HIGH, inferred)
     [graph relation] com.coffeeshop.domain.order.Order is a AGGREGATE_ROOT because OrderRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.coffeeshop.ports.out.OrderRepository
     derivation:
       [DECISION] AGGREGATE_ROOT(com.coffeeshop.domain.order.Order) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.coffeeshop.domain.order.Order) [graph relation: MANAGED_BY(com.coffeeshop.ports.out.OrderRepository)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.coffeeshop.domain.order.OrderId: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.coffeeshop.domain.order.OrderId is a IDENTIFIER because OrderRepository takes it to answer with Order, which keeps it
@@ -2073,18 +2442,28 @@ GoldenFileTest-createCoffeeshopDomain
       [DECISION] IDENTIFIER(com.coffeeshop.domain.order.OrderId) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.coffeeshop.domain.order.OrderId) [graph relation: SEARCHED_BY(com.coffeeshop.ports.out.OrderRepository)]
         [SHAPE] IDENTIFIER(com.coffeeshop.domain.order.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.coffeeshop.domain.order.OrderId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.coffeeshop.ports.in.OrderingCoffee: DRIVING_PORT (EXPLICIT, declared)
     [declared intent] com.coffeeshop.ports.in.OrderingCoffee declares DRIVING_PORT by bearing org.jmolecules.architecture.hexagonal.PrimaryPort (pack jmolecules)
     derivation:
       [DECISION] DRIVING_PORT(com.coffeeshop.ports.in.OrderingCoffee) [decided on 1 signal of declared intent]
         [INTENT] DRIVING_PORT(com.coffeeshop.ports.in.OrderingCoffee) [declared intent: DECLARED_KIND(DRIVING_PORT)]
           DECLARED_KIND(com.coffeeshop.ports.in.OrderingCoffee) [jmolecules:org.jmolecules.architecture.hexagonal.PrimaryPort]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.coffeeshop.ports.out.OrderRepository: DRIVEN_PORT (EXPLICIT, declared)
     [declared intent] com.coffeeshop.ports.out.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
       [DECISION] DRIVEN_PORT(com.coffeeshop.ports.out.OrderRepository) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.coffeeshop.ports.out.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.coffeeshop.ports.out.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 GoldenFileTest-createEcommerceDomain
   9 types analysed
@@ -2098,6 +2477,9 @@ GoldenFileTest-createEcommerceDomain
     derivation:
       [DECISION] AGGREGATE_ROOT(com.ecommerce.customer.Customer) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.ecommerce.customer.Customer) [graph relation: MANAGED_BY(com.ecommerce.customer.CustomerRepository)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.ecommerce.customer.CustomerId: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.ecommerce.customer.CustomerId is a IDENTIFIER because CustomerRepository takes it to answer with Customer, which keeps it
@@ -2107,18 +2489,28 @@ GoldenFileTest-createEcommerceDomain
       [DECISION] IDENTIFIER(com.ecommerce.customer.CustomerId) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.ecommerce.customer.CustomerId) [graph relation: SEARCHED_BY(com.ecommerce.customer.CustomerRepository)]
         [SHAPE] IDENTIFIER(com.ecommerce.customer.CustomerId) [local structure: SINGLE_VALUE_WRAPPER(com.ecommerce.customer.CustomerId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.ecommerce.customer.CustomerRepository: DRIVEN_PORT (EXPLICIT, declared)
     [declared intent] com.ecommerce.customer.CustomerRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
       [DECISION] DRIVEN_PORT(com.ecommerce.customer.CustomerRepository) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.ecommerce.customer.CustomerRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.ecommerce.customer.CustomerRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.ecommerce.order.Order: AGGREGATE_ROOT (HIGH, inferred)
     [graph relation] com.ecommerce.order.Order is a AGGREGATE_ROOT because OrderRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.ecommerce.order.OrderRepository
     derivation:
       [DECISION] AGGREGATE_ROOT(com.ecommerce.order.Order) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.ecommerce.order.Order) [graph relation: MANAGED_BY(com.ecommerce.order.OrderRepository)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.ecommerce.order.OrderId: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.ecommerce.order.OrderId is a IDENTIFIER because OrderRepository takes it to answer with Order, which keeps it
@@ -2128,18 +2520,28 @@ GoldenFileTest-createEcommerceDomain
       [DECISION] IDENTIFIER(com.ecommerce.order.OrderId) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.ecommerce.order.OrderId) [graph relation: SEARCHED_BY(com.ecommerce.order.OrderRepository)]
         [SHAPE] IDENTIFIER(com.ecommerce.order.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.ecommerce.order.OrderId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.ecommerce.order.OrderRepository: DRIVEN_PORT (EXPLICIT, declared)
     [declared intent] com.ecommerce.order.OrderRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
       [DECISION] DRIVEN_PORT(com.ecommerce.order.OrderRepository) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.ecommerce.order.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.ecommerce.order.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.ecommerce.product.Product: AGGREGATE_ROOT (HIGH, inferred)
     [graph relation] com.ecommerce.product.Product is a AGGREGATE_ROOT because ProductRepository keeps it and hands it back, which is a lifecycle of its own
       involving com.ecommerce.product.ProductRepository
     derivation:
       [DECISION] AGGREGATE_ROOT(com.ecommerce.product.Product) [decided on 1 signal of graph relation]
         [R1b] AGGREGATE_ROOT(com.ecommerce.product.Product) [graph relation: MANAGED_BY(com.ecommerce.product.ProductRepository)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R1b: reads the type a way out stores and retrieves as the aggregate it is
   com.ecommerce.product.ProductId: IDENTIFIER (HIGH, inferred)
     signals, strongest first: declared intent > framework knowledge > graph relation > local structure > topology > naming
     [graph relation] com.ecommerce.product.ProductId is a IDENTIFIER because ProductRepository takes it to answer with Product, which keeps it
@@ -2149,12 +2551,19 @@ GoldenFileTest-createEcommerceDomain
       [DECISION] IDENTIFIER(com.ecommerce.product.ProductId) [decided on 1 signal of graph relation, 1 of local structure]
         [R2] IDENTIFIER(com.ecommerce.product.ProductId) [graph relation: SEARCHED_BY(com.ecommerce.product.ProductRepository)]
         [SHAPE] IDENTIFIER(com.ecommerce.product.ProductId) [local structure: SINGLE_VALUE_WRAPPER(com.ecommerce.product.ProductId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R2: reads the key a way out searches an aggregate by as the identity of that aggregate
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.ecommerce.product.ProductRepository: DRIVEN_PORT (EXPLICIT, declared)
     [declared intent] com.ecommerce.product.ProductRepository declares DRIVEN_PORT by bearing org.jmolecules.ddd.annotation.Repository (pack jmolecules)
     derivation:
       [DECISION] DRIVEN_PORT(com.ecommerce.product.ProductRepository) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.ecommerce.product.ProductRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.ecommerce.product.ProductRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 PortBoundary-contractNoRingCallsStaysSilent
   2 types analysed
@@ -2190,6 +2599,9 @@ PortBoundary-contractOnlyTheRingCallsIsNotAPort
       [DECISION] DRIVEN_ADAPTER(com.acme.hangar.store.HangarBooks) [decided on 1 signal of framework knowledge]
         [W1-DR] DRIVEN_ADAPTER(com.acme.hangar.store.HangarBooks) [framework knowledge: INFRA_DEPENDENCY(jakarta.persistence.EntityManager)]
           INFRA_DEPENDENCY(jakarta.persistence.EntityManager) [jakarta:jakarta.persistence.EntityManager]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      W1-DR: reads a type that holds a tool reaching outside the hexagon as the driven adapter it is
 
 PortBoundary-contractTheCoreAlsoWritesIsNotAPort
   3 types analysed
@@ -2208,6 +2620,9 @@ PortBoundary-contractTheCoreAlsoWritesIsNotAPort
       [DECISION] UNCLASSIFIED(com.acme.hangar.core.Checkout) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.acme.hangar.core.Checkout) [local structure: SINGLE_VALUE_WRAPPER(com.acme.hangar.core.Checkout)]
         [SHAPE] VALUE_OBJECT(com.acme.hangar.core.Checkout) [local structure: IMMUTABLE_SHAPE(com.acme.hangar.core.Checkout)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
   com.acme.hangar.core.Ledger: UNCLASSIFIED (LOW, inferred)
     UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
     to make it explicit: com.acme.hangar.core.Ledger is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
@@ -2230,12 +2645,18 @@ PortBoundary-contractTheCoreCallsIsADrivenPort
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.acme.hangar.core.Checkout) [graph relation: CALLS_DRIVEN_PORT(com.acme.hangar.core.Ledger)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
   com.acme.hangar.core.Ledger: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.acme.hangar.core.Ledger is a DRIVEN_PORT because Checkout calls it and nothing inside the hexagon implements it
       involving com.acme.hangar.core.Checkout
     derivation:
       [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of graph relation]
         [R4] DRIVEN_PORT(com.acme.hangar.core.Ledger) [graph relation: CONSUMED_BY_CORE(com.acme.hangar.core.Checkout)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R4: reads a contract the core calls and nothing inside fulfils as the driven port it is
 
 PortBoundary-contractTheRingCallsAndTheCoreWritesIsADrivingPort
   3 types analysed
@@ -2249,18 +2670,27 @@ PortBoundary-contractTheRingCallsAndTheCoreWritesIsADrivingPort
     derivation:
       [DECISION] DRIVING_PORT(com.acme.hangar.core.Assembly) [decided on 1 signal of graph relation]
         [R5] DRIVING_PORT(com.acme.hangar.core.Assembly) [graph relation: HELD_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R5: reads a contract the core fulfils and the outer ring calls as the driving port it is
   com.acme.hangar.core.AssemblyLine: APPLICATION_SERVICE (HIGH, inferred)
     [graph relation] com.acme.hangar.core.AssemblyLine is a APPLICATION_SERVICE because it stands on Assembly, through which the outside reaches the application
       involving com.acme.hangar.core.Assembly
     derivation:
       [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.AssemblyLine) [decided on 1 signal of graph relation]
         [R6] APPLICATION_SERVICE(com.acme.hangar.core.AssemblyLine) [graph relation: ANSWERS_DRIVING_PORT(com.acme.hangar.core.Assembly)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
   com.acme.hangar.web.HangarDoor: DRIVING_ADAPTER (HIGH, inferred)
     [framework knowledge] com.acme.hangar.web.HangarDoor is a DRIVING_ADAPTER because the framework calls it from outside the application (org.springframework.web.bind.annotation.RestController)
     derivation:
       [DECISION] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [decided on 1 signal of framework knowledge]
         [W1-DA] DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor) [framework knowledge: DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor)]
           DRIVING_ENTRYPOINT(com.acme.hangar.web.HangarDoor) [spring:org.springframework.web.bind.annotation.RestController]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      W1-DA: reads a type the framework calls from outside as the driving adapter it is
 
 PortBoundary-declaredWayOutPlacesItsImplementer
   2 types analysed
@@ -2273,12 +2703,18 @@ PortBoundary-declaredWayOutPlacesItsImplementer
       [DECISION] DRIVEN_PORT(com.acme.hangar.core.Ledger) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.acme.hangar.core.Ledger) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.acme.hangar.core.Ledger) [jmolecules:org.jmolecules.architecture.hexagonal.SecondaryPort]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
   com.acme.hangar.store.LedgerBook: DRIVEN_ADAPTER (HIGH, inferred)
     [graph relation] com.acme.hangar.store.LedgerBook is a DRIVEN_ADAPTER because it answers Ledger, which the hexagon calls to reach outside
       involving com.acme.hangar.core.Ledger
     derivation:
       [DECISION] DRIVEN_ADAPTER(com.acme.hangar.store.LedgerBook) [decided on 1 signal of graph relation]
         [W1-DR2] DRIVEN_ADAPTER(com.acme.hangar.store.LedgerBook) [graph relation: IMPLEMENTS_DRIVEN_PORT(com.acme.hangar.core.Ledger)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      W1-DR2: reads what fulfils an established way out as the driven adapter it is
 
 PortClassifierTest-classificationShouldBeDeterministic
   1 types analysed
@@ -2290,6 +2726,9 @@ PortClassifierTest-classificationShouldBeDeterministic
       [DECISION] DRIVEN_PORT(com.example.CustomerRepository) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.CustomerRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.CustomerRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 PortClassifierTest-explicitAnnotationTakesPriority
   1 types analysed
@@ -2301,6 +2740,9 @@ PortClassifierTest-explicitAnnotationTakesPriority
       [DECISION] DRIVEN_PORT(com.example.PaymentGateway) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.PaymentGateway) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.PaymentGateway) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 PortClassifierTest-gatewayShouldBeDriven
   1 types analysed
@@ -2312,6 +2754,9 @@ PortClassifierTest-gatewayShouldBeDriven
       [DECISION] DRIVEN_PORT(com.example.PaymentGateway) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.PaymentGateway) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.PaymentGateway) [jmolecules:org.jmolecules.architecture.hexagonal.SecondaryPort]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 PortClassifierTest-interfaceWithUseCaseSuffixShouldNotBeDriven
   2 types analysed
@@ -2355,6 +2800,9 @@ PortClassifierTest-repositoryShouldBeDriven
       [DECISION] DRIVEN_PORT(com.example.OrderRepository) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 PortClassifierTest-shouldClassifyExplicitPrimaryPort
   1 types analysed
@@ -2366,6 +2814,9 @@ PortClassifierTest-shouldClassifyExplicitPrimaryPort
       [DECISION] DRIVING_PORT(com.example.PlaceOrderUseCase) [decided on 1 signal of declared intent]
         [INTENT] DRIVING_PORT(com.example.PlaceOrderUseCase) [declared intent: DECLARED_KIND(DRIVING_PORT)]
           DECLARED_KIND(com.example.PlaceOrderUseCase) [jmolecules:org.jmolecules.architecture.hexagonal.PrimaryPort]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 PortClassifierTest-shouldClassifyExplicitRepository
   1 types analysed
@@ -2377,6 +2828,9 @@ PortClassifierTest-shouldClassifyExplicitRepository
       [DECISION] DRIVEN_PORT(com.example.OrderRepository) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 PortClassifierTest-shouldClassifyExplicitSecondaryPort
   1 types analysed
@@ -2388,6 +2842,9 @@ PortClassifierTest-shouldClassifyExplicitSecondaryPort
       [DECISION] DRIVEN_PORT(com.example.PaymentGateway) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.PaymentGateway) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.PaymentGateway) [jmolecules:org.jmolecules.architecture.hexagonal.SecondaryPort]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 PortClassifierTest-shouldHandleEmptyInterface
   1 types analysed
@@ -2409,6 +2866,9 @@ PortClassifierTest-shouldHandleEnumTypes
     derivation:
       [DECISION] VALUE_OBJECT(com.example.OrderStatus) [decided on 1 signal of local structure]
         [SHAPE] VALUE_OBJECT(com.example.OrderStatus) [local structure: IMMUTABLE_SHAPE(com.example.OrderStatus)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 PortClassifierTest-shouldHandleRecordTypes
   1 types analysed
@@ -2426,6 +2886,9 @@ PortClassifierTest-shouldHandleRecordTypes
       [DECISION] UNCLASSIFIED(com.example.OrderId) [AMBIGUOUS between IDENTIFIER and VALUE_OBJECT]
         [SHAPE] IDENTIFIER(com.example.OrderId) [local structure: SINGLE_VALUE_WRAPPER(com.example.OrderId)]
         [SHAPE] VALUE_OBJECT(com.example.OrderId) [local structure: IMMUTABLE_SHAPE(com.example.OrderId)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
 
 PortClassifierTest-shouldReturnUnclassifiedForClass
   1 types analysed
@@ -2459,6 +2922,9 @@ PortClassifierTest-useCaseShouldBeDriving
       [DECISION] DRIVING_PORT(com.example.PlaceOrderUseCase) [decided on 1 signal of declared intent]
         [INTENT] DRIVING_PORT(com.example.PlaceOrderUseCase) [declared intent: DECLARED_KIND(DRIVING_PORT)]
           DECLARED_KIND(com.example.PlaceOrderUseCase) [jmolecules:org.jmolecules.architecture.hexagonal.PrimaryPort]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 PortCriteriaTest-shouldMatchInterfaceImplementingPrimaryPort
   1 types analysed
@@ -2503,6 +2969,9 @@ PortCriteriaTest-shouldMatchInterfaceWithRepositoryAnnotation
       [DECISION] DRIVEN_PORT(com.example.OrderRepository) [decided on 1 signal of declared intent]
         [INTENT] DRIVEN_PORT(com.example.OrderRepository) [declared intent: DECLARED_KIND(DRIVEN_PORT)]
           DECLARED_KIND(com.example.OrderRepository) [jmolecules:org.jmolecules.ddd.annotation.Repository]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
 PortCriteriaTest-shouldNotMatchDomainEventInterface
   1 types analysed

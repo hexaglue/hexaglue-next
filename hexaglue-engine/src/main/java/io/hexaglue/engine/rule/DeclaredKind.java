@@ -59,6 +59,11 @@ public final class DeclaredKind implements Rule {
     }
 
     @Override
+    public String title() {
+        return "takes the kind the author declared in the sources, by an intent annotation or interface";
+    }
+
+    @Override
     public Set<Predicate> reads() {
         return Set.of(Predicate.KNOWLEDGE);
     }

@@ -61,6 +61,11 @@ public final class PortPivot implements Rule {
     }
 
     @Override
+    public String title() {
+        return "reads the type standing between the ports as the application service it is";
+    }
+
+    @Override
     public Set<Predicate> writes() {
         return Set.of(Predicate.EVIDENCE);
     }

@@ -22,11 +22,15 @@ import io.hexaglue.model.TypeId;
 import io.hexaglue.model.TypeNature;
 import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.arch.AggregateRoot;
+import io.hexaglue.model.arch.ApplicationService;
 import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.arch.ArchType;
+import io.hexaglue.model.arch.DomainEvent;
 import io.hexaglue.model.arch.DrivenAdapter;
 import io.hexaglue.model.arch.DrivenPort;
 import io.hexaglue.model.arch.DrivenPortType;
+import io.hexaglue.model.arch.DrivingAdapter;
+import io.hexaglue.model.arch.DrivingPort;
 import io.hexaglue.model.arch.Entity;
 import io.hexaglue.model.arch.TypeStructure;
 import io.hexaglue.model.arch.ValueObject;
@@ -39,6 +43,7 @@ import io.hexaglue.model.code.Edge;
 import io.hexaglue.model.code.EdgeKind;
 import io.hexaglue.model.code.TypeNode;
 import io.hexaglue.model.config.AnalysisScope;
+import io.hexaglue.model.config.ClassificationConfig;
 import io.hexaglue.model.declaration.Field;
 import io.hexaglue.model.declaration.FieldRole;
 import io.hexaglue.model.declaration.Method;
@@ -53,6 +58,9 @@ import java.util.Set;
  * A shop stated one fact at a time, so that each check is read against the smallest architecture
  * that can trigger it — and against the neighbouring one that must not.
  */
+// One verb per architectural fact is what lets a test state the smallest shop that triggers a
+// check and the neighbouring one that must not. Splitting the vocabulary would scatter that.
+@SuppressWarnings("PMD.TooManyMethods")
 final class ShopJudgements {
 
     private final List<ArchType> types = new ArrayList<>();
@@ -201,12 +209,83 @@ final class ShopJudgements {
         return this;
     }
 
+    ShopJudgements drivenAdapterFor(String id, String portId) {
+        types.add(new DrivenAdapter(
+                TypeId.of(id),
+                TypeStructure.builder(TypeNature.CLASS)
+                        .interfaces(List.of(TypeRef.of(portId)))
+                        .build(),
+                verdict(ArchKind.DRIVEN_ADAPTER),
+                List.of(TypeRef.of(portId))));
+        return this;
+    }
+
+    ShopJudgements drivingAdapterFor(String id, String portId) {
+        types.add(new DrivingAdapter(
+                TypeId.of(id),
+                structure(TypeNature.CLASS, List.of(), List.of()),
+                verdict(ArchKind.DRIVING_ADAPTER),
+                List.of(TypeRef.of(portId))));
+        return this;
+    }
+
+    ShopJudgements drivingPort(String id) {
+        types.add(new DrivingPort(
+                TypeId.of(id),
+                structure(TypeNature.INTERFACE, List.of(), List.of()),
+                verdict(ArchKind.DRIVING_PORT),
+                List.of(),
+                List.of(),
+                List.of()));
+        return this;
+    }
+
+    ShopJudgements drivingPortAsClass(String id) {
+        types.add(new DrivingPort(
+                TypeId.of(id),
+                structure(TypeNature.CLASS, List.of(), List.of()),
+                verdict(ArchKind.DRIVING_PORT),
+                List.of(),
+                List.of(),
+                List.of()));
+        return this;
+    }
+
+    ShopJudgements applicationService(String id, String... implementedPorts) {
+        types.add(new ApplicationService(
+                TypeId.of(id),
+                TypeStructure.builder(TypeNature.CLASS)
+                        .interfaces(refs(implementedPorts))
+                        .build(),
+                verdict(ArchKind.APPLICATION_SERVICE)));
+        return this;
+    }
+
+    ShopJudgements domainEvent(String id) {
+        types.add(new DomainEvent(
+                TypeId.of(id),
+                structure(TypeNature.RECORD, List.of(), List.of()),
+                verdict(ArchKind.DOMAIN_EVENT),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty()));
+        return this;
+    }
+
     ShopJudgements uses(String from, String to) {
         edges.add(Edge.of(TypeId.of(from), EdgeKind.FIELD_TYPE, TypeId.of(to)));
         return this;
     }
 
+    List<Finding> judgeWith(ClassificationConfig vocabulary) {
+        return judge(vocabulary);
+    }
+
     List<Finding> judge() {
+        return judge(ClassificationConfig.defaults());
+    }
+
+    private List<Finding> judge(ClassificationConfig vocabulary) {
         ArchModel.Builder model = ArchModel.builder();
         types.forEach(model::addType);
         CodeModel.Builder code = CodeModel.builder();
@@ -215,6 +294,7 @@ final class ShopJudgements {
                 .build()));
         edges.forEach(code::addEdge);
         CodeModel built = code.build();
-        return Findings.of(model.build(), Dependencies.of(built, Perimeter.of(built, AnalysisScope.everything())));
+        return Findings.of(
+                model.build(), Dependencies.of(built, Perimeter.of(built, AnalysisScope.everything())), vocabulary);
     }
 }

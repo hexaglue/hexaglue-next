@@ -99,7 +99,8 @@ class FrontendRequestTest {
                     List.of(),
                     FrontendRequest.DEFAULT_JAVA_VERSION,
                     AnalysisScope.everything(),
-                    Set.of(CodeModelCapability.METHOD_BODIES));
+                    Set.of(CodeModelCapability.METHOD_BODIES),
+                    Optional.empty());
 
             assertThat(request.capabilities()).containsExactly(CodeModelCapability.METHOD_BODIES);
             assertThat(request.sourceRoots()).isUnmodifiable();

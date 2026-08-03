@@ -19,6 +19,7 @@ import io.hexaglue.frontend.TypeNodeMapper.MappedType;
 import io.hexaglue.model.TypeId;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.MethodBodyFacts;
+import io.hexaglue.model.code.ModuleNode;
 import io.hexaglue.model.code.TypeNode;
 import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.model.finding.DiagnosticSeverity;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spoon.Launcher;
@@ -108,7 +110,10 @@ public final class SpoonFrontend {
 
         CodeModel.Builder model = CodeModel.builder();
         request.capabilities().forEach(model::capability);
-        allNodes.forEach(model::addType);
+        // A stub is a type the classpath supplied, not one this module holds: stamping it would
+        // put another project's types inside this one's boundary.
+        request.moduleName().ifPresent(module -> model.addModule(new ModuleNode(module, Optional.empty())));
+        allNodes.forEach(node -> model.addType(stamped(node, nodes, request)));
         relations.all().forEach(model::addEdge);
         bodyFacts.forEach(model::addBodyFacts);
         Supertypes.closures(allNodes, request.classpath()).forEach(model::supertypes);
@@ -119,6 +124,16 @@ public final class SpoonFrontend {
                 relations.all().size(),
                 diagnostics.size());
         return new FrontendResult(model.build(), diagnostics);
+    }
+
+    /**
+     * Records which module a type was read from, on the types this reading actually analysed.
+     */
+    private static TypeNode stamped(TypeNode node, List<TypeNode> analysed, FrontendRequest request) {
+        return request.moduleName()
+                .filter(module -> analysed.contains(node))
+                .map(node::inModule)
+                .orElse(node);
     }
 
     /**

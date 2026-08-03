@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -36,6 +37,7 @@ import java.util.Set;
  * @param javaVersion the Java language level the sources are parsed at
  * @param scope the perimeter of the analysis
  * @param capabilities the optional extractions to run
+ * @param moduleName the reactor module these sources belong to, absent on a single-module project
  * @since 7.0.0
  */
 public record FrontendRequest(
@@ -43,7 +45,8 @@ public record FrontendRequest(
         List<Path> classpath,
         int javaVersion,
         AnalysisScope scope,
-        Set<CodeModelCapability> capabilities) {
+        Set<CodeModelCapability> capabilities,
+        Optional<String> moduleName) {
 
     /** The Java level sources are parsed at unless the caller asks for another one. */
     public static final int DEFAULT_JAVA_VERSION = 17;
@@ -57,6 +60,7 @@ public record FrontendRequest(
         Objects.requireNonNull(classpath, "classpath must not be null");
         Objects.requireNonNull(scope, "scope must not be null");
         Objects.requireNonNull(capabilities, "capabilities must not be null");
+        Objects.requireNonNull(moduleName, "moduleName must not be null");
         if (sourceRoots.isEmpty()) {
             throw new IllegalArgumentException("at least one source root is required");
         }
@@ -109,6 +113,7 @@ public record FrontendRequest(
         private final Set<CodeModelCapability> capabilities = EnumSet.noneOf(CodeModelCapability.class);
         private int javaVersion = DEFAULT_JAVA_VERSION;
         private AnalysisScope scope = AnalysisScope.everything();
+        private Optional<String> moduleName = Optional.empty();
 
         private Builder() {}
 
@@ -146,7 +151,21 @@ public record FrontendRequest(
         }
 
         /**
-         * Sets the perimeter of the analysis.
+         * States which module of a reactor these sources belong to.
+         *
+         * <p>Only the host knows this: a source root says nothing about the module it was declared
+         * in. Left unstated, the reading is of a single-module project and no topology follows.</p>
+         *
+         * @param moduleName the module name
+         * @return this builder
+         */
+        public Builder moduleName(String moduleName) {
+            this.moduleName = Optional.of(moduleName);
+            return this;
+        }
+
+        /**
+         * Sets the analysis scope.
          *
          * @param scope the analysis scope
          * @return this builder
@@ -173,7 +192,7 @@ public record FrontendRequest(
          * @return a new FrontendRequest
          */
         public FrontendRequest build() {
-            return new FrontendRequest(sourceRoots, classpath, javaVersion, scope, capabilities);
+            return new FrontendRequest(sourceRoots, classpath, javaVersion, scope, capabilities, moduleName);
         }
     }
 }

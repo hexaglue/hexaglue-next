@@ -144,6 +144,36 @@ public record TypeNode(
     }
 
     /**
+     * Returns this node as read from a named module of a reactor.
+     *
+     * <p>Which module a type came from is something only the reading knows: the same package can
+     * be spread over several modules, and nothing in a type says which one it was compiled in. So
+     * the reading stamps it, once, on the way out.</p>
+     *
+     * @param moduleName the module the type was read from
+     * @return a copy carrying the module name
+     */
+    public TypeNode inModule(String moduleName) {
+        Objects.requireNonNull(moduleName, "moduleName must not be null");
+        return new TypeNode(
+                id,
+                nature,
+                modifiers,
+                external,
+                enclosingType,
+                superClass,
+                interfaces,
+                permittedSubtypes,
+                annotations,
+                fields,
+                methods,
+                constructors,
+                documentation,
+                sourceLocation,
+                Optional.of(moduleName));
+    }
+
+    /**
      * Builder for {@link TypeNode} instances.
      *
      * @since 7.0.0

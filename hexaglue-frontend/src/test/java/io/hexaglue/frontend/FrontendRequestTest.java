@@ -20,6 +20,7 @@ import io.hexaglue.model.code.CodeModelCapability;
 import io.hexaglue.model.config.AnalysisScope;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
@@ -100,11 +101,42 @@ class FrontendRequestTest {
                     FrontendRequest.DEFAULT_JAVA_VERSION,
                     AnalysisScope.everything(),
                     Set.of(CodeModelCapability.METHOD_BODIES),
-                    Optional.empty());
+                    Map.of());
 
             assertThat(request.capabilities()).containsExactly(CodeModelCapability.METHOD_BODIES);
             assertThat(request.sourceRoots()).isUnmodifiable();
             assertThat(request.classpath()).isUnmodifiable();
+            assertThat(request.modules()).isUnmodifiable();
+        }
+
+        @Test
+        @DisplayName("rejects a module attributed to a root nobody reads")
+        void rejectsAModuleOnAnUnreadRoot() {
+            assertThatIllegalArgumentException()
+                    .isThrownBy(() -> new FrontendRequest(
+                            List.of(SOURCE_ROOT),
+                            List.of(),
+                            FrontendRequest.DEFAULT_JAVA_VERSION,
+                            AnalysisScope.everything(),
+                            Set.of(),
+                            Map.of(Path.of("elsewhere"), "shop-domain")))
+                    .withMessageContaining("is not read");
+        }
+
+        @Test
+        @DisplayName("keeps the roots of a reactor in reading order, each under its module")
+        void keepsTheRootsOfAReactorInReadingOrder() {
+            Path domain = Path.of("shop-domain", "src", "main", "java");
+            Path infra = Path.of("shop-infra", "src", "main", "java");
+
+            FrontendRequest request = FrontendRequest.builder()
+                    .sourceRoot(domain, "shop-domain")
+                    .sourceRoot(infra, "shop-infra")
+                    .build();
+
+            assertThat(request.sourceRoots()).containsExactly(domain, infra);
+            assertThat(request.modules())
+                    .containsExactly(Map.entry(domain, "shop-domain"), Map.entry(infra, "shop-infra"));
         }
     }
 }

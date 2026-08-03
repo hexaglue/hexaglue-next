@@ -30,10 +30,12 @@ import spoon.reflect.declaration.CtElement;
  */
 final class SourceLocations {
 
-    private final List<Path> sourceRoots;
+    private final List<Root> sourceRoots;
 
     SourceLocations(List<Path> sourceRoots) {
-        this.sourceRoots = sourceRoots.stream().map(SourceLocations::canonical).toList();
+        this.sourceRoots = sourceRoots.stream()
+                .map(root -> new Root(root, canonical(root)))
+                .toList();
     }
 
     /**
@@ -43,24 +45,53 @@ final class SourceLocations {
      * @return the location, or empty when the element has no valid position
      */
     Optional<SourceLocation> of(CtElement element) {
+        return file(element).map(file -> {
+            SourcePosition position = element.getPosition();
+            int lineStart = position.getLine();
+            int lineEnd = Math.max(lineStart, position.getEndLine());
+            return new SourceLocation(display(file), lineStart, lineEnd);
+        });
+    }
+
+    /**
+     * Returns the source root an element was read from, as the caller stated it.
+     *
+     * <p>The path is handed back unchanged rather than resolved, because it is the key everything
+     * the caller knows about that root is filed under.</p>
+     *
+     * @param element the parsed element
+     * @return the root, or empty when the element has no valid position or comes from none of them
+     */
+    Optional<Path> rootOf(CtElement element) {
+        return file(element)
+                .flatMap(file -> sourceRoots.stream()
+                        .filter(root -> file.startsWith(root.canonical()))
+                        .findFirst()
+                        .map(Root::declared));
+    }
+
+    private Optional<Path> file(CtElement element) {
         SourcePosition position = element.getPosition();
         if (position == null || !position.isValidPosition() || position.getFile() == null) {
             return Optional.empty();
         }
-        Path file = canonical(position.getFile().toPath());
-        int lineStart = position.getLine();
-        int lineEnd = Math.max(lineStart, position.getEndLine());
-        return Optional.of(new SourceLocation(display(file), lineStart, lineEnd));
+        return Optional.of(canonical(position.getFile().toPath()));
     }
 
     private String display(Path file) {
-        for (Path root : sourceRoots) {
-            if (file.startsWith(root)) {
-                return separated(root.relativize(file));
+        for (Root root : sourceRoots) {
+            if (file.startsWith(root.canonical())) {
+                return separated(root.canonical().relativize(file));
             }
         }
         return separated(file);
     }
+
+    /**
+     * A source root under the two names it answers to: the one the caller stated, and the one the
+     * file system resolves it to.
+     */
+    private record Root(Path declared, Path canonical) {}
 
     private static String separated(Path path) {
         return path.toString().replace('\\', '/');

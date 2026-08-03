@@ -28,7 +28,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -101,6 +103,7 @@ public final class SpoonFrontend {
 
         List<MappedType> mapped = analyzed.stream().map(mapper::map).toList();
         List<TypeNode> nodes = mapped.stream().map(MappedType::node).toList();
+        Map<TypeId, String> modulesByType = attribution(analyzed, nodes, locations, request);
         List<MethodBodyFacts> bodyFacts =
                 mapped.stream().flatMap(type -> type.bodyFacts().stream()).toList();
         Edges relations = Edges.from(nodes, bodyFacts);
@@ -110,10 +113,12 @@ public final class SpoonFrontend {
 
         CodeModel.Builder model = CodeModel.builder();
         request.capabilities().forEach(model::capability);
-        // A stub is a type the classpath supplied, not one this module holds: stamping it would
-        // put another project's types inside this one's boundary.
-        request.moduleName().ifPresent(module -> model.addModule(new ModuleNode(module, Optional.empty())));
-        allNodes.forEach(node -> model.addType(stamped(node, nodes, request)));
+        // A stub is a type the classpath supplied, not one a module of this reactor holds: stamping
+        // it would put another project's types inside this one's boundary.
+        request.modules().values().stream()
+                .distinct()
+                .forEach(module -> model.addModule(new ModuleNode(module, Optional.empty())));
+        allNodes.forEach(node -> model.addType(stamped(node, modulesByType)));
         relations.all().forEach(model::addEdge);
         bodyFacts.forEach(model::addBodyFacts);
         Supertypes.closures(allNodes, request.classpath()).forEach(model::supertypes);
@@ -127,11 +132,29 @@ public final class SpoonFrontend {
     }
 
     /**
+     * Attributes each analysed type to the module that declared the root it was read from.
+     *
+     * <p>The two lists are parallel by construction — one mapped node per parsed type, in order —
+     * so the identity of a node is read off the mapping rather than derived a second time.</p>
+     */
+    private static Map<TypeId, String> attribution(
+            List<CtType<?>> parsed, List<TypeNode> nodes, SourceLocations locations, FrontendRequest request) {
+        if (request.modules().isEmpty()) {
+            return Map.of();
+        }
+        Map<TypeId, String> byType = new LinkedHashMap<>();
+        for (int index = 0; index < nodes.size(); index++) {
+            TypeId id = nodes.get(index).id();
+            locations.rootOf(parsed.get(index)).map(request.modules()::get).ifPresent(module -> byType.put(id, module));
+        }
+        return byType;
+    }
+
+    /**
      * Records which module a type was read from, on the types this reading actually analysed.
      */
-    private static TypeNode stamped(TypeNode node, List<TypeNode> analysed, FrontendRequest request) {
-        return request.moduleName()
-                .filter(module -> analysed.contains(node))
+    private static TypeNode stamped(TypeNode node, Map<TypeId, String> modulesByType) {
+        return Optional.ofNullable(modulesByType.get(node.id()))
                 .map(node::inModule)
                 .orElse(node);
     }

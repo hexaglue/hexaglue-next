@@ -18,10 +18,12 @@ import io.hexaglue.model.code.CodeModelCapability;
 import io.hexaglue.model.config.AnalysisScope;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -32,12 +34,17 @@ import java.util.Set;
  * JpaRepository<Order, OrderId>} resolves to a real hierarchy instead of a bare name. Parsing
  * stays tolerant when it is incomplete — an unresolved type keeps its source-level name.</p>
  *
+ * <p>A whole reactor is read in one call rather than one call per module: a reference from one
+ * module to another then resolves to the type itself instead of to a stub of it, and the modules of
+ * a reactor are exactly what makes such references worth reading. Which module a root belongs to is
+ * something only the host knows — a directory says nothing about the build that declared it.</p>
+ *
  * @param sourceRoots the directories holding the Java sources to read, in reading order
  * @param classpath the classpath entries (jars or class directories) used to resolve references
  * @param javaVersion the Java language level the sources are parsed at
  * @param scope the perimeter of the analysis
  * @param capabilities the optional extractions to run
- * @param moduleName the reactor module these sources belong to, absent on a single-module project
+ * @param modules the reactor module each source root belongs to, empty on a single-module project
  * @since 7.0.0
  */
 public record FrontendRequest(
@@ -46,7 +53,7 @@ public record FrontendRequest(
         int javaVersion,
         AnalysisScope scope,
         Set<CodeModelCapability> capabilities,
-        Optional<String> moduleName) {
+        Map<Path, String> modules) {
 
     /** The Java level sources are parsed at unless the caller asks for another one. */
     public static final int DEFAULT_JAVA_VERSION = 17;
@@ -60,16 +67,23 @@ public record FrontendRequest(
         Objects.requireNonNull(classpath, "classpath must not be null");
         Objects.requireNonNull(scope, "scope must not be null");
         Objects.requireNonNull(capabilities, "capabilities must not be null");
-        Objects.requireNonNull(moduleName, "moduleName must not be null");
+        Objects.requireNonNull(modules, "modules must not be null");
         if (sourceRoots.isEmpty()) {
             throw new IllegalArgumentException("at least one source root is required");
         }
         if (javaVersion < 8) {
             throw new IllegalArgumentException("javaVersion must be >= 8, got " + javaVersion);
         }
+        List<Path> declaredRoots = sourceRoots;
+        modules.forEach((root, module) -> {
+            if (!declaredRoots.contains(root)) {
+                throw new IllegalArgumentException(root + " is attributed to module " + module + " but is not read");
+            }
+        });
         sourceRoots = List.copyOf(sourceRoots);
         classpath = List.copyOf(classpath);
         capabilities = EnumSets.ordered(capabilities);
+        modules = Collections.unmodifiableMap(new LinkedHashMap<>(modules));
     }
 
     /**
@@ -111,20 +125,39 @@ public record FrontendRequest(
         private final List<Path> sourceRoots = new ArrayList<>();
         private final List<Path> classpath = new ArrayList<>();
         private final Set<CodeModelCapability> capabilities = EnumSet.noneOf(CodeModelCapability.class);
+        private final Map<Path, String> modules = new LinkedHashMap<>();
         private int javaVersion = DEFAULT_JAVA_VERSION;
         private AnalysisScope scope = AnalysisScope.everything();
-        private Optional<String> moduleName = Optional.empty();
 
         private Builder() {}
 
         /**
-         * Adds a source root to read.
+         * Adds a source root to read, belonging to no module in particular.
          *
          * @param sourceRoot the directory holding Java sources
          * @return this builder
          */
         public Builder sourceRoot(Path sourceRoot) {
             sourceRoots.add(Objects.requireNonNull(sourceRoot, "sourceRoot must not be null"));
+            return this;
+        }
+
+        /**
+         * Adds a source root to read, stating which module of a reactor declared it.
+         *
+         * <p>Only the host knows this: a directory says nothing about the module it was declared in.
+         * A reading where no root names a module is the reading of a single-module project, and no
+         * topology follows from it.</p>
+         *
+         * @param sourceRoot the directory holding Java sources
+         * @param moduleName the module that declared the root
+         * @return this builder
+         */
+        public Builder sourceRoot(Path sourceRoot, String moduleName) {
+            Objects.requireNonNull(sourceRoot, "sourceRoot must not be null");
+            Objects.requireNonNull(moduleName, "moduleName must not be null");
+            sourceRoots.add(sourceRoot);
+            modules.put(sourceRoot, moduleName);
             return this;
         }
 
@@ -147,20 +180,6 @@ public record FrontendRequest(
          */
         public Builder javaVersion(int javaVersion) {
             this.javaVersion = javaVersion;
-            return this;
-        }
-
-        /**
-         * States which module of a reactor these sources belong to.
-         *
-         * <p>Only the host knows this: a source root says nothing about the module it was declared
-         * in. Left unstated, the reading is of a single-module project and no topology follows.</p>
-         *
-         * @param moduleName the module name
-         * @return this builder
-         */
-        public Builder moduleName(String moduleName) {
-            this.moduleName = Optional.of(moduleName);
             return this;
         }
 
@@ -192,7 +211,7 @@ public record FrontendRequest(
          * @return a new FrontendRequest
          */
         public FrontendRequest build() {
-            return new FrontendRequest(sourceRoots, classpath, javaVersion, scope, capabilities, moduleName);
+            return new FrontendRequest(sourceRoots, classpath, javaVersion, scope, capabilities, modules);
         }
     }
 }

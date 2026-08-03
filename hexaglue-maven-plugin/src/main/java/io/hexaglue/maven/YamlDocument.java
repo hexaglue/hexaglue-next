@@ -81,11 +81,6 @@ final class YamlDocument {
                                 failure(origin, DOCUMENT_UNREADABLE, "is not a configuration: it is not a mapping")));
     }
 
-    /** Returns where this document comes from, as diagnostics name it. */
-    String origin() {
-        return origin;
-    }
-
     /** Returns whether the document states nothing at all. */
     boolean isEmpty() {
         return fields.isEmpty();

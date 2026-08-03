@@ -22,6 +22,7 @@ import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.PortDirection;
 import io.hexaglue.model.TypeId;
 import io.hexaglue.model.TypeNature;
+import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.classification.Basis;
 import io.hexaglue.model.classification.Classification;
 import io.hexaglue.model.classification.Confidence;
@@ -29,6 +30,7 @@ import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.TypeNode;
 import io.hexaglue.model.config.HexaGlueConfig;
 import io.hexaglue.model.declaration.Annotation;
+import io.hexaglue.model.declaration.Method;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -44,6 +46,24 @@ class FrameworkEntryPointTest {
                         .annotations(List.of(annotations).stream()
                                 .map(Annotation::of)
                                 .toList())
+                        .build())
+                .build();
+        return Classifier.classify(EngineContext.of(code, KnowledgePacks.embedded(), HexaGlueConfig.defaults()))
+                .verdict(SUBJECT)
+                .orElseThrow();
+    }
+
+    /**
+     * The shape a message-driven adapter actually has: a stereotype on the class, and the broker
+     * named on the method that receives from it.
+     */
+    private static Classification verdictOfListeningComponent(String listener) {
+        CodeModel code = CodeModel.builder()
+                .addType(TypeNode.builder(SUBJECT, TypeNature.CLASS)
+                        .annotations(List.of(Annotation.of("org.springframework.stereotype.Component")))
+                        .methods(List.of(Method.builder("receive", TypeRef.of("void"))
+                                .annotations(List.of(Annotation.of(listener)))
+                                .build()))
                         .build())
                 .build();
         return Classifier.classify(EngineContext.of(code, KnowledgePacks.embedded(), HexaGlueConfig.defaults()))
@@ -78,6 +98,15 @@ class FrameworkEntryPointTest {
         @DisplayName("whatever vendor names the entry point")
         void whateverVendorNamesTheEntryPoint() {
             assertThat(verdictOf("jakarta.ws.rs.Path").kind()).isEqualTo(ArchKind.DRIVING_ADAPTER);
+        }
+
+        @Test
+        @DisplayName("when the broker is named on the receiving method, under a stereotype alone")
+        void whenTheBrokerIsNamedOnTheReceivingMethod() {
+            Classification verdict = verdictOfListeningComponent("org.springframework.jms.annotation.JmsListener");
+
+            assertThat(verdict.kind()).isEqualTo(ArchKind.DRIVING_ADAPTER);
+            assertThat(verdict.confidence()).isEqualTo(Confidence.HIGH);
         }
 
         @Test

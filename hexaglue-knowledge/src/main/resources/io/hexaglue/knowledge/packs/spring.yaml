@@ -23,6 +23,17 @@ entries:
   - annotation: org.springframework.amqp.rabbit.annotation.RabbitListener
     emits: DRIVING_ENTRYPOINT
 
+  # The same three, where they are actually written: on the method that receives the
+  # message, under a class whose only type-level mark is a stereotype. Stated as their
+  # own entries rather than folded into the ones above, so that each placement can be
+  # read and argued with on its own.
+  - member-annotation: org.springframework.kafka.annotation.KafkaListener
+    emits: DRIVING_ENTRYPOINT
+  - member-annotation: org.springframework.jms.annotation.JmsListener
+    emits: DRIVING_ENTRYPOINT
+  - member-annotation: org.springframework.amqp.rabbit.annotation.RabbitListener
+    emits: DRIVING_ENTRYPOINT
+
   # Stereotypes: worn by application services as often as by anything else, so they
   # support a reading and never carry one on their own.
   - annotation: org.springframework.stereotype.Service

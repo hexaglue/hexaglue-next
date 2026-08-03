@@ -49,6 +49,8 @@ class KnowledgeContractTest {
             assertThat(new Selector.Supertype("org.springframework.data.repository.Repository").symbol())
                     .isEqualTo("org.springframework.data.repository.Repository");
             assertThat(new Selector.PackagePrefix("feign").symbol()).isEqualTo("feign");
+            assertThat(new Selector.MemberAnnotated("org.springframework.kafka.annotation.KafkaListener").symbol())
+                    .isEqualTo("org.springframework.kafka.annotation.KafkaListener");
         }
 
         @Test
@@ -59,6 +61,8 @@ class KnowledgeContractTest {
                     .hasMessageContaining("qualified");
             assertThatThrownBy(() -> new Selector.Supertype("Repository")).isInstanceOf(IllegalArgumentException.class);
             assertThatThrownBy(() -> new Selector.Type("EntityManager")).isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> new Selector.MemberAnnotated("KafkaListener"))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test

@@ -55,9 +55,9 @@ import org.snakeyaml.engine.v2.exceptions.YamlEngineException;
  *     kind: AGGREGATE_ROOT
  * }</pre>
  *
- * <p>An entry names its symbol with exactly one of {@code annotation}, {@code supertype},
- * {@code type} or {@code package-prefix}, the fact with {@code emits}, and — for the
- * declared-intent fact only — the declared kind with {@code kind}. The type arguments a fact
+ * <p>An entry names its symbol with exactly one of {@code annotation}, {@code member-annotation},
+ * {@code supertype}, {@code type} or {@code package-prefix}, the fact with {@code emits}, and — for
+ * the declared-intent fact only — the declared kind with {@code kind}. The type arguments a fact
  * captures are not written down: they belong to the fact's meaning, so no pack can bind them to
  * the wrong position.</p>
  *
@@ -86,6 +86,7 @@ public final class PackLoader {
     /** The selector keys and the shape each one builds, in the order diagnostics list them. */
     private static final List<SelectorShape> SELECTOR_SHAPES = List.of(
             new SelectorShape("annotation", Selector.Annotated::new),
+            new SelectorShape("member-annotation", Selector.MemberAnnotated::new),
             new SelectorShape("supertype", Selector.Supertype::new),
             new SelectorShape("type", Selector.Type::new),
             new SelectorShape("package-prefix", Selector.PackagePrefix::new));

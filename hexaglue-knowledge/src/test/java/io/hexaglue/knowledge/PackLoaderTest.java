@@ -70,14 +70,16 @@ class PackLoaderTest {
         }
 
         @Test
-        @DisplayName("reads the four selector shapes")
-        void readsTheFourSelectorShapes() {
+        @DisplayName("reads every selector shape")
+        void readsEverySelectorShape() {
             KnowledgePack pack = load("""
                     pack: spring
                     description: Every way of naming a framework symbol.
                     entries:
                       - annotation: jakarta.persistence.Entity
                         emits: PERSISTENCE_MODEL
+                      - member-annotation: org.springframework.kafka.annotation.KafkaListener
+                        emits: DRIVING_ENTRYPOINT
                       - supertype: org.springframework.data.repository.Repository
                         emits: SPRING_DATA_REPOSITORY
                       - type: jakarta.persistence.EntityManager
@@ -90,6 +92,7 @@ class PackLoaderTest {
                     .extracting(KnowledgeEntry::selector)
                     .containsExactly(
                             new Selector.Annotated("jakarta.persistence.Entity"),
+                            new Selector.MemberAnnotated("org.springframework.kafka.annotation.KafkaListener"),
                             new Selector.Supertype("org.springframework.data.repository.Repository"),
                             new Selector.Type("jakarta.persistence.EntityManager"),
                             new Selector.PackagePrefix("feign"));

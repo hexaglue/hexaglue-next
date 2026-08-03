@@ -17,6 +17,10 @@ import io.hexaglue.model.TypeId;
 import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.TypeNode;
+import io.hexaglue.model.declaration.Constructor;
+import io.hexaglue.model.declaration.Field;
+import io.hexaglue.model.declaration.Method;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -24,11 +28,11 @@ import java.util.stream.Stream;
 /**
  * How a pack entry recognizes the symbol it knows about.
  *
- * <p>Four shapes, and no fifth: an annotation borne by the type, a supertype it inherits from, the
- * type itself, or the package it lives in. Every one of them names its symbol in full — a simple
- * name is refused at construction, because {@code Entity} is two unrelated concepts depending on
- * the package it comes from, and choosing the wrong one silently is exactly the failure this
- * hierarchy exists to prevent.</p>
+ * <p>Five shapes: an annotation borne by the type, an annotation borne by one of its members, a
+ * supertype it inherits from, the type itself, or the package it lives in. Every one of them names
+ * its symbol in full — a simple name is refused at construction, because {@code Entity} is two
+ * unrelated concepts depending on the package it comes from, and choosing the wrong one silently is
+ * exactly the failure this hierarchy exists to prevent.</p>
  *
  * @since 7.0.0
  */
@@ -74,6 +78,50 @@ public sealed interface Selector {
         @Override
         public boolean matches(CodeModel model, TypeNode type) {
             return type.hasAnnotation(qualifiedName);
+        }
+    }
+
+    /**
+     * An annotation borne by a member the type declares — a method, a constructor or a field —
+     * matched on its exact qualified name.
+     *
+     * <p>Where a framework expects its symbol is the framework's rule, not ours: {@code
+     * @KafkaListener}, {@code @JmsListener} and {@code @RabbitListener} are written on the method
+     * that receives the message, on a class whose only type-level mark is a stereotype. Reading
+     * such a type as anything but an entry point is how a listener ends up in the core of the
+     * hexagon. This shape therefore asks the plain question — does the declaration carry the symbol
+     * anywhere? — instead of encoding, per vendor, which placement is the legal one.</p>
+     *
+     * <p>It answers for members and for nothing else. A pack that also knows the symbol on the type
+     * states that separately, because the two placements are two statements a reader can argue with
+     * one at a time.</p>
+     *
+     * @param qualifiedName the fully qualified annotation type name
+     * @since 7.0.0
+     */
+    record MemberAnnotated(String qualifiedName) implements Selector {
+
+        /**
+         * Validates that the annotation is named in full.
+         */
+        public MemberAnnotated {
+            requireQualifiedName(qualifiedName, "annotation");
+        }
+
+        @Override
+        public String symbol() {
+            return qualifiedName;
+        }
+
+        @Override
+        public boolean matches(CodeModel model, TypeNode type) {
+            return Stream.of(
+                            type.methods().stream().map(Method::annotations),
+                            type.constructors().stream().map(Constructor::annotations),
+                            type.fields().stream().map(Field::annotations))
+                    .flatMap(members -> members)
+                    .flatMap(List::stream)
+                    .anyMatch(annotation -> annotation.is(qualifiedName));
         }
     }
 

@@ -24,6 +24,8 @@ import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.TypeNode;
 import io.hexaglue.model.declaration.Annotation;
+import io.hexaglue.model.declaration.Field;
+import io.hexaglue.model.declaration.Method;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +45,7 @@ class FrameworkKnowledgeTest {
     private static final String JPA_REPOSITORY = "org.springframework.data.jpa.repository.JpaRepository";
     private static final String ENTITY = "jakarta.persistence.Entity";
     private static final String AGGREGATE_ROOT = "org.jmolecules.ddd.annotation.AggregateRoot";
+    private static final String LISTENER = "org.springframework.kafka.annotation.KafkaListener";
 
     private static final KnowledgePack SPRING_DATA = new KnowledgePack(
             "spring-data",
@@ -63,8 +66,13 @@ class FrameworkKnowledgeTest {
             "Intent, declared by the author.",
             List.of(KnowledgeEntry.declaring(new Selector.Annotated(AGGREGATE_ROOT), ArchKind.AGGREGATE_ROOT)));
 
+    private static final KnowledgePack MESSAGING = new KnowledgePack(
+            "messaging",
+            "Entry points a broker calls, written where the framework expects them.",
+            List.of(KnowledgeEntry.of(new Selector.MemberAnnotated(LISTENER), KnowledgeFact.DRIVING_ENTRYPOINT)));
+
     private static final FrameworkKnowledge KNOWLEDGE =
-            FrameworkKnowledge.of(List.of(SPRING_DATA, JAKARTA, JMOLECULES));
+            FrameworkKnowledge.of(List.of(SPRING_DATA, JAKARTA, JMOLECULES, MESSAGING));
 
     private static TypeNode source(String qualifiedName) {
         return TypeNode.builder(TypeId.of(qualifiedName), TypeNature.CLASS).build();
@@ -73,6 +81,14 @@ class FrameworkKnowledgeTest {
     private static TypeNode annotated(String qualifiedName, String... annotations) {
         return TypeNode.builder(TypeId.of(qualifiedName), TypeNature.CLASS)
                 .annotations(List.of(annotations).stream().map(Annotation::of).toList())
+                .build();
+    }
+
+    private static TypeNode withAnnotatedMethod(String qualifiedName, String methodAnnotation) {
+        return TypeNode.builder(TypeId.of(qualifiedName), TypeNature.CLASS)
+                .methods(List.of(Method.builder("receive", TypeRef.of("void"))
+                        .annotations(List.of(Annotation.of(methodAnnotation)))
+                        .build()))
                 .build();
     }
 
@@ -148,6 +164,40 @@ class FrameworkKnowledgeTest {
                     .extracting(KnowledgeFinding::fact)
                     .containsExactly(KnowledgeFact.NEUTRAL);
             assertThat(KNOWLEDGE.factsFor(modelOf(lookalike), lookalike)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("borne by a member, where the framework expects it rather than on the type")
+        void borneByAMember() {
+            TypeNode consumer = withAnnotatedMethod("com.acme.Intake", LISTENER);
+
+            assertThat(KNOWLEDGE.factsFor(modelOf(consumer), consumer))
+                    .extracting(KnowledgeFinding::fact)
+                    .containsExactly(KnowledgeFact.DRIVING_ENTRYPOINT);
+        }
+
+        @Test
+        @DisplayName("borne by any member, the placement being the framework's rule and not ours")
+        void borneByAnyMember() {
+            TypeNode consumer = TypeNode.builder(TypeId.of("com.acme.Intake"), TypeNature.CLASS)
+                    .fields(List.of(Field.builder("channel", TypeRef.of("java.lang.String"))
+                            .annotations(List.of(Annotation.of(LISTENER)))
+                            .build()))
+                    .build();
+
+            assertThat(KNOWLEDGE.factsFor(modelOf(consumer), consumer))
+                    .extracting(KnowledgeFinding::fact)
+                    .containsExactly(KnowledgeFact.DRIVING_ENTRYPOINT);
+        }
+
+        @Test
+        @DisplayName("on a member and on the type are two readings: neither answers for the other")
+        void onAMemberAndOnTheTypeAreTwoReadings() {
+            TypeNode onTheType = annotated("com.acme.Intake", LISTENER);
+            TypeNode memberEntity = withAnnotatedMethod("com.acme.Order", ENTITY);
+
+            assertThat(KNOWLEDGE.factsFor(modelOf(onTheType), onTheType)).isEmpty();
+            assertThat(KNOWLEDGE.factsFor(modelOf(memberEntity), memberEntity)).isEmpty();
         }
 
         @Test
@@ -290,7 +340,7 @@ class FrameworkKnowledgeTest {
         void inTheOrderTheyWereGiven() {
             assertThat(KNOWLEDGE.packs())
                     .extracting(KnowledgePack::id)
-                    .containsExactly("spring-data", "jakarta", "jmolecules");
+                    .containsExactly("spring-data", "jakarta", "jmolecules", "messaging");
         }
 
         @Test

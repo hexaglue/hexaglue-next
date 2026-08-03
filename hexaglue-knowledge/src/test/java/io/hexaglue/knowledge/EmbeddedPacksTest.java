@@ -23,6 +23,7 @@ import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.TypeNode;
 import io.hexaglue.model.declaration.Annotation;
+import io.hexaglue.model.declaration.Method;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,15 @@ class EmbeddedPacksTest {
     private static List<KnowledgeFinding> factsOnTypeAnnotatedWith(String... annotations) {
         TypeNode type = TypeNode.builder(TypeId.of("com.acme.Subject"), TypeNature.CLASS)
                 .annotations(List.of(annotations).stream().map(Annotation::of).toList())
+                .build();
+        return KNOWLEDGE.factsFor(CodeModel.builder().addType(type).build(), type);
+    }
+
+    private static List<KnowledgeFinding> factsOnTypeWhoseMethodBears(String annotation) {
+        TypeNode type = TypeNode.builder(TypeId.of("com.acme.Subject"), TypeNature.CLASS)
+                .methods(List.of(Method.builder("receive", TypeRef.of("void"))
+                        .annotations(List.of(Annotation.of(annotation)))
+                        .build()))
                 .build();
         return KNOWLEDGE.factsFor(CodeModel.builder().addType(type).build(), type);
     }
@@ -74,12 +84,14 @@ class EmbeddedPacksTest {
             Map<String, String> claimedBy = new LinkedHashMap<>();
             for (KnowledgePack pack : KNOWLEDGE.packs()) {
                 for (KnowledgeEntry entry : pack.entries()) {
+                    // Within one pack a symbol may be read in two placements — on the type and on a
+                    // member — and the pack's own rule already refuses the same statement twice.
                     String previous = claimedBy.putIfAbsent(entry.selector().symbol(), pack.id());
                     assertThat(previous)
                             .withFailMessage(
                                     "%s is claimed by both %s and %s",
                                     entry.selector().symbol(), previous, pack.id())
-                            .isNull();
+                            .isIn(null, pack.id());
                 }
             }
         }
@@ -207,6 +219,25 @@ class EmbeddedPacksTest {
                     .containsExactly(KnowledgeFact.DRIVING_ENTRYPOINT);
             assertThat(factsOf(factsOnTypeAnnotatedWith("org.springframework.stereotype.Controller")))
                     .containsExactly(KnowledgeFact.DRIVING_ENTRYPOINT);
+        }
+
+        @Test
+        @DisplayName("a listener, read on the method the broker calls and not only on the type")
+        void aListenerOnTheMethodTheBrokerCalls() {
+            assertThat(factsOf(factsOnTypeWhoseMethodBears("org.springframework.kafka.annotation.KafkaListener")))
+                    .containsExactly(KnowledgeFact.DRIVING_ENTRYPOINT);
+            assertThat(factsOf(factsOnTypeWhoseMethodBears("org.springframework.jms.annotation.JmsListener")))
+                    .containsExactly(KnowledgeFact.DRIVING_ENTRYPOINT);
+            assertThat(factsOf(
+                            factsOnTypeWhoseMethodBears("org.springframework.amqp.rabbit.annotation.RabbitListener")))
+                    .containsExactly(KnowledgeFact.DRIVING_ENTRYPOINT);
+        }
+
+        @Test
+        @DisplayName("no entry point from a stereotype whose methods carry nothing the broker calls")
+        void noEntryPointFromAStereotypeAlone() {
+            assertThat(factsOf(factsOnTypeWhoseMethodBears("org.springframework.transaction.annotation.Transactional")))
+                    .isEmpty();
         }
 
         @Test

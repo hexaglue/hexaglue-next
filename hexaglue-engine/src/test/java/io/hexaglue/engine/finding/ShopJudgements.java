@@ -162,7 +162,7 @@ final class ShopJudgements {
                 TypeId.of(id),
                 structure(
                         TypeNature.RECORD,
-                        List.of(Field.of("amount", TypeRef.of("java.math.BigDecimal"))),
+                        List.of(fixed("amount", "java.math.BigDecimal")),
                         List.of(Method.of("amount", TypeRef.of("java.math.BigDecimal")))),
                 verdict(ArchKind.VALUE_OBJECT)));
         return this;
@@ -171,23 +171,43 @@ final class ShopJudgements {
     ShopJudgements valueWithIdentityField(String id) {
         types.add(new ValueObject(
                 TypeId.of(id),
-                structure(TypeNature.CLASS, List.of(Field.of("id", TypeRef.of("java.lang.Integer"))), List.of()),
+                structure(TypeNature.CLASS, List.of(fixed("id", "java.lang.Integer")), List.of()),
                 verdict(ArchKind.VALUE_OBJECT)));
         return this;
     }
 
-    ShopJudgements mutableValue(String id, String mutator) {
-        Method setter = Method.builder(mutator, TypeRef.of("void"))
-                .parameters(List.of(Parameter.of("value", TypeRef.of("java.math.BigDecimal"))))
-                .build();
+    /**
+     * A value holding state that nothing fixes at construction, which is what makes it changeable —
+     * the shape the check reads, rather than a method whose name happens to begin with {@code set}.
+     */
+    ShopJudgements mutableValue(String id, String changeable) {
+        types.add(new ValueObject(
+                TypeId.of(id),
+                structure(
+                        TypeNature.CLASS, List.of(Field.of(changeable, TypeRef.of("java.math.BigDecimal"))), List.of()),
+                verdict(ArchKind.VALUE_OBJECT)));
+        return this;
+    }
+
+    /** A value whose state is fixed, carrying a method whose name merely sounds like a mutator. */
+    ShopJudgements valueAnswering(String id, String method) {
         types.add(new ValueObject(
                 TypeId.of(id),
                 structure(
                         TypeNature.CLASS,
-                        List.of(Field.of("amount", TypeRef.of("java.math.BigDecimal"))),
-                        List.of(setter)),
+                        List.of(fixed("amount", "java.math.BigDecimal")),
+                        List.of(Method.builder(method, TypeRef.of("void"))
+                                .parameters(List.of(Parameter.of("payment", TypeRef.of("java.math.BigDecimal"))))
+                                .build())),
                 verdict(ArchKind.VALUE_OBJECT)));
         return this;
+    }
+
+    /** A field fixed at construction: state a value holds and nothing can change afterwards. */
+    private static Field fixed(String name, String type) {
+        return Field.builder(name, TypeRef.of(type))
+                .modifiers(Set.of(Modifier.FINAL))
+                .build();
     }
 
     ShopJudgements repository(String id, String aggregateId) {

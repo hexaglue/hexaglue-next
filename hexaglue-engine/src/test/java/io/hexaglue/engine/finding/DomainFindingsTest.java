@@ -15,11 +15,14 @@ package io.hexaglue.engine.finding;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.TypeId;
+import io.hexaglue.model.config.ClassificationConfig;
 import io.hexaglue.model.finding.Finding;
 import io.hexaglue.model.finding.IssueCode;
 import io.hexaglue.model.finding.Severity;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -204,15 +207,25 @@ class DomainFindingsTest {
         }
 
         @Test
-        @DisplayName("says when a value can be changed in place")
+        @DisplayName("says when a value can be changed in place, naming the state that can change")
         void reportsAMutableValue() {
             List<Finding> findings = ShopJudgements.shop()
-                    .mutableValue("com.shop.Money", "setAmount")
+                    .mutableValue("com.shop.Money", "amount")
                     .judge();
 
             assertThat(coded(findings, DomainFindings.MUTABLE_VALUE))
                     .singleElement()
-                    .satisfies(finding -> assertThat(finding.message()).contains("setAmount"));
+                    .satisfies(finding -> assertThat(finding.message()).contains("amount can change in place"));
+        }
+
+        @Test
+        @DisplayName("reads the state, so a method that only sounds like a mutator is not one")
+        void readsTheStateRatherThanTheMethodName() {
+            List<Finding> findings = ShopJudgements.shop()
+                    .valueAnswering("com.shop.Money", "settle")
+                    .judge();
+
+            assertThat(coded(findings, DomainFindings.MUTABLE_VALUE)).isEmpty();
         }
 
         @Test
@@ -230,12 +243,23 @@ class DomainFindingsTest {
     class Undecidable {
 
         @Test
+        @DisplayName("stays silent on a project that declares no word for an identity")
+        void staysSilentWithoutAVocabulary() {
+            List<Finding> findings = ShopJudgements.shop()
+                    .aggregateHolding("com.shop.Owner", "com.shop.Pet")
+                    .valueWithIdentityField("com.shop.Pet")
+                    .judge();
+
+            assertThat(coded(findings, DomainFindings.UNDECIDABLE_PART)).isEmpty();
+        }
+
+        @Test
         @DisplayName("names it, and says the declaration that would settle it")
         void reportsAPartWithAPlatformIdentity() {
             List<Finding> findings = ShopJudgements.shop()
                     .aggregateHolding("com.shop.Owner", "com.shop.Pet")
                     .valueWithIdentityField("com.shop.Pet")
-                    .judge();
+                    .judgeWith(new ClassificationConfig(Map.of(), Map.of(ArchKind.IDENTIFIER, List.of("Id"))));
 
             assertThat(coded(findings, DomainFindings.UNDECIDABLE_PART))
                     .singleElement()

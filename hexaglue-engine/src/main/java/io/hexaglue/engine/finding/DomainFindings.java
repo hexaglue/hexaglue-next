@@ -14,6 +14,7 @@
 package io.hexaglue.engine.finding;
 
 import io.hexaglue.model.ArchKind;
+import io.hexaglue.model.Modifier;
 import io.hexaglue.model.TypeId;
 import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.arch.AggregateRoot;
@@ -25,7 +26,8 @@ import io.hexaglue.model.classification.Confidence;
 import io.hexaglue.model.classification.Evidence;
 import io.hexaglue.model.classification.EvidenceTier;
 import io.hexaglue.model.classification.RemediationHint;
-import io.hexaglue.model.declaration.Method;
+import io.hexaglue.model.config.ClassificationConfig;
+import io.hexaglue.model.declaration.Field;
 import io.hexaglue.model.finding.Finding;
 import io.hexaglue.model.finding.IssueCode;
 import io.hexaglue.model.finding.Severity;
@@ -284,31 +286,38 @@ public final class DomainFindings {
     private static List<Finding> valuesThatCanChange(Judgement judgement) {
         List<Finding> findings = new ArrayList<>();
         for (ValueObject value : judgement.model().domainIndex().valueObjects().toList()) {
-            List<String> mutators = value.structure().methods().stream()
-                    .filter(DomainFindings::changesInPlace)
-                    .map(Method::name)
-                    .sorted()
-                    .toList();
-            if (!mutators.isEmpty()) {
+            List<String> changeable = changeableState(value);
+            if (!changeable.isEmpty()) {
                 findings.add(finding(
                                 MUTABLE_VALUE,
                                 Severity.MAJOR,
                                 value.id(),
-                                value.id().simpleName() + " is a value and " + String.join(", ", mutators)
-                                        + " change it in place. A value is what it holds: changing it makes it a "
+                                value.id().simpleName() + " is a value and " + String.join(", ", changeable)
+                                        + " can change in place. A value is what it holds: changing it makes it a "
                                         + "different value, which everything holding the old one should have been "
                                         + "told about.",
-                                evidence("changes-in-place", String.join(", ", mutators), List.of()))
+                                evidence("changeable-state", String.join(", ", changeable), List.of()))
                         .build());
             }
         }
         return findings;
     }
 
-    private static boolean changesInPlace(Method method) {
-        return method.name().startsWith("set")
-                && method.parameters().size() == 1
-                && "void".equals(method.returnType().qualifiedName());
+    /**
+     * Returns the state of a value that can change: the fields it holds that are neither shared by
+     * every instance nor fixed at construction.
+     *
+     * <p>Read on the state rather than on a method whose name begins with {@code set}, because that
+     * would be a naming rule the project never stated — and one that would miss every mutator
+     * written under another verb while flagging a {@code settle(payment)} that changes nothing.</p>
+     */
+    private static List<String> changeableState(ValueObject value) {
+        return value.structure().fields().stream()
+                .filter(field -> !field.modifiers().contains(Modifier.STATIC))
+                .filter(field -> !field.modifiers().contains(Modifier.FINAL))
+                .map(Field::name)
+                .sorted()
+                .toList();
     }
 
     /**
@@ -331,7 +340,7 @@ public final class DomainFindings {
                         .filter(ValueObject.class::isInstance)
                         .map(ValueObject.class::cast)
                         .findFirst();
-                if (value.isEmpty() || !readsLikeAnIdentity(value.orElseThrow())) {
+                if (value.isEmpty() || !readsLikeAnIdentity(value.orElseThrow(), judgement.vocabulary())) {
                     continue;
                 }
                 findings.add(finding(
@@ -357,12 +366,21 @@ public final class DomainFindings {
     }
 
     /**
-     * A single field named as an identity whose type nothing in the perimeter classifies — the
-     * shape of a part identified by a bare {@code Long} or {@code Integer}.
+     * Returns whether a part carries a field the project's own vocabulary would call an identity.
+     *
+     * <p>Nothing structural separates a part identified by a bare {@code Long} from a value that
+     * merely holds one, which is the whole difficulty this finding exists for. The only remaining
+     * signal is the word, so it is read — but only the word the <em>project</em> declared for
+     * identities, never one shipped here. A code base that states no vocabulary gets no finding,
+     * exactly as it gets no naming verdict.</p>
      */
-    private static boolean readsLikeAnIdentity(ValueObject value) {
-        return value.structure().fields().stream()
-                .anyMatch(field -> "id".equals(field.name()) || field.name().endsWith("Id"));
+    private static boolean readsLikeAnIdentity(ValueObject value, ClassificationConfig vocabulary) {
+        List<String> declared = vocabulary.suffixesFor(ArchKind.IDENTIFIER);
+        return !declared.isEmpty()
+                && value.structure().fields().stream()
+                        .anyMatch(field -> declared.stream()
+                                .anyMatch(suffix -> field.name().endsWith(suffix)
+                                        || field.name().equalsIgnoreCase(suffix)));
     }
 
     private static Set<TypeId> insideOf(AggregateRoot aggregate) {

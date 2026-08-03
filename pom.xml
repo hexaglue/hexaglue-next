@@ -36,6 +36,7 @@
         <module>hexaglue-knowledge</module>
         <module>hexaglue-engine</module>
         <module>hexaglue-spi</module>
+        <module>hexaglue-plugins</module>
         <module>hexaglue-maven-plugin</module>
         <module>hexaglue-testkit</module>
         <module>hexaglue-acceptance</module>

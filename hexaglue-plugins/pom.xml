@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.hexaglue</groupId>
+        <artifactId>hexaglue-parent</artifactId>
+        <version>7.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>hexaglue-plugins</artifactId>
+    <packaging>pom</packaging>
+
+    <name>HexaGlue Plugins</name>
+    <description>The backends: everything that turns the classified model into an output. Each one reads the model through the SPI and emits into sinks.</description>
+
+    <properties>
+        <hexaglue.root>${project.basedir}/..</hexaglue.root>
+    </properties>
+
+    <modules>
+        <module>hexaglue-plugin-living-doc</module>
+    </modules>
+</project>

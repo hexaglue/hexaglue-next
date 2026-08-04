@@ -77,6 +77,7 @@ final class StoredType {
             spec.addField(fieldOf(field, identity.filter(field::equals).isPresent()));
             spec.addMethod(getterOf(field));
         }
+        spec.addMethod(fullConstructor());
         return SourceFile.of(
                 type.id().packageName(),
                 generatedName,
@@ -119,6 +120,23 @@ final class StoredType {
         }
         spec.addAnnotation(Jpa.column(SqlNames.column(field.name())));
         return spec.build();
+    }
+
+    /**
+     * The one way anything but the provider builds one of these. There are no writers, so a row is
+     * either read back by the provider or built whole — which is what lets the generated mapper
+     * turn a domain object into a row without ever leaving it half filled.
+     */
+    private MethodSpec fullConstructor() {
+        MethodSpec.Builder full = MethodSpec.constructorBuilder()
+                .addModifiers(javax.lang.model.element.Modifier.PUBLIC)
+                .addJavadoc("Builds a row from what the domain holds.\n");
+        for (Field field : state()) {
+            full.addParameter(stored.typeOf(field), field.name())
+                    .addStatement("this.$L = $L", field.name(), field.name())
+                    .addJavadoc("@param $L the stored $L\n", field.name(), field.name());
+        }
+        return full.build();
     }
 
     /**

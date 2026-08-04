@@ -55,6 +55,9 @@ public final class JpaPlugin implements HexaGluePlugin {
     /** A repository port the analysis did not reach an aggregate for. */
     static final IssueCode NOTHING_KEPT = IssueCode.of("HG-JPA-003");
 
+    /** A domain type the generated code has no way of reading or of rebuilding. */
+    static final IssueCode OUT_OF_REACH = IssueCode.of("HG-JPA-004");
+
     /**
      * Creates the plugin. A host discovers backends by loading them as services, which needs a
      * constructor that is public and takes nothing.
@@ -142,6 +145,42 @@ public final class JpaPlugin implements HexaGluePlugin {
         }
         SourceFile source = new StoredType(type, stored, options).render(identity);
         contribution.emit(options.targetModule().map(source::in).orElse(source));
+        if (options.mappers()) {
+            carry(type, contribution, stored, options);
+        }
+    }
+
+    /**
+     * Writes the two ways between a type and its row, or says which field stands in the way. A
+     * mapper is all-or-nothing: one that carried most of a type would lose the rest on the way out
+     * and rebuild something that is not what was stored.
+     */
+    private void carry(DomainType type, Contribution contribution, Stored stored, JpaOptions options) {
+        StoredMapper mapper = new StoredMapper(type, contribution.model(), stored, options);
+        if (!DomainAccess.isRebuildable(type)) {
+            contribution.report(
+                    outOfReach(type, "nothing in it takes its own state, so a row could not be turned back into one"));
+            return;
+        }
+        Optional<Field> blocking = mapper.unmappable();
+        if (blocking.isPresent()) {
+            contribution.report(outOfReach(
+                    type,
+                    "its field " + blocking.orElseThrow().name()
+                            + " cannot be carried across, and half a mapper loses what it skips"));
+            return;
+        }
+        SourceFile source = mapper.render();
+        contribution.emit(options.targetModule().map(source::in).orElse(source));
+    }
+
+    private static Diagnostic outOfReach(ArchType type, String because) {
+        return Diagnostic.builder(
+                        OUT_OF_REACH,
+                        DiagnosticSeverity.WARNING,
+                        "no mapper was written for " + type.qualifiedName() + ": " + because)
+                .subject(type.id())
+                .build();
     }
 
     /** Only what the store has a shape for: aggregates, their parts, and the values they hold. */

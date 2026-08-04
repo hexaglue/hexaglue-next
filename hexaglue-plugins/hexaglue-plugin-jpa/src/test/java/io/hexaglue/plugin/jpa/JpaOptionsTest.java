@@ -82,9 +82,11 @@ class JpaOptionsTest {
                             "entitySuffix",
                             "embeddableSuffix",
                             "repositorySuffix",
+                            "mapperSuffix",
                             "tablePrefix",
                             "generateEmbeddables",
                             "generateRepositories",
+                            "generateMappers",
                             "idStrategy",
                             "targetModule");
         }

@@ -362,6 +362,60 @@ class JpaPluginTest {
     }
 
     @Nested
+    @DisplayName("carries a type across to its row and back")
+    class CarriesATypeAcross {
+
+        @Test
+        @DisplayName("reading the domain by shape, and rebuilding it through its own constructor")
+        void readingTheDomainByShape() {
+            String mapper = source(run(Map.of()), "com.shop.domain.MoneyMapper");
+
+            assertThat(flat(mapper))
+                    .contains("static MoneyEmbeddable toEntity(Money domain)")
+                    .contains("new MoneyEmbeddable(domain.amount(), domain.currency())")
+                    .contains("static Money toDomain(MoneyEmbeddable row)")
+                    .contains("new Money(row.getAmount(), row.getCurrency())");
+        }
+
+        @Test
+        @DisplayName("unwrapping an identity on the way out and rebuilding it on the way back")
+        void unwrappingAnIdentity() {
+            String mapper = source(run(Map.of()), "com.shop.domain.InvoiceMapper");
+
+            assertThat(flat(mapper)).contains("domain.id().value()").contains("new InvoiceId(row.getId())");
+        }
+
+        @Test
+        @DisplayName("handing a value to the mapper written for it, rather than opening it here")
+        void handingAValueToItsOwnMapper() {
+            assertThat(source(run(Map.of()), "com.shop.domain.InvoiceMapper")).doesNotContain("getAmount");
+        }
+
+        @Test
+        @DisplayName("and writing nothing at all when a field cannot make the trip")
+        void andWritingNothingWhenAFieldCannotMakeTheTrip() {
+            PluginRun run = run(Map.of());
+
+            assertThat(run.sources())
+                    .extracting(SourceFile::qualifiedName)
+                    .doesNotContain("com.shop.domain.OrderMapper");
+            assertThat(run.diagnostics())
+                    .filteredOn(diagnostic -> diagnostic.code().equals(JpaPlugin.OUT_OF_REACH))
+                    .anySatisfy(diagnostic -> assertThat(diagnostic.message())
+                            .contains("com.shop.domain.OrderLine")
+                            .contains("tag"));
+        }
+
+        @Test
+        @DisplayName("unless the build carries its own types across")
+        void unlessTheBuildCarriesItsOwnTypesAcross() {
+            assertThat(run(Map.of("generateMappers", "false")).sources())
+                    .extracting(SourceFile::qualifiedName)
+                    .doesNotContain("com.shop.domain.MoneyMapper");
+        }
+    }
+
+    @Nested
     @DisplayName("routes what it writes")
     class RoutesWhatItWrites {
 

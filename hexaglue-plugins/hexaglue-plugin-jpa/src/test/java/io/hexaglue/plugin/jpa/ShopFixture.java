@@ -33,6 +33,7 @@ import io.hexaglue.model.classification.Classification;
 import io.hexaglue.model.classification.Confidence;
 import io.hexaglue.model.classification.ProofNode;
 import io.hexaglue.model.classification.RemediationHint;
+import io.hexaglue.model.declaration.Constructor;
 import io.hexaglue.model.declaration.Field;
 import io.hexaglue.model.declaration.FieldRole;
 import io.hexaglue.model.declaration.Method;
@@ -46,6 +47,9 @@ import java.util.Set;
  * wrapper, a part of its own, a value written into its row, a collection, a reference to another
  * aggregate by identity, and a constant that belongs to no row at all.
  */
+// One method per type of the shop, which is what makes the fixture readable: splitting it would
+// scatter a single model across two files without making any of it clearer.
+@SuppressWarnings("PMD.TooManyMethods")
 final class ShopFixture {
 
     static final TypeId ORDER = TypeId.of("com.shop.domain.Order");
@@ -163,6 +167,16 @@ final class ShopFixture {
                                 field("label", TEXT, Set.of()),
                                 field("value", TEXT, Set.of()),
                                 field("tag", ref(TAG_ID), Set.of(FieldRole.EMBEDDED))))
+                        .methods(List.of(
+                                answers("id", ref(LINE_ID)),
+                                answers("label", TEXT),
+                                answers("value", TEXT),
+                                answers("tag", ref(TAG_ID))))
+                        .constructors(List.of(Constructor.of(List.of(
+                                Parameter.of("id", ref(LINE_ID)),
+                                Parameter.of("label", TEXT),
+                                Parameter.of("value", TEXT),
+                                Parameter.of("tag", ref(TAG_ID))))))
                         .build(),
                 verdict(ArchKind.ENTITY, Confidence.HIGH),
                 Optional.of(id),
@@ -171,12 +185,14 @@ final class ShopFixture {
 
     /** A value with two components, which is what makes it something to write into a row. */
     private static ValueObject money() {
+        TypeRef decimal = TypeRef.of("java.math.BigDecimal");
         return new ValueObject(
                 MONEY,
                 TypeStructure.builder(TypeNature.RECORD)
-                        .fields(List.of(
-                                field("amount", TypeRef.of("java.math.BigDecimal"), Set.of()),
-                                field("currency", TEXT, Set.of())))
+                        .fields(List.of(field("amount", decimal, Set.of()), field("currency", TEXT, Set.of())))
+                        .methods(List.of(answers("amount", decimal), answers("currency", TEXT)))
+                        .constructors(List.of(Constructor.of(
+                                List.of(Parameter.of("amount", decimal), Parameter.of("currency", TEXT)))))
                         .build(),
                 verdict(ArchKind.VALUE_OBJECT, Confidence.HIGH));
     }
@@ -224,6 +240,9 @@ final class ShopFixture {
                 INVOICE,
                 TypeStructure.builder(TypeNature.CLASS)
                         .fields(List.of(id, field("reference", TEXT, Set.of())))
+                        .methods(List.of(answers("id", ref(INVOICE_ID)), answers("reference", TEXT)))
+                        .constructors(List.of(Constructor.of(
+                                List.of(Parameter.of("id", ref(INVOICE_ID)), Parameter.of("reference", TEXT)))))
                         .build(),
                 verdict(ArchKind.AGGREGATE_ROOT, Confidence.HIGH),
                 Optional.of(id),
@@ -321,6 +340,11 @@ final class ShopFixture {
                 .build();
     }
 
+    /** A reader: no parameters, answering with the type of the field it stands for. */
+    private static Method answers(String name, TypeRef type) {
+        return Method.of(name, type);
+    }
+
     private static Method asks(String name, TypeRef answer, TypeId argument) {
         return Method.builder(name, answer)
                 .parameters(List.of(Parameter.of("what", ref(argument))))
@@ -332,6 +356,8 @@ final class ShopFixture {
                 id,
                 TypeStructure.builder(TypeNature.RECORD)
                         .fields(List.of(field("value", UUID, Set.of())))
+                        .methods(List.of(answers("value", UUID)))
+                        .constructors(List.of(Constructor.of(List.of(Parameter.of("value", UUID)))))
                         .build(),
                 verdict(ArchKind.IDENTIFIER, Confidence.HIGH),
                 Optional.of(UUID));

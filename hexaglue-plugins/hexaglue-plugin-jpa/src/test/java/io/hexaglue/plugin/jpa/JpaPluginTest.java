@@ -252,6 +252,116 @@ class JpaPluginTest {
     }
 
     @Nested
+    @DisplayName("serves a repository port from a Spring Data interface")
+    class ServesARepositoryPort {
+
+        private String orders() {
+            return source(run(Map.of()), "com.shop.domain.OrderJpaRepository");
+        }
+
+        @Test
+        @DisplayName("keyed by the value the identity is written around")
+        void keyedByTheValueTheIdentityIsWrittenAround() {
+            assertThat(flat(orders()))
+                    .contains("interface OrderJpaRepository extends JpaRepository<OrderEntity, UUID>");
+        }
+
+        /**
+         * Which method deserves a query is settled by matching its parameters against the fields of
+         * the aggregate — never by reading its name, which is what the carrière did.
+         */
+        @Test
+        @DisplayName("asking about a field the aggregate holds, whatever the port called the method")
+        void askingAboutAFieldTheAggregateHolds() {
+            assertThat(flat(orders())).contains("List<OrderEntity> findByCustomer(UUID customer)");
+        }
+
+        @Test
+        @DisplayName("and letting the answer say which question it is")
+        void andLettingTheAnswerSayWhichQuestionItIs() {
+            assertThat(flat(orders()))
+                    .contains("boolean existsByCustomer(UUID customer)")
+                    .contains("long countByCustomer(UUID customer)");
+        }
+
+        @Test
+        @DisplayName("answering with one row or with many, as the port asked")
+        void answeringWithOneRowOrWithMany() {
+            assertThat(flat(orders()))
+                    .contains("List<OrderEntity> findByCustomer(UUID customer)")
+                    .contains("Optional<OrderEntity> findByShipment(ShipmentEntity shipment)");
+        }
+
+        @Test
+        @DisplayName("and asking each question once, however many ways the port asks it")
+        void andAskingEachQuestionOnce() {
+            assertThat(flat(orders()).split("findByCustomer", -1)).hasSize(2);
+        }
+
+        @Test
+        @DisplayName("and asking nothing about a value the aggregate does not hold")
+        void andAskingNothingAboutAValueTheAggregateDoesNotHold() {
+            assertThat(orders()).doesNotContain("Instant");
+        }
+
+        @Test
+        @DisplayName("but writing nothing for what the store already answers")
+        void butWritingNothingForWhatTheStoreAlreadyAnswers() {
+            assertThat(orders()).doesNotContain("findByIdBy").doesNotContain("findById(");
+        }
+
+        @Test
+        @DisplayName("and nothing at all for a port that keeps nothing")
+        void andNothingAtAllForAPortThatKeepsNothing() {
+            PluginRun run = run(Map.of());
+
+            assertThat(run.sources())
+                    .extracting(SourceFile::qualifiedName)
+                    .doesNotContain("com.shop.domain.AuditingJpaRepository");
+            assertThat(coded(run, JpaPlugin.NOTHING_KEPT).orElseThrow().message())
+                    .contains("com.shop.domain.Auditing");
+        }
+
+        @Test
+        @DisplayName("and nothing for a way out that is not a store")
+        void andNothingForAWayOutThatIsNotAStore() {
+            assertThat(run(Map.of()).sources())
+                    .extracting(SourceFile::qualifiedName)
+                    .doesNotContain("com.shop.domain.NotifyingJpaRepository");
+        }
+
+        @Test
+        @DisplayName("and nothing when the verdict on the port falls short")
+        void andNothingWhenTheVerdictFallsShort() {
+            PluginRun run = run(ShopFixture.model(Confidence.LOW), Confidence.HIGH, Map.of());
+
+            assertThat(run.sources())
+                    .extracting(SourceFile::qualifiedName)
+                    .doesNotContain("com.shop.domain.OrderJpaRepository");
+        }
+
+        @Test
+        @DisplayName("and nothing when the aggregate it keeps has no identity to serve rows by")
+        void andNothingWhenTheAggregateHasNoIdentity() {
+            PluginRun run = run(Map.of());
+
+            assertThat(run.sources())
+                    .extracting(SourceFile::qualifiedName)
+                    .doesNotContain("com.shop.domain.CustomerJpaRepository");
+            assertThat(coded(run, JpaPlugin.NO_IDENTITY).orElseThrow().message())
+                    .contains("com.shop.domain.Customer");
+        }
+
+        @Test
+        @DisplayName("unless the build would rather serve its ports itself")
+        void unlessTheBuildWouldRatherServeItsPortsItself() {
+            assertThat(run(Map.of("generateRepositories", "false")).sources())
+                    .extracting(SourceFile::qualifiedName)
+                    .doesNotContain("com.shop.domain.OrderJpaRepository");
+        }
+    }
+
+    @Nested
     @DisplayName("routes what it writes")
     class RoutesWhatItWrites {
 

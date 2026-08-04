@@ -13,9 +13,12 @@
 
 package io.hexaglue.plugin.jpa;
 
+import io.hexaglue.model.TypeId;
 import io.hexaglue.model.arch.AggregateRoot;
 import io.hexaglue.model.arch.ArchType;
 import io.hexaglue.model.arch.DomainType;
+import io.hexaglue.model.arch.DrivenPort;
+import io.hexaglue.model.arch.DrivenPortType;
 import io.hexaglue.model.arch.Entity;
 import io.hexaglue.model.arch.ValueObject;
 import io.hexaglue.model.declaration.Field;
@@ -49,6 +52,9 @@ public final class JpaPlugin implements HexaGluePlugin {
     /** An aggregate or a part whose identity the analysis could not name. */
     static final IssueCode NO_IDENTITY = IssueCode.of("HG-JPA-002");
 
+    /** A repository port the analysis did not reach an aggregate for. */
+    static final IssueCode NOTHING_KEPT = IssueCode.of("HG-JPA-003");
+
     /**
      * Creates the plugin. A host discovers backends by loading them as services, which needs a
      * constructor that is public and takes nothing.
@@ -70,6 +76,50 @@ public final class JpaPlugin implements HexaGluePlugin {
         JpaOptions options = JpaOptions.from(contribution.config());
         Stored stored = new Stored(contribution.model(), options);
         contribution.model().all(DomainType.class).forEach(type -> store(type, contribution, stored, options));
+        if (options.repositories()) {
+            contribution.model().all(DrivenPort.class).forEach(port -> serve(port, contribution, stored, options));
+        }
+    }
+
+    /**
+     * Serves one repository port. A port that keeps nothing the analysis could name gets nothing:
+     * there is no table to reach for, and guessing one is how a generator writes something that
+     * looks right and stores the wrong rows.
+     */
+    private void serve(DrivenPort port, Contribution contribution, Stored stored, JpaOptions options) {
+        if (port.portType() != DrivenPortType.REPOSITORY) {
+            return;
+        }
+        Optional<AggregateRoot> kept = port.managedAggregate()
+                .flatMap(reference -> contribution.model().type(TypeId.of(reference.qualifiedName())))
+                .filter(AggregateRoot.class::isInstance)
+                .map(AggregateRoot.class::cast);
+        if (kept.isEmpty()) {
+            contribution.report(nothingKept(port));
+            return;
+        }
+        AggregateRoot aggregate = kept.orElseThrow();
+        if (!contribution.isCertainEnough(port) || !contribution.isCertainEnough(aggregate)) {
+            contribution.report(tooUnsure(port, contribution));
+            return;
+        }
+        if (aggregate.identityField().isEmpty()) {
+            contribution.report(noIdentity(aggregate));
+            return;
+        }
+        SourceFile source = new StoredRepository(port, aggregate, stored, options).render();
+        contribution.emit(options.targetModule().map(source::in).orElse(source));
+    }
+
+    private static Diagnostic nothingKept(DrivenPort port) {
+        return Diagnostic.builder(
+                        NOTHING_KEPT,
+                        DiagnosticSeverity.WARNING,
+                        "no repository was written for " + port.qualifiedName()
+                                + ": the analysis did not reach which aggregate it keeps, and a store"
+                                + " serves one thing rather than anything")
+                .subject(port.id())
+                .build();
     }
 
     /**

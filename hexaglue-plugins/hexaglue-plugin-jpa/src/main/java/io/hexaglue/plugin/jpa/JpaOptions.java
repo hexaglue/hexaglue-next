@@ -28,8 +28,10 @@ import java.util.Set;
  *
  * @param entitySuffix what a generated entity is called after the type it stores
  * @param embeddableSuffix what a generated embeddable is called after the value it stores
+ * @param repositorySuffix what a generated Spring Data interface is called after the aggregate it serves
  * @param tablePrefix what every table of this project is prefixed with
  * @param embeddables whether values are generated as embeddables at all
+ * @param repositories whether repository ports are served by a generated Spring Data interface
  * @param identity who decides an identity the domain does not
  * @param targetModule the module generated types are routed to, empty when the build says nothing
  * @since 7.0.0
@@ -37,17 +39,27 @@ import java.util.Set;
 public record JpaOptions(
         String entitySuffix,
         String embeddableSuffix,
+        String repositorySuffix,
         String tablePrefix,
         boolean embeddables,
+        boolean repositories,
         IdentityStrategy identity,
         Optional<String> targetModule) {
 
     /** The option keys this plugin answers to. */
     static final Set<String> KEYS = Set.of(
-            "entitySuffix", "embeddableSuffix", "tablePrefix", "generateEmbeddables", "idStrategy", "targetModule");
+            "entitySuffix",
+            "embeddableSuffix",
+            "repositorySuffix",
+            "tablePrefix",
+            "generateEmbeddables",
+            "generateRepositories",
+            "idStrategy",
+            "targetModule");
 
     private static final String DEFAULT_ENTITY_SUFFIX = "Entity";
     private static final String DEFAULT_EMBEDDABLE_SUFFIX = "Embeddable";
+    private static final String DEFAULT_REPOSITORY_SUFFIX = "JpaRepository";
 
     /**
      * Validates the options.
@@ -55,11 +67,13 @@ public record JpaOptions(
     public JpaOptions {
         Objects.requireNonNull(entitySuffix, "entitySuffix must not be null");
         Objects.requireNonNull(embeddableSuffix, "embeddableSuffix must not be null");
+        Objects.requireNonNull(repositorySuffix, "repositorySuffix must not be null");
         Objects.requireNonNull(tablePrefix, "tablePrefix must not be null");
         Objects.requireNonNull(identity, "identity must not be null");
         Objects.requireNonNull(targetModule, "targetModule must not be null");
         requireNamePart(entitySuffix, "entitySuffix");
         requireNamePart(embeddableSuffix, "embeddableSuffix");
+        requireNamePart(repositorySuffix, "repositorySuffix");
         targetModule.ifPresent(module -> {
             if (module.isBlank()) {
                 throw new IllegalArgumentException("targetModule must not be blank when stated");
@@ -76,7 +90,9 @@ public record JpaOptions(
         return new JpaOptions(
                 DEFAULT_ENTITY_SUFFIX,
                 DEFAULT_EMBEDDABLE_SUFFIX,
+                DEFAULT_REPOSITORY_SUFFIX,
                 "",
+                true,
                 true,
                 IdentityStrategy.ASSIGNED,
                 Optional.empty());
@@ -94,8 +110,10 @@ public record JpaOptions(
         return new JpaOptions(
                 config.text("entitySuffix").orElse(defaults.entitySuffix()),
                 config.text("embeddableSuffix").orElse(defaults.embeddableSuffix()),
+                config.text("repositorySuffix").orElse(defaults.repositorySuffix()),
                 config.text("tablePrefix").orElse(defaults.tablePrefix()),
                 config.flag("generateEmbeddables", defaults.embeddables()),
+                config.flag("generateRepositories", defaults.repositories()),
                 config.choice("idStrategy", IdentityStrategy.class, defaults.identity()),
                 config.text("targetModule"));
     }
@@ -118,6 +136,16 @@ public record JpaOptions(
      */
     public String embeddableFor(String typeName) {
         return typeName + embeddableSuffix;
+    }
+
+    /**
+     * Returns what the Spring Data interface serving the given aggregate is called.
+     *
+     * @param typeName the simple name of the aggregate
+     * @return the simple name of the generated interface
+     */
+    public String repositoryFor(String typeName) {
+        return typeName + repositorySuffix;
     }
 
     /**

@@ -15,12 +15,15 @@ package io.hexaglue.plugin.jpa;
 
 import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.Modifier;
+import io.hexaglue.model.PortDirection;
 import io.hexaglue.model.TypeId;
 import io.hexaglue.model.TypeNature;
 import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.arch.AggregateRoot;
 import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.arch.DomainEvent;
+import io.hexaglue.model.arch.DrivenPort;
+import io.hexaglue.model.arch.DrivenPortType;
 import io.hexaglue.model.arch.Entity;
 import io.hexaglue.model.arch.Identifier;
 import io.hexaglue.model.arch.TypeStructure;
@@ -32,6 +35,8 @@ import io.hexaglue.model.classification.ProofNode;
 import io.hexaglue.model.classification.RemediationHint;
 import io.hexaglue.model.declaration.Field;
 import io.hexaglue.model.declaration.FieldRole;
+import io.hexaglue.model.declaration.Method;
+import io.hexaglue.model.declaration.Parameter;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -56,6 +61,10 @@ final class ShopFixture {
     static final TypeId ORDER_PLACED = TypeId.of("com.shop.domain.OrderPlaced");
     static final TypeId INVOICE = TypeId.of("com.shop.domain.Invoice");
     static final TypeId INVOICE_ID = TypeId.of("com.shop.domain.InvoiceId");
+    static final TypeId ORDERS = TypeId.of("com.shop.domain.Orders");
+    static final TypeId AUDITING = TypeId.of("com.shop.domain.Auditing");
+    static final TypeId NOTIFYING = TypeId.of("com.shop.domain.Notifying");
+    static final TypeId CUSTOMERS = TypeId.of("com.shop.domain.Customers");
 
     private static final TypeRef TEXT = TypeRef.of("java.lang.String");
     private static final TypeRef UUID = TypeRef.of("java.util.UUID");
@@ -86,6 +95,10 @@ final class ShopFixture {
                 .addType(orderPlaced())
                 .addType(invoice())
                 .addType(identifier(INVOICE_ID))
+                .addType(orders())
+                .addType(auditing())
+                .addType(notifying())
+                .addType(customers())
                 .build();
     }
 
@@ -244,6 +257,74 @@ final class ShopFixture {
                 Optional.empty(),
                 Optional.empty(),
                 Optional.of(ref(ORDER)));
+    }
+
+    /**
+     * The way out the aggregate is kept behind. Three questions: one by identity, which the store
+     * already answers; one by a value the aggregate holds; and one asking whether there is any.
+     */
+    private static DrivenPort orders() {
+        return new DrivenPort(
+                ORDERS,
+                TypeStructure.builder(TypeNature.INTERFACE)
+                        .methods(List.of(
+                                asks("findById", TypeRef.parameterized("java.util.Optional", ref(ORDER)), ORDER_ID),
+                                asks("of", TypeRef.parameterized("java.util.List", ref(ORDER)), CUSTOMER_ID),
+                                asks("one", TypeRef.parameterized("java.util.Optional", ref(ORDER)), SHIPMENT),
+                                asks(
+                                        "alsoByCustomer",
+                                        TypeRef.parameterized("java.util.List", ref(ORDER)),
+                                        CUSTOMER_ID),
+                                asks("byNothingKnown", ref(ORDER), TypeId.of("java.time.Instant")),
+                                asks("has", TypeRef.of("boolean"), CUSTOMER_ID),
+                                asks("howMany", TypeRef.of("long"), CUSTOMER_ID)))
+                        .build(),
+                port(),
+                DrivenPortType.REPOSITORY,
+                Optional.of(ref(ORDER)));
+    }
+
+    /** A store for an aggregate whose identity nothing names: there is no key to serve rows by. */
+    private static DrivenPort customers() {
+        return new DrivenPort(
+                CUSTOMERS,
+                TypeStructure.builder(TypeNature.INTERFACE).build(),
+                port(),
+                DrivenPortType.REPOSITORY,
+                Optional.of(ref(CUSTOMER)));
+    }
+
+    /** A way out that is not a store at all: nothing is written for it. */
+    private static DrivenPort notifying() {
+        return new DrivenPort(
+                NOTIFYING,
+                TypeStructure.builder(TypeNature.INTERFACE).build(),
+                port(),
+                DrivenPortType.GATEWAY,
+                Optional.of(ref(ORDER)));
+    }
+
+    /** A way out that keeps nothing: there is no table it could be served from. */
+    private static DrivenPort auditing() {
+        return new DrivenPort(
+                AUDITING,
+                TypeStructure.builder(TypeNature.INTERFACE).build(),
+                port(),
+                DrivenPortType.REPOSITORY,
+                Optional.empty());
+    }
+
+    private static Classification port() {
+        return Classification.builder(
+                        ArchKind.DRIVEN_PORT, Confidence.HIGH, Basis.INFERRED, ProofNode.fact("DRIVEN_PORT by fixture"))
+                .direction(PortDirection.DRIVEN)
+                .build();
+    }
+
+    private static Method asks(String name, TypeRef answer, TypeId argument) {
+        return Method.builder(name, answer)
+                .parameters(List.of(Parameter.of("what", ref(argument))))
+                .build();
     }
 
     private static Identifier identifier(TypeId id) {

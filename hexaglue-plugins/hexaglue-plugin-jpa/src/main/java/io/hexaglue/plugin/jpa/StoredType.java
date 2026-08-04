@@ -115,6 +115,11 @@ final class StoredType {
             spec.addAnnotation(Jpa.EMBEDDED);
             return spec.build();
         }
+        if (stored.isOneOfAClosedSet(field)) {
+            spec.addAnnotation(Jpa.enumerated());
+            spec.addAnnotation(Jpa.column(SqlNames.column(field.name())));
+            return spec.build();
+        }
         if (stored.isRelation(field)) {
             spec.addAnnotation(Jpa.MANY_TO_ONE);
             return spec.build();

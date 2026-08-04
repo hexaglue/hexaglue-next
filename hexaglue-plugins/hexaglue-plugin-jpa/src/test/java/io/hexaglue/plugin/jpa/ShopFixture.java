@@ -65,6 +65,7 @@ final class ShopFixture {
     static final TypeId ORDER_PLACED = TypeId.of("com.shop.domain.OrderPlaced");
     static final TypeId INVOICE = TypeId.of("com.shop.domain.Invoice");
     static final TypeId INVOICE_ID = TypeId.of("com.shop.domain.InvoiceId");
+    static final TypeId INVOICE_STATE = TypeId.of("com.shop.domain.InvoiceState");
     static final TypeId ORDERS = TypeId.of("com.shop.domain.Orders");
     static final TypeId INVOICES = TypeId.of("com.shop.domain.Invoices");
     static final TypeId AUDITING = TypeId.of("com.shop.domain.Auditing");
@@ -101,6 +102,7 @@ final class ShopFixture {
                 .addType(orderPlaced())
                 .addType(invoice())
                 .addType(identifier(INVOICE_ID))
+                .addType(invoiceState())
                 .addType(orders())
                 .addType(invoices())
                 .addType(auditing())
@@ -242,10 +244,18 @@ final class ShopFixture {
         return new AggregateRoot(
                 INVOICE,
                 TypeStructure.builder(TypeNature.CLASS)
-                        .fields(List.of(id, field("reference", TEXT, Set.of())))
-                        .methods(List.of(answers("id", ref(INVOICE_ID)), answers("reference", TEXT)))
-                        .constructors(List.of(Constructor.of(
-                                List.of(Parameter.of("id", ref(INVOICE_ID)), Parameter.of("reference", TEXT)))))
+                        .fields(List.of(
+                                id,
+                                field("reference", TEXT, Set.of()),
+                                field("state", ref(INVOICE_STATE), Set.of(FieldRole.EMBEDDED))))
+                        .methods(List.of(
+                                answers("id", ref(INVOICE_ID)),
+                                answers("reference", TEXT),
+                                answers("state", ref(INVOICE_STATE))))
+                        .constructors(List.of(Constructor.of(List.of(
+                                Parameter.of("id", ref(INVOICE_ID)),
+                                Parameter.of("reference", TEXT),
+                                Parameter.of("state", ref(INVOICE_STATE))))))
                         .build(),
                 verdict(ArchKind.AGGREGATE_ROOT, Confidence.HIGH),
                 Optional.of(id),
@@ -255,6 +265,17 @@ final class ShopFixture {
                 List.of(),
                 Optional.empty(),
                 List.of());
+    }
+
+    /**
+     * A value with no state of its own: the store keeps it as itself, which is what the provider
+     * has a shape for.
+     */
+    private static ValueObject invoiceState() {
+        return new ValueObject(
+                INVOICE_STATE,
+                TypeStructure.builder(TypeNature.ENUM).build(),
+                verdict(ArchKind.VALUE_OBJECT, Confidence.HIGH));
     }
 
     /** An identity the analysis could not see inside: stored as itself, for want of anything else. */

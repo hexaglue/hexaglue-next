@@ -446,6 +446,44 @@ class JpaPluginTest {
         }
     }
 
+    /**
+     * A value with no state of its own is one the store already has a shape for. Writing it an
+     * embeddable produced a class with nothing in it and two constructors taking nothing — code no
+     * compiler accepts, which is how a real project found this.
+     */
+    @Nested
+    @DisplayName("keeps a value that is one of a closed set as itself")
+    class KeepsAClosedSetAsItself {
+
+        @Test
+        @DisplayName("storing it in the column of whatever holds it, by name and not by rank")
+        void storingItInTheColumnOfWhateverHoldsIt() {
+            assertThat(flat(source(run(Map.of()), "com.shop.domain.InvoiceEntity")))
+                    .contains("@Enumerated(EnumType.STRING) @Column( name = \"state\" ) private InvoiceState state;");
+        }
+
+        @Test
+        @DisplayName("writing it neither an embeddable nor a mapper, which it has no state for")
+        void writingItNeitherAnEmbeddableNorAMapper() {
+            PluginRun run = run(Map.of());
+
+            assertThat(run.sources())
+                    .extracting(SourceFile::qualifiedName)
+                    .doesNotContain("com.shop.domain.InvoiceStateEmbeddable", "com.shop.domain.InvoiceStateMapper");
+            assertThat(run.diagnostics())
+                    .noneSatisfy(
+                            diagnostic -> assertThat(diagnostic.message()).contains("com.shop.domain.InvoiceState"));
+        }
+
+        @Test
+        @DisplayName("and carrying it across untouched, both ways")
+        void carryingItAcrossUntouched() {
+            String mapper = source(run(Map.of()), "com.shop.domain.InvoiceMapper");
+
+            assertThat(flat(mapper)).contains("domain.state()").contains("row.getState()");
+        }
+    }
+
     @Nested
     @DisplayName("plugs a repository port into the store it is served by")
     class PlugsAPortIntoTheStore {

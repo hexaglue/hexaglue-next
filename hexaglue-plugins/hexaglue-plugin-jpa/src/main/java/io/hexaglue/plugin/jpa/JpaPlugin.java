@@ -14,6 +14,7 @@
 package io.hexaglue.plugin.jpa;
 
 import io.hexaglue.model.TypeId;
+import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.arch.AggregateRoot;
 import io.hexaglue.model.arch.ArchType;
 import io.hexaglue.model.arch.DomainType;
@@ -220,7 +221,7 @@ public final class JpaPlugin implements HexaGluePlugin {
      */
     private void store(
             DomainType type, Contribution contribution, Stored stored, Crossing crossing, JpaOptions options) {
-        if (!storable(type, options)) {
+        if (!storable(type, stored, options)) {
             return;
         }
         Optional<Field> identity = identityOf(type);
@@ -271,10 +272,14 @@ public final class JpaPlugin implements HexaGluePlugin {
                 .build();
     }
 
-    /** Only what the store has a shape for: aggregates, their parts, and the values they hold. */
-    private static boolean storable(DomainType type, JpaOptions options) {
+    /**
+     * Only what the store has a shape for: aggregates, their parts, and the values they hold. A
+     * value that is one of a closed set is left out — the provider keeps it in the column itself,
+     * so an embeddable for it would be a class with nothing in it.
+     */
+    private static boolean storable(DomainType type, Stored stored, JpaOptions options) {
         if (type instanceof ValueObject) {
-            return options.embeddables();
+            return options.embeddables() && !stored.isOneOfAClosedSet(TypeRef.of(type.qualifiedName()));
         }
         return hasATableOfItsOwn(type);
     }

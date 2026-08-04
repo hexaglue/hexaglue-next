@@ -17,6 +17,7 @@ import com.palantir.javapoet.ClassName;
 import com.palantir.javapoet.CodeBlock;
 import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.TypeId;
+import io.hexaglue.model.TypeNature;
 import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.arch.ArchType;
@@ -68,7 +69,10 @@ final class Crossing {
         }
         return switch (kind.orElseThrow()) {
             case IDENTIFIER -> unwrapAccessor(held).map(accessor -> CodeBlock.of("$L.$L()", domain, accessor));
-            case VALUE_OBJECT -> carrier(held).map(mapper -> CodeBlock.of("$T.toEntity($L)", mapper, domain));
+            case VALUE_OBJECT ->
+                isOneOfAClosedSet(held)
+                        ? Optional.of(domain)
+                        : carrier(held).map(mapper -> CodeBlock.of("$T.toEntity($L)", mapper, domain));
             default -> Optional.empty();
         };
     }
@@ -90,7 +94,10 @@ final class Crossing {
         }
         return switch (kind.orElseThrow()) {
             case IDENTIFIER -> unwrapAccessor(held).map(ignored -> CodeBlock.of("new $T($L)", Stored.named(held), row));
-            case VALUE_OBJECT -> carrier(held).map(mapper -> CodeBlock.of("$T.toDomain($L)", mapper, row));
+            case VALUE_OBJECT ->
+                isOneOfAClosedSet(held)
+                        ? Optional.of(row)
+                        : carrier(held).map(mapper -> CodeBlock.of("$T.toDomain($L)", mapper, row));
             default -> Optional.empty();
         };
     }
@@ -113,6 +120,16 @@ final class Crossing {
      */
     ClassName mapperFor(TypeRef type) {
         return ClassName.get(type.packageName(), options.mapperFor(type.simpleName()));
+    }
+
+    /**
+     * Whether the value is one of a closed set the type lists: it crosses as itself, having no
+     * state to take apart and nothing for a mapper to carry.
+     */
+    private boolean isOneOfAClosedSet(TypeRef type) {
+        return model.type(TypeId.of(type.qualifiedName()))
+                .filter(declared -> declared.structure().nature() == TypeNature.ENUM)
+                .isPresent();
     }
 
     /** The mapper of a type, when that type is one this backend can rebuild from a row. */

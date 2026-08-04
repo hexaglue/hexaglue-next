@@ -38,12 +38,25 @@ final class Jpa {
     static final ClassName ONE_TO_MANY = ClassName.get(PACKAGE, "OneToMany");
     static final ClassName MANY_TO_ONE = ClassName.get(PACKAGE, "ManyToOne");
     static final ClassName ELEMENT_COLLECTION = ClassName.get(PACKAGE, "ElementCollection");
+    static final ClassName ENUMERATED = ClassName.get(PACKAGE, "Enumerated");
+    static final ClassName ENUM_TYPE = ClassName.get(PACKAGE, "EnumType");
 
     private Jpa() {}
 
     /** {@code @Table(name = "…")}. */
     static AnnotationSpec table(String name) {
         return AnnotationSpec.builder(TABLE).addMember("name", "$S", name).build();
+    }
+
+    /**
+     * {@code @Enumerated(EnumType.STRING)} — by name, never by rank. The provider's own default is
+     * the rank, and the day a constant is inserted in the middle every row already written means
+     * something else.
+     */
+    static AnnotationSpec enumerated() {
+        return AnnotationSpec.builder(ENUMERATED)
+                .addMember("value", "$T.STRING", ENUM_TYPE)
+                .build();
     }
 
     /** {@code @Column(name = "…")}. */

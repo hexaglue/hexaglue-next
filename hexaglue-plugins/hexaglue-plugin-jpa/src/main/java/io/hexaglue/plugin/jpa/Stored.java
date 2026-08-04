@@ -18,6 +18,7 @@ import com.palantir.javapoet.ParameterizedTypeName;
 import com.palantir.javapoet.TypeName;
 import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.TypeId;
+import io.hexaglue.model.TypeNature;
 import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.arch.ArchType;
@@ -62,10 +63,21 @@ final class Stored {
      * lives in the same row as what holds it; anything with a life of its own does not.
      */
     boolean isEmbedded(Field field) {
+        TypeRef held = field.elementType().orElse(field.type());
         return !field.isCollection()
-                && kindOf(field.elementType().orElse(field.type()))
-                        .filter(ArchKind.VALUE_OBJECT::equals)
-                        .isPresent();
+                && !isOneOfAClosedSet(held)
+                && kindOf(held).filter(ArchKind.VALUE_OBJECT::equals).isPresent();
+    }
+
+    /**
+     * Answers whether the given field holds one of a closed set, which the provider keeps in the
+     * column itself rather than spread over several.
+     *
+     * @param field the domain field
+     * @return true when what it holds is an enum
+     */
+    boolean isOneOfAClosedSet(Field field) {
+        return isOneOfAClosedSet(field.elementType().orElse(field.type()));
     }
 
     /**
@@ -86,7 +98,7 @@ final class Stored {
             return named(element);
         }
         return switch (kind.orElseThrow()) {
-            case VALUE_OBJECT -> embeddable(element);
+            case VALUE_OBJECT -> isOneOfAClosedSet(element) ? named(element) : embeddable(element);
             case IDENTIFIER -> unwrapped(element);
             case AGGREGATE_ROOT, ENTITY -> entity(element);
             default -> named(element);
@@ -106,6 +118,22 @@ final class Stored {
                 .flatMap(Identifier::wrappedType)
                 .map(Stored::named)
                 .orElseGet(() -> named(element));
+    }
+
+    /**
+     * Answers whether the value is one of a closed set the type itself lists.
+     *
+     * <p>Such a value holds no state to spread over columns: the provider stores it as itself, so
+     * this backend writes it nothing — neither an embeddable with nothing in it, nor a mapper with
+     * nothing to carry.</p>
+     *
+     * @param type the domain type
+     * @return true when the sources declared it as an enum
+     */
+    boolean isOneOfAClosedSet(TypeRef type) {
+        return model.type(TypeId.of(type.qualifiedName()))
+                .filter(declared -> declared.structure().nature() == TypeNature.ENUM)
+                .isPresent();
     }
 
     /** The entity generated for a domain type, in the same package as the type it stores. */

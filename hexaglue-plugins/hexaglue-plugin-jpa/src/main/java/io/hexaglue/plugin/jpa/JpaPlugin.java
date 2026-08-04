@@ -20,6 +20,7 @@ import io.hexaglue.model.arch.DomainType;
 import io.hexaglue.model.arch.DrivenPort;
 import io.hexaglue.model.arch.DrivenPortType;
 import io.hexaglue.model.arch.Entity;
+import io.hexaglue.model.arch.PortFamily;
 import io.hexaglue.model.arch.ValueObject;
 import io.hexaglue.model.declaration.Field;
 import io.hexaglue.model.declaration.Method;
@@ -32,6 +33,7 @@ import io.hexaglue.spi.PluginManifest;
 import io.hexaglue.spi.SourceFile;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -74,9 +76,16 @@ public final class JpaPlugin implements HexaGluePlugin {
         // Nothing to hold: a contribution is a function of the model it is handed.
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>What it fills is stated by family: the ports that keep an aggregate. A hexagon reaching
+     * the outside for anything else — sending mail, calling a service — leaves holes this backend
+     * says nothing about, and those go on being reported as the holes they are.</p>
+     */
     @Override
     public PluginManifest manifest() {
-        return new PluginManifest(ID, List.of(), JpaOptions.KEYS);
+        return new PluginManifest(ID, List.of(), JpaOptions.KEYS, Set.of(PortFamily.driven(DrivenPortType.REPOSITORY)));
     }
 
     @Override

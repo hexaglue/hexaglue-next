@@ -16,6 +16,8 @@ package io.hexaglue.spi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.hexaglue.model.arch.DrivenPortType;
+import io.hexaglue.model.arch.PortFamily;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +42,23 @@ class PluginManifestTest {
         PluginManifest manifest = new PluginManifest("doc", List.of(), Set.of("zeta", "alpha", "mu"));
 
         assertThat(manifest.options()).containsExactly("alpha", "mu", "zeta");
+    }
+
+    @Test
+    @DisplayName("and what it will write, so a hole this build fills is not reported as one")
+    void declaresWhatItWillWrite() {
+        PluginManifest manifest = new PluginManifest(
+                "io.hexaglue.jpa", List.of(), Set.of(), Set.of(PortFamily.driven(DrivenPortType.REPOSITORY)));
+
+        assertThat(manifest.produces()).containsExactly(PortFamily.driven(DrivenPortType.REPOSITORY));
+    }
+
+    @Test
+    @DisplayName("a plugin that fills nothing the core left open declaring none")
+    void aPluginThatFillsNothingDeclaresNone() {
+        assertThat(PluginManifest.of("io.hexaglue.plugin.audit").produces()).isEmpty();
+        assertThat(new PluginManifest("doc", List.of(), Set.of("outputDirectory")).produces())
+                .isEmpty();
     }
 
     @Test

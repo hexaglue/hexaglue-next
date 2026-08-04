@@ -16,6 +16,8 @@ package io.hexaglue.plugin.jpa;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.hexaglue.model.arch.ArchModel;
+import io.hexaglue.model.arch.DrivenPortType;
+import io.hexaglue.model.arch.PortFamily;
 import io.hexaglue.model.classification.Confidence;
 import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.model.finding.IssueCode;
@@ -204,6 +206,18 @@ class JpaPluginTest {
             assertThat(run.sources())
                     .extracting(SourceFile::qualifiedName)
                     .doesNotContain("com.shop.domain.MoneyEmbeddable");
+        }
+    }
+
+    @Nested
+    @DisplayName("says what it will write before it writes it")
+    class SaysWhatItWillWrite {
+
+        @Test
+        @DisplayName("the ports that keep an aggregate, and nothing about the other ways out")
+        void thePortsThatKeepAnAggregate() {
+            assertThat(new JpaPlugin().manifest().produces())
+                    .containsExactly(PortFamily.driven(DrivenPortType.REPOSITORY));
         }
     }
 

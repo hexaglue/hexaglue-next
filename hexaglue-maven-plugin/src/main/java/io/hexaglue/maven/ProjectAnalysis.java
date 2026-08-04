@@ -24,6 +24,7 @@ import io.hexaglue.frontend.FrontendResult;
 import io.hexaglue.frontend.SpoonFrontend;
 import io.hexaglue.knowledge.KnowledgePacks;
 import io.hexaglue.model.arch.ArchModel;
+import io.hexaglue.model.classification.Confidence;
 import io.hexaglue.model.config.HexaGlueConfig;
 import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.model.finding.Finding;
@@ -104,15 +105,21 @@ final class ProjectAnalysis {
      *
      * @param analysed what the analysis concluded
      * @param plugins the backends found on the classpath
+     * @param minConfidence how sure the analysis must be before a backend generates from it
      * @param options what the document asks of each of them
      * @return what the backends produced and what the run refused
      */
     static PluginRun contribute(
-            Result analysed, List<HexaGluePlugin> plugins, Map<String, Map<String, String>> options) {
+            Result analysed,
+            List<HexaGluePlugin> plugins,
+            Confidence minConfidence,
+            Map<String, Map<String, String>> options) {
         Objects.requireNonNull(analysed, "analysed must not be null");
         Objects.requireNonNull(plugins, "plugins must not be null");
+        Objects.requireNonNull(minConfidence, "minConfidence must not be null");
         Objects.requireNonNull(options, "options must not be null");
-        return PluginExecutor.run(plugins, analysed.model(), analysed.findings(), analysed.measurements(), options);
+        return PluginExecutor.run(
+                plugins, analysed.model(), analysed.findings(), analysed.measurements(), minConfidence, options);
     }
 
     /**

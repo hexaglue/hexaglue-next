@@ -67,9 +67,7 @@ final class Fields {
         Optional<TypeId> tied = kind == ArchKind.AGGREGATE_ROOT
                 ? Links.single(links.objects(RelationKind.IDENTIFIED_BY, type.id()))
                 : Optional.empty();
-        return type.fields().stream()
-                .map(field -> read(field, kind, tied))
-                .toList();
+        return type.fields().stream().map(field -> read(field, kind, tied)).toList();
     }
 
     private Field read(Field field, ArchKind owner, Optional<TypeId> tied) {

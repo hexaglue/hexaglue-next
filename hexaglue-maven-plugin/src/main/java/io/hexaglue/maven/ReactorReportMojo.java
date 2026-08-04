@@ -125,7 +125,8 @@ public class ReactorReportMojo extends AbstractMojo {
         Diagnostics.report(analysed.diagnostics(), log);
         log.info("HexaGlue laid out " + analysed.model().moduleTopology().size()
                 + " module(s) of it, being the ones whose role the project declares");
-        PluginRun run = ProjectAnalysis.contribute(analysed, plugins, options);
+        PluginRun run = ProjectAnalysis.contribute(
+                analysed, plugins, config.generation().minConfidence(), options);
 
         Path output = output(reactor);
         Documents.report(run, log);

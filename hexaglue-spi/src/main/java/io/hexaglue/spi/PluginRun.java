@@ -25,24 +25,31 @@ import java.util.Objects;
  * that depended on it — never the others. Whoever hosts the run decides what to do with the
  * diagnostics; the contract only owes an account that leaves nothing silent.</p>
  *
- * @param documents what the plugins handed over, in execution order then emission order
+ * @param documents what the plugins handed over to read, in execution order then emission order
+ * @param sources what the plugins handed over to compile, in the same order
  * @param diagnostics what the run refused or survived, coded
  * @param executed the plugins that ran, in execution order
  * @param skipped the plugins that did not run, in identifier order
  * @since 7.0.0
  */
 public record PluginRun(
-        List<Document> documents, List<Diagnostic> diagnostics, List<String> executed, List<String> skipped) {
+        List<Document> documents,
+        List<SourceFile> sources,
+        List<Diagnostic> diagnostics,
+        List<String> executed,
+        List<String> skipped) {
 
     /**
      * Validates every component and copies the collections.
      */
     public PluginRun {
         Objects.requireNonNull(documents, "documents must not be null");
+        Objects.requireNonNull(sources, "sources must not be null");
         Objects.requireNonNull(diagnostics, "diagnostics must not be null");
         Objects.requireNonNull(executed, "executed must not be null");
         Objects.requireNonNull(skipped, "skipped must not be null");
         documents = List.copyOf(documents);
+        sources = List.copyOf(sources);
         diagnostics = List.copyOf(diagnostics);
         executed = List.copyOf(executed);
         skipped = List.copyOf(skipped);

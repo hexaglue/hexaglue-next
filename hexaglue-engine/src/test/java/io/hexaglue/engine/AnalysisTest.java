@@ -458,8 +458,8 @@ class AnalysisTest {
 
             assertThat(fleet.structure().fields())
                     .filteredOn(field -> "NONE".equals(field.name()))
-                    .allSatisfy(field -> assertThat(field.hasRole(FieldRole.IDENTITY))
-                            .isFalse());
+                    .allSatisfy(field ->
+                            assertThat(field.hasRole(FieldRole.IDENTITY)).isFalse());
         }
 
         @Test
@@ -481,7 +481,9 @@ class AnalysisTest {
         @Test
         @DisplayName("leaving audit and plumbing unsaid, which no pack can name on a member")
         void leavingAuditAndPlumbingUnsaid() {
-            assertThat(read(modelOf(hexagon()), FLEET, ArchType.class).structure().fields())
+            assertThat(read(modelOf(hexagon()), FLEET, ArchType.class)
+                            .structure()
+                            .fields())
                     .flatExtracting(Field::roles)
                     .doesNotContain(FieldRole.AUDIT, FieldRole.TECHNICAL);
         }

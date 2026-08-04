@@ -14,6 +14,9 @@
 package io.hexaglue.spi;
 
 import io.hexaglue.model.arch.ArchModel;
+import io.hexaglue.model.arch.ArchType;
+import io.hexaglue.model.classification.Confidence;
+import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.model.finding.Finding;
 import java.util.List;
 import java.util.Objects;
@@ -27,15 +30,25 @@ import java.util.Objects;
  * gate, a build would pass while its own report condemned it. What a plugin does with them is
  * presentation: order them, count them, explain them. Never re-decide them.</p>
  *
+ * <p>The certainty threshold travels here rather than among a plugin's own options, because it is
+ * the project's policy and not the backend's preference: how sure the analysis must be before code
+ * is written from it is the same question for every generator, and the answer is stated once.</p>
+ *
  * @param model the classified model, complete and immutable
  * @param findings what the checks made of it, in a stable order
  * @param measurements what was measured about the shape of the codebase
  * @param config the options stated for this plugin, opaque to every other stage
+ * @param minConfidence the weakest verdict this run accepts as grounds for generating
  * @param sinks where the contribution goes
  * @since 7.0.0
  */
 public record Contribution(
-        ArchModel model, List<Finding> findings, Measurements measurements, PluginConfig config, Sinks sinks) {
+        ArchModel model,
+        List<Finding> findings,
+        Measurements measurements,
+        PluginConfig config,
+        Confidence minConfidence,
+        Sinks sinks) {
 
     /**
      * Validates every component and copies the findings.
@@ -45,6 +58,7 @@ public record Contribution(
         Objects.requireNonNull(findings, "findings must not be null");
         Objects.requireNonNull(measurements, "measurements must not be null");
         Objects.requireNonNull(config, "config must not be null");
+        Objects.requireNonNull(minConfidence, "minConfidence must not be null");
         Objects.requireNonNull(sinks, "sinks must not be null");
         findings = List.copyOf(findings);
     }
@@ -57,5 +71,38 @@ public record Contribution(
      */
     public void emit(String path, String content) {
         sinks.documents().emit(new Document(path, content));
+    }
+
+    /**
+     * Hands a generated Java type over to the run.
+     *
+     * @param source the type to write, named rather than placed
+     */
+    public void emit(SourceFile source) {
+        sinks.sources().emit(source);
+    }
+
+    /**
+     * Says something about this run without giving it up.
+     *
+     * @param diagnostic what to say, coded
+     */
+    public void report(Diagnostic diagnostic) {
+        sinks.diagnostics().report(diagnostic);
+    }
+
+    /**
+     * Answers whether the analysis was sure enough about a type for this run to generate from it.
+     *
+     * <p>Asked here rather than worked out by each backend: the comparison runs the opposite way to
+     * the enum it reads, and a generator getting it backwards would write code for exactly the
+     * verdicts the threshold was raised to keep out.</p>
+     *
+     * @param type the type a plugin is about to generate from
+     * @return true when the verdict on it reaches the threshold this run states
+     */
+    public boolean isCertainEnough(ArchType type) {
+        Objects.requireNonNull(type, "type must not be null");
+        return type.classification().confidence().isAtLeast(minConfidence);
     }
 }

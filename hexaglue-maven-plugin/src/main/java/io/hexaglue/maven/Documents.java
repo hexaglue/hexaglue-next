@@ -49,6 +49,14 @@ final class Documents {
         if (!run.skipped().isEmpty()) {
             log.warn("HexaGlue skipped " + String.join(", ", run.skipped()));
         }
+        // A goal that reports does not compile anything, so the types a generating backend handed
+        // over have nowhere to go here. Dropping them without a word would look like a backend that
+        // generated nothing.
+        if (!run.sources().isEmpty()) {
+            log.warn(
+                    "HexaGlue was handed " + run.sources().size()
+                            + " generated type(s) by a backend, which this goal does not write: run hexaglue:generate for those");
+        }
     }
 
     /**

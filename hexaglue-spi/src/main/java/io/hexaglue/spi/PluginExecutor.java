@@ -14,6 +14,8 @@
 package io.hexaglue.spi;
 
 import io.hexaglue.model.arch.ArchModel;
+import io.hexaglue.model.classification.Confidence;
+import io.hexaglue.model.config.GenerationConfig;
 import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.model.finding.DiagnosticSeverity;
 import io.hexaglue.model.finding.Finding;
@@ -57,6 +59,9 @@ public final class PluginExecutor {
     /** Two plugins claim the same identifier. */
     private static final IssueCode DUPLICATE_ID = IssueCode.of("HG-PLUGIN-007");
 
+    /** Two plugins want to generate the same type. */
+    private static final IssueCode SOURCE_CLAIMED_TWICE = IssueCode.of("HG-PLUGIN-008");
+
     private PluginExecutor() {}
 
     /**
@@ -69,7 +74,13 @@ public final class PluginExecutor {
      */
     public static PluginRun run(
             List<HexaGluePlugin> plugins, ArchModel model, Map<String, Map<String, String>> options) {
-        return run(plugins, model, List.of(), Measurements.none(), options);
+        return run(
+                plugins,
+                model,
+                List.of(),
+                Measurements.none(),
+                GenerationConfig.defaults().minConfidence(),
+                options);
     }
 
     /**
@@ -79,6 +90,7 @@ public final class PluginExecutor {
      * @param model the classified model they all read
      * @param findings what the checks made of that model
      * @param measurements what was measured about the shape of the codebase
+     * @param minConfidence the weakest verdict this run accepts as grounds for generating
      * @param options the stated options, by plugin identifier
      * @return what the run produced and what it refused
      */
@@ -87,27 +99,27 @@ public final class PluginExecutor {
             ArchModel model,
             List<Finding> findings,
             Measurements measurements,
+            Confidence minConfidence,
             Map<String, Map<String, String>> options) {
         Objects.requireNonNull(plugins, "plugins must not be null");
         Objects.requireNonNull(model, "model must not be null");
         Objects.requireNonNull(findings, "findings must not be null");
         Objects.requireNonNull(measurements, "measurements must not be null");
+        Objects.requireNonNull(minConfidence, "minConfidence must not be null");
         Objects.requireNonNull(options, "options must not be null");
 
-        List<Diagnostic> diagnostics = new ArrayList<>();
+        Outputs outputs = new Outputs();
         Map<String, HexaGluePlugin> byId = new LinkedHashMap<>();
-        Schedule schedule = Schedule.of(described(plugins, byId, diagnostics));
+        Schedule schedule = Schedule.of(described(plugins, byId, outputs.diagnostics));
 
         Set<String> skipped = new TreeSet<>();
         schedule.excluded().forEach(exclusion -> skipped.add(exclusion.pluginId()));
-        schedule.excluded().forEach(exclusion -> refusalOf(exclusion, schedule).ifPresent(diagnostics::add));
+        schedule.excluded().forEach(exclusion -> refusalOf(exclusion, schedule).ifPresent(outputs.diagnostics::add));
         schedule.duplicates()
-                .forEach(pluginId -> diagnostics.add(diagnostic(
+                .forEach(pluginId -> outputs.diagnostics.add(diagnostic(
                         DUPLICATE_ID,
                         "two plugins claim the identifier " + pluginId + "; the first one read was kept")));
 
-        Map<String, String> writtenBy = new LinkedHashMap<>();
-        List<Document> documents = new ArrayList<>();
         List<String> executed = new ArrayList<>();
         for (String pluginId : schedule.order()) {
             if (skipped.contains(pluginId)) {
@@ -116,17 +128,58 @@ public final class PluginExecutor {
             // The schedule was built from these very manifests, so the plugin is always there.
             HexaGluePlugin plugin = Objects.requireNonNull(byId.get(pluginId), pluginId);
             Optional<Diagnostic> refusal =
-                    contribute(plugin, model, findings, measurements, options, documents, writtenBy, diagnostics);
+                    contribute(plugin, model, findings, measurements, minConfidence, options, outputs);
             if (refusal.isEmpty()) {
                 executed.add(pluginId);
             } else {
                 List<String> dependents = schedule.dependentsOf(pluginId);
-                diagnostics.add(alsoSkipping(refusal.get(), dependents));
+                outputs.diagnostics.add(alsoSkipping(refusal.get(), dependents));
                 skipped.add(pluginId);
                 skipped.addAll(dependents);
             }
         }
-        return new PluginRun(documents, diagnostics, executed, List.copyOf(skipped));
+        return new PluginRun(outputs.documents, outputs.sources, outputs.diagnostics, executed, List.copyOf(skipped));
+    }
+
+    /**
+     * What a run accumulates across its plugins, and who claimed what first.
+     *
+     * <p>Two backends writing the same thing is arbitrated the same way whatever the thing is: the
+     * first writer keeps it, both claimants are named, and the run carries on. What differs is only
+     * what the collision is called.</p>
+     */
+    private static final class Outputs {
+
+        private final List<Document> documents = new ArrayList<>();
+        private final List<SourceFile> sources = new ArrayList<>();
+        private final List<Diagnostic> diagnostics = new ArrayList<>();
+        private final Map<String, String> documentClaims = new LinkedHashMap<>();
+        private final Map<String, String> sourceClaims = new LinkedHashMap<>();
+
+        void takeDocuments(String pluginId, List<Document> emitted) {
+            for (Document document : emitted) {
+                take(pluginId, document.path(), documentClaims, () -> documents.add(document), DOCUMENT_CLAIMED_TWICE);
+            }
+        }
+
+        void takeSources(String pluginId, List<SourceFile> emitted) {
+            for (SourceFile source : emitted) {
+                take(pluginId, source.qualifiedName(), sourceClaims, () -> sources.add(source), SOURCE_CLAIMED_TWICE);
+            }
+        }
+
+        private void take(
+                String pluginId, String claimed, Map<String, String> claims, Runnable keep, IssueCode collision) {
+            String first = claims.putIfAbsent(claimed, pluginId);
+            if (first == null) {
+                keep.run();
+            } else {
+                diagnostics.add(diagnostic(
+                        collision,
+                        "plugins " + first + " and " + pluginId + " both write " + claimed + "; the one of " + first
+                                + " was kept"));
+            }
+        }
     }
 
     /**
@@ -164,10 +217,9 @@ public final class PluginExecutor {
             ArchModel model,
             List<Finding> findings,
             Measurements measurements,
+            Confidence minConfidence,
             Map<String, Map<String, String>> options,
-            List<Document> documents,
-            Map<String, String> writtenBy,
-            List<Diagnostic> diagnostics) {
+            Outputs outputs) {
         PluginManifest manifest = plugin.manifest();
         Map<String, String> stated = options.getOrDefault(manifest.id(), Map.of());
         List<String> undeclared = stated.keySet().stream()
@@ -182,10 +234,19 @@ public final class PluginExecutor {
                             + String.join(", ", manifest.options())));
         }
 
-        List<Document> emitted = new ArrayList<>();
+        // Held aside until the plugin comes back: a backend that fails halfway through leaves
+        // nothing behind, so a failed contribution is a contribution that did not happen.
+        List<Document> documents = new ArrayList<>();
+        List<SourceFile> sources = new ArrayList<>();
+        List<Diagnostic> reported = new ArrayList<>();
         try {
             plugin.contribute(new Contribution(
-                    model, findings, measurements, PluginConfig.of(manifest.id(), stated), new Sinks(emitted::add)));
+                    model,
+                    findings,
+                    measurements,
+                    PluginConfig.of(manifest.id(), stated),
+                    minConfidence,
+                    new Sinks(documents::add, sources::add, reported::add)));
         } catch (PluginConfigException malformed) {
             return Optional.of(malformed.diagnostic());
         }
@@ -196,7 +257,9 @@ public final class PluginExecutor {
             return Optional.of(
                     diagnostic(PLUGIN_FAILED, "plugin " + manifest.id() + " failed and was skipped: " + failure));
         }
-        collect(manifest.id(), emitted, documents, writtenBy, diagnostics);
+        outputs.takeDocuments(manifest.id(), documents);
+        outputs.takeSources(manifest.id(), sources);
+        outputs.diagnostics.addAll(reported);
         return Optional.empty();
     }
 
@@ -214,29 +277,6 @@ public final class PluginExecutor {
                         cause.severity(),
                         cause.message() + ". Skipped with it: " + String.join(", ", dependents))
                 .build();
-    }
-
-    /**
-     * Takes in what a plugin emitted, refusing a document another plugin already claimed — the
-     * first writer keeps the path, and both claimants are named.
-     */
-    private static void collect(
-            String pluginId,
-            List<Document> emitted,
-            List<Document> documents,
-            Map<String, String> writtenBy,
-            List<Diagnostic> diagnostics) {
-        for (Document document : emitted) {
-            String first = writtenBy.putIfAbsent(document.path(), pluginId);
-            if (first == null) {
-                documents.add(document);
-            } else {
-                diagnostics.add(diagnostic(
-                        DOCUMENT_CLAIMED_TWICE,
-                        "plugins " + first + " and " + pluginId + " both write " + document.path()
-                                + "; the document of " + first + " was kept"));
-            }
-        }
     }
 
     /**

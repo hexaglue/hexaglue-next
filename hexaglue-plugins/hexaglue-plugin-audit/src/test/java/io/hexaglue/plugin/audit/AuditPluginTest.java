@@ -109,7 +109,8 @@ class AuditPluginTest {
 
     private static PluginRun run(Map<String, String> options) {
         List<HexaGluePlugin> plugins = List.of(new AuditPlugin());
-        return PluginExecutor.run(plugins, model(), findings(), measurements(), Map.of(AuditPlugin.ID, options));
+        return PluginExecutor.run(
+                plugins, model(), findings(), measurements(), Confidence.HIGH, Map.of(AuditPlugin.ID, options));
     }
 
     private static String document(PluginRun run, String name) {
@@ -194,7 +195,7 @@ class AuditPluginTest {
         @DisplayName("the inventory lays out a reactor: its roles, what depends on what, and what holds a domain")
         void laysOutAReactor() {
             PluginRun run = PluginExecutor.run(
-                    List.of(new AuditPlugin()), reactorModel(), findings(), measurements(), Map.of());
+                    List.of(new AuditPlugin()), reactorModel(), findings(), measurements(), Confidence.HIGH, Map.of());
 
             String report = document(run, AuditReport.NAME);
 

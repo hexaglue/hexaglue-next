@@ -228,16 +228,60 @@ class MembersTest {
                     .containsExactly("()", "(OrderId)");
         }
 
+        /**
+         * A record states its whole state in its header, and the language writes the reader and
+         * the builder of that state for it. Leaving those out would report a type offering no way
+         * in and no way out — which is not what its author declared.
+         */
         @Test
-        @DisplayName("reports only what the source declares, not what the language implies")
-        void reportsOnlyDeclaredMembers() {
+        @DisplayName("gives back what a record states in its header, reader and builder alike")
+        void givesBackWhatARecordStatesInItsHeader() {
             SourceFixtures.write(
                     sources, "com/acme/OrderId.java", "package com.acme; public record OrderId(String value) {}");
 
             TypeNode orderId = node("com.acme.OrderId");
-            assertThat(orderId.constructors()).isEmpty();
-            assertThat(orderId.methods()).isEmpty();
             assertThat(orderId.fields()).extracting(Field::name).containsExactly("value");
+            assertThat(orderId.methods())
+                    .singleElement()
+                    .satisfies(accessor -> assertThat(accessor.signature()).isEqualTo("value()"));
+            assertThat(orderId.constructors())
+                    .extracting(Constructor::signature)
+                    .containsExactly("(String)");
+        }
+
+        @Test
+        @DisplayName("once each, whether or not the record writes some of it out itself")
+        void onceEachWhateverTheRecordWritesOut() {
+            SourceFixtures.write(sources, "com/acme/Money.java", """
+                    package com.acme;
+                    public record Money(java.math.BigDecimal amount, String currency) {
+                        public Money {
+                            if (amount == null) {
+                                throw new IllegalArgumentException("amount");
+                            }
+                        }
+                        public boolean isZero() { return amount.signum() == 0; }
+                    }
+                    """);
+
+            TypeNode money = node("com.acme.Money");
+            assertThat(money.methods())
+                    .extracting(Method::signature)
+                    .containsExactly("amount()", "currency()", "isZero()");
+            assertThat(money.constructors()).extracting(Constructor::signature).containsExactly("(BigDecimal, String)");
+        }
+
+        /**
+         * What a class gets for having written no constructor is not a declaration: it takes
+         * nothing and says nothing about the type. A record's components are the opposite — they
+         * are the declaration, written in the header.
+         */
+        @Test
+        @DisplayName("but still leaves out what the language merely supplies")
+        void stillLeavesOutWhatTheLanguageMerelySupplies() {
+            SourceFixtures.write(sources, "com/acme/Order.java", "package com.acme; public class Order {}");
+
+            assertThat(node("com.acme.Order").constructors()).isEmpty();
         }
 
         @Test

@@ -32,15 +32,16 @@ import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
+import spoon.reflect.declaration.CtRecord;
 import spoon.reflect.declaration.CtType;
 
 /**
  * Reads the members a type declares.
  *
- * <p>Declared members only: inherited members belong to the supertype closure. Executables the
- * language implies — a record's canonical constructor, its component accessors — express no
- * decision of the author and are left out. Record components are the exception: they are the state
- * the author declared, written in the header rather than in a body.</p>
+ * <p>Declared members only: inherited members belong to the supertype closure. What a class gets
+ * for having written no constructor is left out — it takes nothing and expresses no decision of the
+ * author. A record is the other case: its header states its whole state, and the components, their
+ * accessors and the canonical constructor are that statement written where the author put it.</p>
  *
  * <p>Enum constants are left out of the fields: they are the values of the type, not state it
  * holds, and the shape of an enum is already carried by its nature.</p>
@@ -87,7 +88,7 @@ final class Members {
      */
     List<Method> methodsOf(CtType<?> type, MethodBodies bodies) {
         return type.getMethods().stream()
-                .filter(method -> !method.isImplicit())
+                .filter(method -> declares(type, method.isImplicit()))
                 .map(method -> methodOf(method, bodies))
                 .sorted(BY_METHOD_SIGNATURE)
                 .toList();
@@ -104,10 +105,26 @@ final class Members {
             return List.of();
         }
         return declaration.getConstructors().stream()
-                .filter(constructor -> !constructor.isImplicit())
+                .filter(constructor -> declares(type, constructor.isImplicit()))
                 .map(this::constructorOf)
                 .sorted(BY_CONSTRUCTOR_SIGNATURE)
                 .toList();
+    }
+
+    /**
+     * Whether a member the source did not write out is nonetheless part of what the type declares.
+     *
+     * <p>A record states its whole state in its header, and the language writes down the reader
+     * and the builder of that state for it: those <em>are</em> the declaration, put where the
+     * author put it. A class that wrote no constructor declares nothing by it — what it gets takes
+     * nothing and says nothing — so that one stays out.</p>
+     *
+     * <p>The distinction matters beyond tidiness. Anything generated against a domain has to call
+     * what the domain offers, and a record reported with no way in and no way out is a record
+     * nothing can be written for.</p>
+     */
+    private static boolean declares(CtType<?> type, boolean implicit) {
+        return !implicit || type instanceof CtRecord;
     }
 
     private Field fieldOf(CtField<?> field) {

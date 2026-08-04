@@ -27,6 +27,14 @@
             <artifactId>hexaglue-spi</artifactId>
         </dependency>
 
+        <!-- Java is written as a syntax tree and printed from it: a template would let this
+             backend emit text that does not compile, and the compiler of the project being
+             built would be the first to find out. -->
+        <dependency>
+            <groupId>com.palantir.javapoet</groupId>
+            <artifactId>javapoet</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

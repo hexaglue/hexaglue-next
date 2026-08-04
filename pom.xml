@@ -61,6 +61,7 @@
         <snakeyaml-engine.version>3.0.1</snakeyaml-engine.version>
         <jgrapht.version>1.5.2</jgrapht.version>
         <jackson.version>2.22.1</jackson.version>
+        <javapoet.version>0.18.0</javapoet.version>
 
         <!-- Compilation guard rails -->
         <error-prone.version>2.50.0</error-prone.version>
@@ -189,6 +190,15 @@
                 <groupId>io.github.classgraph</groupId>
                 <artifactId>classgraph</artifactId>
                 <version>${classgraph.version}</version>
+            </dependency>
+
+            <!-- Java source generation. The Palantir fork is the maintained one: Square
+                 archived JavaPoet, and the API is the same. Writing Java with a text
+                 template is how a generator ends up emitting code that does not compile. -->
+            <dependency>
+                <groupId>com.palantir.javapoet</groupId>
+                <artifactId>javapoet</artifactId>
+                <version>${javapoet.version}</version>
             </dependency>
 
             <!-- JSON for the report the site and the tooling read. Canonical, ordered

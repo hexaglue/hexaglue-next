@@ -16,11 +16,13 @@ package io.hexaglue.spi;
 import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.model.finding.DiagnosticSeverity;
 import io.hexaglue.model.finding.IssueCode;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /**
  * The options stated for one plugin, opaque to every other stage.
@@ -122,6 +124,41 @@ public final class PluginConfig {
         } catch (NumberFormatException notANumber) {
             throw new PluginConfigException(refusal(key, value, "a whole number"), notANumber);
         }
+    }
+
+    /**
+     * Returns a stated choice among a fixed set of names, or the plugin's own fallback when the key
+     * was not stated.
+     *
+     * <p>What is accepted is named in the refusal, in declaration order: an author who mistypes a
+     * strategy is told which ones exist rather than being handed the exception a bare
+     * {@code valueOf} throws, which names neither the option nor the alternatives.</p>
+     *
+     * @param key the option key
+     * @param choices the type whose constants are the accepted values
+     * @param fallback the value to use when the key was not stated
+     * @param <E> the enumeration of accepted values
+     * @return the chosen value
+     * @throws PluginConfigException if the stated value is not one of the accepted names
+     */
+    public <E extends Enum<E>> E choice(String key, Class<E> choices, E fallback) {
+        Objects.requireNonNull(choices, "choices must not be null");
+        Objects.requireNonNull(fallback, "fallback must not be null");
+        Optional<String> stated = text(key);
+        if (stated.isEmpty()) {
+            return fallback;
+        }
+        String value = stated.get().trim();
+        for (E candidate : choices.getEnumConstants()) {
+            if (candidate.name().equalsIgnoreCase(value)) {
+                return candidate;
+            }
+        }
+        throw malformed(key, value, "one of " + names(choices));
+    }
+
+    private static <E extends Enum<E>> String names(Class<E> choices) {
+        return Arrays.stream(choices.getEnumConstants()).map(Enum::name).collect(Collectors.joining(", "));
     }
 
     private PluginConfigException malformed(String key, String value, String expected) {

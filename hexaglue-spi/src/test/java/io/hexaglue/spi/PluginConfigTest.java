@@ -96,4 +96,46 @@ class PluginConfigTest {
                     .hasMessageContaining("doc");
         }
     }
+
+    @Nested
+    @DisplayName("a choice among a fixed set of names")
+    class AChoiceAmongNames {
+
+        /** Stands in for the strategies and modes a backend states as words. */
+        private enum Depth {
+            SHALLOW,
+            DEEP
+        }
+
+        @Test
+        @DisplayName("is the plugin's own when the build states nothing")
+        void isThePluginsOwnWhenNothingIsStated() {
+            assertThat(config(Map.of()).choice("depth", Depth.class, Depth.SHALLOW))
+                    .isEqualTo(Depth.SHALLOW);
+        }
+
+        @Test
+        @DisplayName("is read whatever case and spacing the build wrote it in")
+        void isReadWhateverCaseAndSpacing() {
+            assertThat(config(Map.of("depth", "deep")).choice("depth", Depth.class, Depth.SHALLOW))
+                    .isEqualTo(Depth.DEEP);
+            assertThat(config(Map.of("depth", " DEEP ")).choice("depth", Depth.class, Depth.SHALLOW))
+                    .isEqualTo(Depth.DEEP);
+        }
+
+        /**
+         * The whole reason this is not a bare {@code valueOf}: that names neither the option nor
+         * what would have been right, and the author reads a stack trace instead of a sentence.
+         */
+        @Test
+        @DisplayName("and a word that is not one of them is refused, with the ones that are named")
+        void refusesAWordThatIsNotOneOfThem() {
+            assertThatThrownBy(() -> config(Map.of("depth", "profound")).choice("depth", Depth.class, Depth.SHALLOW))
+                    .isInstanceOf(PluginConfigException.class)
+                    .hasMessageContaining("depth")
+                    .hasMessageContaining("profound")
+                    .hasMessageContaining("SHALLOW")
+                    .hasMessageContaining("DEEP");
+        }
+    }
 }

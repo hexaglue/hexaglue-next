@@ -25,4 +25,15 @@ assert !diagram.contains('+Money total') : 'the diagram should stop at the budge
 // Provenance was refused, so no verdict unfolds what it rests on.
 assert !domain.text.contains('What this verdict rests on') : 'provenance was refused and should be absent'
 
+// The boundary is drawn: which way each port faces, and what a driven one manages.
+def ports = new File(output, 'docs/ports.md')
+assert ports.text.contains('```mermaid') : 'the boundary should be drawn: ' + ports.text
+assert ports.text.contains('-->|"manages"|') : 'the drawing should say what the port manages: ' + ports.text
+
+// The audit draws too, but only what there is to draw: the fixture holds two packages that
+// depend on each other in a circle, and nothing else in it forms a knot.
+assert audit.text.contains('| Dependency knots | 1 |') : 'the audit should count the knot: ' + audit.text
+assert audit.text.contains('```mermaid') : 'the audit should draw the knot it found: ' + audit.text
+assert audit.text.contains('subgraph knot0') : 'the drawing should group the knot: ' + audit.text
+
 return true

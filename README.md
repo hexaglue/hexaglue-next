@@ -2,9 +2,11 @@
 
 New reactor for HexaGlue, the architecture compiler for Java applications.
 At compile time, it turns a codebase into a semantic graph of architectural
-intent: sources are parsed into a code model, classified into an
-architectural model with evidence-backed proofs, then consumed by plugins
-(audit, living documentation, code generation).
+intent: sources are parsed into a code model, classified into an architectural
+model with evidence-backed proofs, held to whatever the build states about it,
+and handed to the backends a project installed — today an architecture audit and
+a living documentation, tomorrow the generation of the adapters the model
+already describes.
 
 ## Modules
 
@@ -13,7 +15,11 @@ architectural model with evidence-backed proofs, then consumed by plugins
 | `hexaglue-model` | The contract: immutable records and sealed interfaces for the code model, the architectural model, classification traces, findings and typed configuration. Zero dependencies, zero logic beyond structural invariants |
 | `hexaglue-frontend` | Reads Java sources and their classpath into the code model: type nodes, external stubs for classpath types, typed edges with provenance, typed annotation values and the supertype closure. The only module that sees a parser |
 | `hexaglue-knowledge` | What the frameworks mean, as versioned declarative packs: which annotation, supertype or package carries which technical fact. A symbol is always named in full, never by simple name |
-| `hexaglue-engine` | The solver: rules derive facts to a fixed point, a deterministic weighing turns the evidences into a verdict, and every verdict carries the proof of how it was reached. Also renders that verdict for a reader. No I/O |
+| `hexaglue-engine` | The solver: rules derive facts to a fixed point, a deterministic weighing turns the evidences into a verdict, and every verdict carries the proof of how it was reached. It also judges the result — the architectural findings and the validation gates live here — and renders both for a reader. No I/O |
+| `hexaglue-spi` | What a backend implements: a manifest and one pure function from what the run concluded to the documents it wants written. Backends are ordered by their declared dependencies and isolated from one another, and none of them ever touches a disk |
+| `hexaglue-render` | The markup a backend writes in: markdown, tables and Mermaid diagrams, with escaping applied by the builders rather than left to the caller |
+| `hexaglue-plugins` | The backends shipped with HexaGlue: `hexaglue-plugin-audit` (the architecture report, in markdown and JSON) and `hexaglue-plugin-living-doc` (the domain and boundary pages, drawn from the model alone) |
+| `hexaglue-maven-plugin` | The host: where the sources are, what the configuration document says, which backends are installed, and where their documents go. Everything worth testing without a running build lives beside the goal rather than inside it |
 | `hexaglue-testkit` | Published test harness: source fixture helpers, golden-file harness, determinism checks and the reference acceptance corpus |
 | `hexaglue-acceptance` | Where the whole chain is exercised end to end: the only module that sees both the frontend and the engine, and the home of the corpus scoreboard and the golden files |
 
@@ -22,11 +28,61 @@ boundary between stages is a data model, never a layer of interfaces — a
 second frontend, if one ever exists, produces the same code model rather than
 implementing an abstraction invented in advance.
 
-Further modules arrive as the reactor is built out: `hexaglue-spi`, the
-plugins, and the Maven adapter, which will be the host HexaGlue is primarily
-used through. A standalone command line stays possible rather than planned —
-the engine already renders everything such a host would print, so what remains
-to build is the host and nothing else.
+A standalone command line stays possible rather than planned — the engine
+already renders everything such a host would print, so what remains to build is
+the host and nothing else.
+
+## Using it
+
+HexaGlue is used through its Maven plugin. Three goals, and the line between
+them is that **one of them judges and the others write**:
+
+```bash
+mvn hexaglue:validate         # hold the architecture to the gates the build armed
+mvn hexaglue:report           # run the installed backends over one project
+mvn hexaglue:reactor-report   # run them over a whole reactor, in one reading
+```
+
+A backend is installed by being declared as a dependency of the plugin. What a
+project asks of the analysis and of each backend goes in a `hexaglue.yaml`
+beside the POM — read strictly, so a key nobody reads or a value nobody can
+honour fails the build rather than being quietly ignored:
+
+```yaml
+analysis:
+  basePackage: com.acme.shop
+
+validation:
+  failOnUnclassified: true
+  findings:
+    # only a code the project arms can break its build
+    HG-DDD-002: BLOCKER
+
+# a reactor states what each of its modules is; nothing is read from its name
+modules:
+  shop-domain: DOMAIN
+  shop-infra: INFRASTRUCTURE
+
+plugins:
+  io.hexaglue.audit:
+    outputDirectory: audit
+  io.hexaglue.living-doc:
+    generateDiagrams: false
+```
+
+A module of a reactor inherits the document of the reactor above it; the nearest
+one wins, whole. Nothing merges two documents, so a gate is never armed by a
+file the reader is not looking at.
+
+**A reactor is read in one pass.** Read module by module, a port declared in one
+and implemented in another resolves to a stub of itself, and the seam the
+analysis exists to find is exactly what it loses. The role of each module is
+declared rather than guessed: what a team calls its modules is a habit, not a
+fact about its architecture.
+
+**Nothing here decides that an architecture may not compile.** A finding breaks
+the build only from the severity a project stated for its code, and a code
+nobody armed says what it found and stops there.
 
 ## Why a verdict is auditable
 
@@ -69,6 +125,27 @@ time, a report indents them under a heading — while the structure behind them
 stays readable on its own. The rendering is a leaf of the pipeline, never a
 stage of it: nothing downstream parses the text back.
 
+## What is read, and what is not
+
+The analysis reads the source directory a project declares, and never a root
+under the build directory. A build tool knows every root it compiles, generated
+ones included, and handing them all over feeds the analysis its own output: an
+emitted adapter comes back implementing the port its author wrote, the rules
+read that port as a seam rather than a boundary, and a second run over unchanged
+sources no longer says the same thing. Code carrying a generated marker is left
+out for the same reason, wherever it sits.
+
+This has a consequence worth knowing before reading a report: **on a project
+whose adapters were generated into its sources, HexaGlue reports on the part
+that was written by hand.** A driven port whose only implementation is generated
+reads as a port nothing implements — which is true of the sources, and is not
+what the running application does.
+
+Whatever is left out is counted rather than dropped in silence. Every goal says
+how many types were not analysed and offers the reasons on request, because a
+report written against half a codebase looks exactly like one written against
+all of it.
+
 ## The acceptance corpus
 
 Correctness here is not a matter of unit tests agreeing with the code that was
@@ -94,6 +171,7 @@ make compile      # compile without tests
 make test         # run all tests
 make format       # apply Palantir Java Format
 make verify       # tests + quality checks (incremental)
+make integration  # run the goals against real Maven builds
 make ci           # clean build: the gate that must be green before a release
 make mutation     # mutation testing on the production modules
 ```
@@ -111,6 +189,12 @@ untouched modules, and their compiler warnings go unreported.
 Recording a golden file is a run that declares itself
 (`-Dhexaglue.golden.regenerate=true`); a missing golden is a failure, never a
 file quietly created from whatever the engine happens to answer today.
+
+What a goal does is proven by running a build. `make integration` invokes the
+goals against real Maven projects and asserts on what they wrote and what they
+said, because a goal's parameters, its logs and its exit condition exist nowhere
+else — every defect this harness has caught was one no unit test could have
+seen.
 
 ## License
 

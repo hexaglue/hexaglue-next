@@ -20,19 +20,15 @@ import com.palantir.javapoet.ParameterSpec;
 import com.palantir.javapoet.ParameterizedTypeName;
 import com.palantir.javapoet.TypeName;
 import com.palantir.javapoet.TypeSpec;
-import io.hexaglue.model.Modifier;
 import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.arch.AggregateRoot;
 import io.hexaglue.model.arch.DrivenPort;
-import io.hexaglue.model.declaration.Field;
 import io.hexaglue.model.declaration.Method;
-import io.hexaglue.model.declaration.Parameter;
 import io.hexaglue.spi.SourceFile;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -51,8 +47,6 @@ import java.util.Set;
  */
 final class StoredRepository {
 
-    private static final ClassName JPA_REPOSITORY =
-            ClassName.get("org.springframework.data.jpa.repository", "JpaRepository");
     private static final ClassName OPTIONAL = ClassName.get("java.util", "Optional");
     private static final ClassName LIST = ClassName.get("java.util", "List");
 
@@ -79,7 +73,7 @@ final class StoredRepository {
                 .addModifiers(javax.lang.model.element.Modifier.PUBLIC)
                 .addAnnotation(Written.by(JpaPlugin.ID))
                 .addSuperinterface(ParameterizedTypeName.get(
-                        JPA_REPOSITORY,
+                        Spring.JPA_REPOSITORY,
                         stored.entity(reference()),
                         identityType().box()))
                 .addJavadoc(
@@ -107,50 +101,29 @@ final class StoredRepository {
         Set<String> written = new LinkedHashSet<>();
         List<MethodSpec> queries = new ArrayList<>();
         for (Method method : port.structure().methods()) {
-            query(method).filter(query -> written.add(query.name())).ifPresent(queries::add);
+            StoreQuestion.of(method, aggregate)
+                    .filter(StoreQuestion::declared)
+                    .filter(question -> written.add(question.name()))
+                    .map(question -> declare(question, method))
+                    .ifPresent(queries::add);
         }
         return queries;
     }
 
     /**
-     * A question is answerable when every value it takes is a field of the aggregate that is not
-     * its identity — asking by identity is what {@code findById} already does. What the answer
-     * looks like says which question it is: a truth is an existence, a count is a count, anything
-     * else is a search.
+     * Spring Data builds its query from the name of the method, so a name is written here — from
+     * the fields of the entity this backend has just generated, never from a name of the user's
+     * code. Writing a name a framework imposes is not reading one to conclude an architecture.
      */
-    private Optional<MethodSpec> query(Method method) {
-        List<Field> matched = new ArrayList<>();
-        for (Parameter parameter : method.parameters()) {
-            Optional<Field> field = fieldHolding(parameter.type());
-            if (field.isEmpty()) {
-                return Optional.empty();
-            }
-            matched.add(field.orElseThrow());
-        }
-        if (matched.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(spring(method, matched));
-    }
-
-    private MethodSpec spring(Method method, List<Field> by) {
-        String suffix = by.stream().map(StoredRepository::capitalised).reduce("", (all, one) -> all + "And" + one);
-        String verb = verbFor(method.returnType());
-        MethodSpec.Builder query = MethodSpec.methodBuilder(verb + "By" + suffix.substring("And".length()))
+    private MethodSpec declare(StoreQuestion question, Method asked) {
+        MethodSpec.Builder query = MethodSpec.methodBuilder(question.name())
                 .addModifiers(javax.lang.model.element.Modifier.PUBLIC, javax.lang.model.element.Modifier.ABSTRACT)
-                .returns(answerFor(method.returnType(), verb))
-                .addJavadoc("@return what $L asks for\n", method.name());
-        by.forEach(field -> query.addParameter(
-                ParameterSpec.builder(stored.typeOf(field), field.name()).build()));
+                .returns(answerFor(question.answer()))
+                .addJavadoc("@return what $L asks for\n", asked.name());
+        question.by()
+                .forEach(field -> query.addParameter(ParameterSpec.builder(stored.typeOf(field), field.name())
+                        .build()));
         return query.build();
-    }
-
-    private static String verbFor(TypeRef answer) {
-        return switch (answer.qualifiedName()) {
-            case "boolean", "java.lang.Boolean" -> "exists";
-            case "long", "int", "java.lang.Long", "java.lang.Integer" -> "count";
-            default -> "find";
-        };
     }
 
     /**
@@ -158,27 +131,14 @@ final class StoredRepository {
      * aggregate is served rows of the entity generated for it, and turning those back into the
      * domain is the adapter's business.
      */
-    private TypeName answerFor(TypeRef answer, String verb) {
-        if ("exists".equals(verb)) {
-            return TypeName.BOOLEAN;
-        }
-        if ("count".equals(verb)) {
-            return TypeName.LONG;
-        }
+    private TypeName answerFor(StoreQuestion.Answer answer) {
         TypeName entity = stored.entity(reference());
-        if (answer.isCollectionLike() || answer.isStreamLike()) {
-            return ParameterizedTypeName.get(LIST, entity);
-        }
-        return ParameterizedTypeName.get(OPTIONAL, entity);
-    }
-
-    /** The field of the aggregate a value of this type would be matched against, if any. */
-    private Optional<Field> fieldHolding(TypeRef type) {
-        return aggregate.structure().fields().stream()
-                .filter(field -> !field.modifiers().contains(Modifier.STATIC))
-                .filter(field -> !field.isIdentity())
-                .filter(field -> field.type().qualifiedName().equals(type.qualifiedName()))
-                .findFirst();
+        return switch (answer) {
+            case TRUTH -> TypeName.BOOLEAN;
+            case COUNT -> TypeName.LONG;
+            case MANY -> ParameterizedTypeName.get(LIST, entity);
+            default -> ParameterizedTypeName.get(OPTIONAL, entity);
+        };
     }
 
     /** What the rows are keyed by: the value the identity is written around. */
@@ -188,10 +148,5 @@ final class StoredRepository {
 
     private TypeRef reference() {
         return TypeRef.of(aggregate.id().qualifiedName());
-    }
-
-    private static String capitalised(Field field) {
-        String name = field.name();
-        return Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 }

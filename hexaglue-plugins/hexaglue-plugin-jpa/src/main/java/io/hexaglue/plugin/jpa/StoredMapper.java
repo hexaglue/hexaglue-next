@@ -13,17 +13,13 @@
 
 package io.hexaglue.plugin.jpa;
 
-import com.palantir.javapoet.ClassName;
 import com.palantir.javapoet.CodeBlock;
 import com.palantir.javapoet.JavaFile;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeName;
 import com.palantir.javapoet.TypeSpec;
 import io.hexaglue.model.ArchKind;
-import io.hexaglue.model.TypeId;
 import io.hexaglue.model.TypeRef;
-import io.hexaglue.model.arch.ArchModel;
-import io.hexaglue.model.arch.ArchType;
 import io.hexaglue.model.arch.DomainType;
 import io.hexaglue.model.declaration.Field;
 import io.hexaglue.spi.SourceFile;
@@ -43,14 +39,14 @@ import java.util.Optional;
 final class StoredMapper {
 
     private final DomainType type;
-    private final ArchModel model;
     private final Stored stored;
+    private final Crossing crossing;
     private final JpaOptions options;
 
-    StoredMapper(DomainType type, ArchModel model, Stored stored, JpaOptions options) {
+    StoredMapper(DomainType type, Stored stored, Crossing crossing, JpaOptions options) {
         this.type = Objects.requireNonNull(type, "type must not be null");
-        this.model = Objects.requireNonNull(model, "model must not be null");
         this.stored = Objects.requireNonNull(stored, "stored must not be null");
+        this.crossing = Objects.requireNonNull(crossing, "crossing must not be null");
         this.options = Objects.requireNonNull(options, "options must not be null");
     }
 
@@ -61,29 +57,8 @@ final class StoredMapper {
      */
     Optional<Field> unmappable() {
         return DomainAccess.state(type).stream()
-                .filter(field -> DomainAccess.accessorOf(type, field).isEmpty() || !carriable(field))
+                .filter(field -> DomainAccess.accessorOf(type, field).isEmpty() || !crossing.crosses(field.type()))
                 .findFirst();
-    }
-
-    /**
-     * A field can be carried when what it holds is something this backend also stores: a plain
-     * value, an identity it can unwrap, or a type it has written a mapper for. A collection is not
-     * yet one of them — turning a list of rows back into a domain collection needs the domain to
-     * say how it takes one, which nothing in the model states.
-     */
-    private boolean carriable(Field field) {
-        if (field.isCollection()) {
-            return false;
-        }
-        Optional<ArchKind> held = kindOf(field.type());
-        if (held.isEmpty()) {
-            return true;
-        }
-        return switch (held.orElseThrow()) {
-            case IDENTIFIER -> unwrapAccessor(field.type()).isPresent();
-            case VALUE_OBJECT -> mappable(field.type());
-            default -> false;
-        };
     }
 
     /**
@@ -156,56 +131,20 @@ final class StoredMapper {
                 .build();
     }
 
-    /** Domain to row: unwrap an identity, hand a value to its own mapper, copy anything else. */
+    /** Domain to row: read the field the way the type offers it, then carry the value across. */
     private CodeBlock outward(Field field) {
-        String read = "domain." + DomainAccess.accessorOf(type, field).orElseThrow() + "()";
-        Optional<ArchKind> held = kindOf(field.type());
-        if (held.filter(ArchKind.IDENTIFIER::equals).isPresent()) {
-            return CodeBlock.of("$L.$L()", read, unwrapAccessor(field.type()).orElseThrow());
-        }
-        if (held.filter(ArchKind.VALUE_OBJECT::equals).isPresent()) {
-            return CodeBlock.of("$T.toEntity($L)", mapperFor(field.type()), read);
-        }
-        return CodeBlock.of("$L", read);
+        CodeBlock read =
+                CodeBlock.of("domain.$L()", DomainAccess.accessorOf(type, field).orElseThrow());
+        return crossing.outward(field.type(), read).orElseThrow();
     }
 
-    /** Row to domain: rebuild an identity around its value, a value through its own mapper. */
+    /** Row to domain: read the column off the row, then carry the value back. */
     private CodeBlock inward(Field field) {
-        String read = "row.get" + Character.toUpperCase(field.name().charAt(0))
-                + field.name().substring(1) + "()";
-        Optional<ArchKind> held = kindOf(field.type());
-        if (held.filter(ArchKind.IDENTIFIER::equals).isPresent()) {
-            return CodeBlock.of("new $T($L)", Stored.named(field.type()), read);
-        }
-        if (held.filter(ArchKind.VALUE_OBJECT::equals).isPresent()) {
-            return CodeBlock.of("$T.toDomain($L)", mapperFor(field.type()), read);
-        }
-        return CodeBlock.of("$L", read);
-    }
-
-    /** The single component an identity is written around, read from the identity itself. */
-    private Optional<String> unwrapAccessor(TypeRef identity) {
-        return model.type(TypeId.of(identity.qualifiedName()))
-                .flatMap(held -> DomainAccess.state(held).stream()
-                        .findFirst()
-                        .flatMap(only -> DomainAccess.accessorOf(held, only)));
-    }
-
-    /** Whether the value held by a field is itself something a mapper was written for. */
-    private boolean mappable(TypeRef value) {
-        return model.type(TypeId.of(value.qualifiedName()))
-                .filter(DomainType.class::isInstance)
-                .map(DomainType.class::cast)
-                .filter(DomainAccess::isRebuildable)
-                .isPresent();
-    }
-
-    private ClassName mapperFor(TypeRef value) {
-        return ClassName.get(value.packageName(), options.mapperFor(value.simpleName()));
-    }
-
-    private Optional<ArchKind> kindOf(TypeRef held) {
-        return model.type(TypeId.of(held.qualifiedName())).map(ArchType::kind);
+        CodeBlock read = CodeBlock.of(
+                "row.get$L$L()",
+                field.name().substring(0, 1).toUpperCase(java.util.Locale.ROOT),
+                field.name().substring(1));
+        return crossing.inward(field.type(), read).orElseThrow();
     }
 
     private TypeRef reference() {

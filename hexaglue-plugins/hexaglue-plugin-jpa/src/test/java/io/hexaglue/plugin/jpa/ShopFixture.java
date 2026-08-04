@@ -66,12 +66,14 @@ final class ShopFixture {
     static final TypeId INVOICE = TypeId.of("com.shop.domain.Invoice");
     static final TypeId INVOICE_ID = TypeId.of("com.shop.domain.InvoiceId");
     static final TypeId ORDERS = TypeId.of("com.shop.domain.Orders");
+    static final TypeId INVOICES = TypeId.of("com.shop.domain.Invoices");
     static final TypeId AUDITING = TypeId.of("com.shop.domain.Auditing");
     static final TypeId NOTIFYING = TypeId.of("com.shop.domain.Notifying");
     static final TypeId CUSTOMERS = TypeId.of("com.shop.domain.Customers");
 
     private static final TypeRef TEXT = TypeRef.of("java.lang.String");
     private static final TypeRef UUID = TypeRef.of("java.util.UUID");
+    private static final TypeRef VOID = TypeRef.of("void");
 
     private ShopFixture() {}
 
@@ -100,6 +102,7 @@ final class ShopFixture {
                 .addType(invoice())
                 .addType(identifier(INVOICE_ID))
                 .addType(orders())
+                .addType(invoices())
                 .addType(auditing())
                 .addType(notifying())
                 .addType(customers())
@@ -296,11 +299,41 @@ final class ShopFixture {
                                         CUSTOMER_ID),
                                 asks("byNothingKnown", ref(ORDER), TypeId.of("java.time.Instant")),
                                 asks("has", TypeRef.of("boolean"), CUSTOMER_ID),
-                                asks("howMany", TypeRef.of("long"), CUSTOMER_ID)))
+                                asks("howMany", TypeRef.of("long"), CUSTOMER_ID),
+                                takes("archive", VOID, "order", ref(ORDER))))
                         .build(),
                 port(),
                 DrivenPortType.REPOSITORY,
                 Optional.of(ref(ORDER)));
+    }
+
+    /**
+     * The way out an invoice is kept behind, asking only things the store has an answer for: one
+     * question per shape a store operation has, plus one the generated interface has to declare.
+     */
+    private static DrivenPort invoices() {
+        TypeRef invoice = ref(INVOICE);
+        TypeRef identity = ref(INVOICE_ID);
+        return new DrivenPort(
+                INVOICES,
+                TypeStructure.builder(TypeNature.INTERFACE)
+                        .methods(List.of(
+                                takes("save", VOID, "invoice", invoice),
+                                takes("store", invoice, "invoice", invoice),
+                                takes("findById", TypeRef.parameterized("java.util.Optional", invoice), "id", identity),
+                                takes("existsById", TypeRef.of("boolean"), "id", identity),
+                                takes("delete", VOID, "id", identity),
+                                Method.of("all", TypeRef.parameterized("java.util.List", invoice)),
+                                Method.of("howMany", TypeRef.of("long")),
+                                takes(
+                                        "withReference",
+                                        TypeRef.parameterized("java.util.List", invoice),
+                                        "reference",
+                                        TEXT)))
+                        .build(),
+                port(),
+                DrivenPortType.REPOSITORY,
+                Optional.of(invoice));
     }
 
     /** A store for an aggregate whose identity nothing names: there is no key to serve rows by. */
@@ -346,8 +379,13 @@ final class ShopFixture {
     }
 
     private static Method asks(String name, TypeRef answer, TypeId argument) {
+        return takes(name, answer, "what", ref(argument));
+    }
+
+    /** A question taking one value, under the name the port gave it. */
+    private static Method takes(String name, TypeRef answer, String parameter, TypeRef type) {
         return Method.builder(name, answer)
-                .parameters(List.of(Parameter.of("what", ref(argument))))
+                .parameters(List.of(Parameter.of(parameter, type)))
                 .build();
     }
 

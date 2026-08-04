@@ -128,6 +128,7 @@ final class Stored {
      */
     static TypeName named(TypeRef type) {
         return switch (type.qualifiedName()) {
+            case "void" -> TypeName.VOID;
             case "boolean" -> TypeName.BOOLEAN;
             case "byte" -> TypeName.BYTE;
             case "short" -> TypeName.SHORT;
@@ -136,7 +137,21 @@ final class Stored {
             case "char" -> TypeName.CHAR;
             case "float" -> TypeName.FLOAT;
             case "double" -> TypeName.DOUBLE;
-            default -> ClassName.bestGuess(type.qualifiedName());
+            default -> withArguments(type);
         };
+    }
+
+    /**
+     * A reference keeps what it was written with: a port answering {@code Optional<Order>} is
+     * implemented by a method answering that and not a raw {@code Optional}, which would not
+     * override it.
+     */
+    private static TypeName withArguments(TypeRef type) {
+        ClassName raw = ClassName.bestGuess(type.qualifiedName());
+        if (type.typeArguments().isEmpty()) {
+            return raw;
+        }
+        return ParameterizedTypeName.get(
+                raw, type.typeArguments().stream().map(Stored::named).toArray(TypeName[]::new));
     }
 }

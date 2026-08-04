@@ -68,13 +68,17 @@ class JpaOptionsTest {
                     "generateEmbeddables", "false",
                     "generateRepositories", "false",
                     "repositorySuffix", "Store",
+                    "adapterSuffix", "Plug",
+                    "generateAdapters", "false",
                     "idStrategy", "SEQUENCE",
                     "targetModule", "shop-persistence"));
 
             assertThat(options.tablePrefix()).isEqualTo("shop_");
             assertThat(options.embeddables()).isFalse();
             assertThat(options.repositories()).isFalse();
+            assertThat(options.adapters()).isFalse();
             assertThat(options.repositoryFor("Order")).isEqualTo("OrderStore");
+            assertThat(options.adapterFor("Orders")).isEqualTo("OrdersPlug");
             assertThat(options.identity()).isEqualTo(IdentityStrategy.SEQUENCE);
             assertThat(options.targetModule()).contains("shop-persistence");
             assertThat(JpaOptions.KEYS)
@@ -83,10 +87,12 @@ class JpaOptionsTest {
                             "embeddableSuffix",
                             "repositorySuffix",
                             "mapperSuffix",
+                            "adapterSuffix",
                             "tablePrefix",
                             "generateEmbeddables",
                             "generateRepositories",
                             "generateMappers",
+                            "generateAdapters",
                             "idStrategy",
                             "targetModule");
         }

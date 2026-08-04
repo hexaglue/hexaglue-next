@@ -30,10 +30,12 @@ import java.util.Set;
  * @param embeddableSuffix what a generated embeddable is called after the value it stores
  * @param repositorySuffix what a generated Spring Data interface is called after the aggregate it serves
  * @param mapperSuffix what a generated mapper is called after the type it carries across
+ * @param adapterSuffix what a generated adapter is called after the port it answers
  * @param tablePrefix what every table of this project is prefixed with
  * @param embeddables whether values are generated as embeddables at all
  * @param repositories whether repository ports are served by a generated Spring Data interface
  * @param mappers whether the ways between a domain type and its row are generated
+ * @param adapters whether repository ports are answered by a generated adapter
  * @param identity who decides an identity the domain does not
  * @param targetModule the module generated types are routed to, empty when the build says nothing
  * @since 7.0.0
@@ -43,10 +45,12 @@ public record JpaOptions(
         String embeddableSuffix,
         String repositorySuffix,
         String mapperSuffix,
+        String adapterSuffix,
         String tablePrefix,
         boolean embeddables,
         boolean repositories,
         boolean mappers,
+        boolean adapters,
         IdentityStrategy identity,
         Optional<String> targetModule) {
 
@@ -56,10 +60,12 @@ public record JpaOptions(
             "embeddableSuffix",
             "repositorySuffix",
             "mapperSuffix",
+            "adapterSuffix",
             "tablePrefix",
             "generateEmbeddables",
             "generateRepositories",
             "generateMappers",
+            "generateAdapters",
             "idStrategy",
             "targetModule");
 
@@ -67,6 +73,7 @@ public record JpaOptions(
     private static final String DEFAULT_EMBEDDABLE_SUFFIX = "Embeddable";
     private static final String DEFAULT_REPOSITORY_SUFFIX = "JpaRepository";
     private static final String DEFAULT_MAPPER_SUFFIX = "Mapper";
+    private static final String DEFAULT_ADAPTER_SUFFIX = "JpaAdapter";
 
     /**
      * Validates the options.
@@ -76,6 +83,7 @@ public record JpaOptions(
         Objects.requireNonNull(embeddableSuffix, "embeddableSuffix must not be null");
         Objects.requireNonNull(repositorySuffix, "repositorySuffix must not be null");
         Objects.requireNonNull(mapperSuffix, "mapperSuffix must not be null");
+        Objects.requireNonNull(adapterSuffix, "adapterSuffix must not be null");
         Objects.requireNonNull(tablePrefix, "tablePrefix must not be null");
         Objects.requireNonNull(identity, "identity must not be null");
         Objects.requireNonNull(targetModule, "targetModule must not be null");
@@ -83,6 +91,7 @@ public record JpaOptions(
         requireNamePart(embeddableSuffix, "embeddableSuffix");
         requireNamePart(repositorySuffix, "repositorySuffix");
         requireNamePart(mapperSuffix, "mapperSuffix");
+        requireNamePart(adapterSuffix, "adapterSuffix");
         targetModule.ifPresent(module -> {
             if (module.isBlank()) {
                 throw new IllegalArgumentException("targetModule must not be blank when stated");
@@ -101,7 +110,9 @@ public record JpaOptions(
                 DEFAULT_EMBEDDABLE_SUFFIX,
                 DEFAULT_REPOSITORY_SUFFIX,
                 DEFAULT_MAPPER_SUFFIX,
+                DEFAULT_ADAPTER_SUFFIX,
                 "",
+                true,
                 true,
                 true,
                 true,
@@ -123,10 +134,12 @@ public record JpaOptions(
                 config.text("embeddableSuffix").orElse(defaults.embeddableSuffix()),
                 config.text("repositorySuffix").orElse(defaults.repositorySuffix()),
                 config.text("mapperSuffix").orElse(defaults.mapperSuffix()),
+                config.text("adapterSuffix").orElse(defaults.adapterSuffix()),
                 config.text("tablePrefix").orElse(defaults.tablePrefix()),
                 config.flag("generateEmbeddables", defaults.embeddables()),
                 config.flag("generateRepositories", defaults.repositories()),
                 config.flag("generateMappers", defaults.mappers()),
+                config.flag("generateAdapters", defaults.adapters()),
                 config.choice("idStrategy", IdentityStrategy.class, defaults.identity()),
                 config.text("targetModule"));
     }
@@ -169,6 +182,16 @@ public record JpaOptions(
      */
     public String mapperFor(String typeName) {
         return typeName + mapperSuffix;
+    }
+
+    /**
+     * Returns what the adapter answering the given port is called.
+     *
+     * @param typeName the simple name of the port
+     * @return the simple name of the generated adapter
+     */
+    public String adapterFor(String typeName) {
+        return typeName + adapterSuffix;
     }
 
     /**

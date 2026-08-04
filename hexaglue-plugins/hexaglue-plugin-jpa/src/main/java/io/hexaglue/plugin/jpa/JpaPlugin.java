@@ -22,6 +22,7 @@ import io.hexaglue.model.arch.DrivenPortType;
 import io.hexaglue.model.arch.Entity;
 import io.hexaglue.model.arch.ValueObject;
 import io.hexaglue.model.declaration.Field;
+import io.hexaglue.model.declaration.Method;
 import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.model.finding.DiagnosticSeverity;
 import io.hexaglue.model.finding.IssueCode;
@@ -31,6 +32,7 @@ import io.hexaglue.spi.PluginManifest;
 import io.hexaglue.spi.SourceFile;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * The persistence side of a hexagon, written from the classified model.
@@ -58,6 +60,9 @@ public final class JpaPlugin implements HexaGluePlugin {
     /** A domain type the generated code has no way of reading or of rebuilding. */
     static final IssueCode OUT_OF_REACH = IssueCode.of("HG-JPA-004");
 
+    /** A port asking something the store has no answer for. */
+    static final IssueCode NO_ANSWER = IssueCode.of("HG-JPA-005");
+
     /**
      * Creates the plugin. A host discovers backends by loading them as services, which needs a
      * constructor that is public and takes nothing.
@@ -78,9 +83,16 @@ public final class JpaPlugin implements HexaGluePlugin {
     public void contribute(Contribution contribution) {
         JpaOptions options = JpaOptions.from(contribution.config());
         Stored stored = new Stored(contribution.model(), options);
-        contribution.model().all(DomainType.class).forEach(type -> store(type, contribution, stored, options));
+        Crossing crossing = new Crossing(contribution.model(), options);
+        contribution
+                .model()
+                .all(DomainType.class)
+                .forEach(type -> store(type, contribution, stored, crossing, options));
         if (options.repositories()) {
-            contribution.model().all(DrivenPort.class).forEach(port -> serve(port, contribution, stored, options));
+            contribution
+                    .model()
+                    .all(DrivenPort.class)
+                    .forEach(port -> serve(port, contribution, stored, crossing, options));
         }
     }
 
@@ -89,7 +101,8 @@ public final class JpaPlugin implements HexaGluePlugin {
      * there is no table to reach for, and guessing one is how a generator writes something that
      * looks right and stores the wrong rows.
      */
-    private void serve(DrivenPort port, Contribution contribution, Stored stored, JpaOptions options) {
+    private void serve(
+            DrivenPort port, Contribution contribution, Stored stored, Crossing crossing, JpaOptions options) {
         if (port.portType() != DrivenPortType.REPOSITORY) {
             return;
         }
@@ -110,7 +123,73 @@ public final class JpaPlugin implements HexaGluePlugin {
             contribution.report(noIdentity(aggregate));
             return;
         }
-        SourceFile source = new StoredRepository(port, aggregate, stored, options).render();
+        emit(new StoredRepository(port, aggregate, stored, options).render(), contribution, options);
+        if (options.adapters()) {
+            plug(port, aggregate, contribution, stored, crossing, options);
+        }
+    }
+
+    /**
+     * Fills the hole the port leaves, or says what stopped it. An adapter answers every question
+     * its port asks or none of them, so both refusals name what the author would have to change.
+     *
+     * <p>The questions come first because they are what the port itself states; that nothing
+     * carries the aggregate across is a consequence the mapper has already reported on the type,
+     * and repeating a cause the author has just read helps nobody.</p>
+     */
+    private void plug(
+            DrivenPort port,
+            AggregateRoot aggregate,
+            Contribution contribution,
+            Stored stored,
+            Crossing crossing,
+            JpaOptions options) {
+        StoredAdapter adapter = new StoredAdapter(port, aggregate, crossing, options);
+        List<Method> unanswerable = adapter.unanswerable();
+        if (!unanswerable.isEmpty()) {
+            contribution.report(noAnswer(
+                    port,
+                    "the store has no answer for " + signatures(unanswerable)
+                            + ", and a class implementing a port implements all of it"));
+            return;
+        }
+        if (!isCarried(aggregate, stored, crossing, options)) {
+            contribution.report(noAnswer(
+                    port,
+                    "nothing carries " + aggregate.qualifiedName()
+                            + " between the domain and its row, so there is nothing to answer with"));
+            return;
+        }
+        emit(adapter.render(), contribution, options);
+    }
+
+    /**
+     * Whether a mapper was written for this type — the same question the mapper itself answered,
+     * asked again rather than remembered, because what another generated file may call is a
+     * property of the type and not of the order the files happened to be written in.
+     */
+    private static boolean isCarried(DomainType type, Stored stored, Crossing crossing, JpaOptions options) {
+        return options.mappers()
+                && DomainAccess.isRebuildable(type)
+                && new StoredMapper(type, stored, crossing, options)
+                        .unmappable()
+                        .isEmpty();
+    }
+
+    private static String signatures(List<Method> methods) {
+        return methods.stream().map(Method::signature).collect(Collectors.joining(", "));
+    }
+
+    private static Diagnostic noAnswer(DrivenPort port, String because) {
+        return Diagnostic.builder(
+                        NO_ANSWER,
+                        DiagnosticSeverity.WARNING,
+                        "no adapter was written for " + port.qualifiedName() + ": " + because)
+                .subject(port.id())
+                .build();
+    }
+
+    private static void emit(SourceFile source, Contribution contribution, JpaOptions options) {
         contribution.emit(options.targetModule().map(source::in).orElse(source));
     }
 
@@ -130,7 +209,8 @@ public final class JpaPlugin implements HexaGluePlugin {
      * they ask different things of an author: one is a verdict to make surer, the other an identity
      * to give the type.
      */
-    private void store(DomainType type, Contribution contribution, Stored stored, JpaOptions options) {
+    private void store(
+            DomainType type, Contribution contribution, Stored stored, Crossing crossing, JpaOptions options) {
         if (!storable(type, options)) {
             return;
         }
@@ -143,10 +223,9 @@ public final class JpaPlugin implements HexaGluePlugin {
             contribution.report(noIdentity(type));
             return;
         }
-        SourceFile source = new StoredType(type, stored, options).render(identity);
-        contribution.emit(options.targetModule().map(source::in).orElse(source));
+        emit(new StoredType(type, stored, options).render(identity), contribution, options);
         if (options.mappers()) {
-            carry(type, contribution, stored, options);
+            carry(type, contribution, stored, crossing, options);
         }
     }
 
@@ -155,8 +234,9 @@ public final class JpaPlugin implements HexaGluePlugin {
      * mapper is all-or-nothing: one that carried most of a type would lose the rest on the way out
      * and rebuild something that is not what was stored.
      */
-    private void carry(DomainType type, Contribution contribution, Stored stored, JpaOptions options) {
-        StoredMapper mapper = new StoredMapper(type, contribution.model(), stored, options);
+    private void carry(
+            DomainType type, Contribution contribution, Stored stored, Crossing crossing, JpaOptions options) {
+        StoredMapper mapper = new StoredMapper(type, stored, crossing, options);
         if (!DomainAccess.isRebuildable(type)) {
             contribution.report(
                     outOfReach(type, "nothing in it takes its own state, so a row could not be turned back into one"));
@@ -170,8 +250,7 @@ public final class JpaPlugin implements HexaGluePlugin {
                             + " cannot be carried across, and half a mapper loses what it skips"));
             return;
         }
-        SourceFile source = mapper.render();
-        contribution.emit(options.targetModule().map(source::in).orElse(source));
+        emit(mapper.render(), contribution, options);
     }
 
     private static Diagnostic outOfReach(ArchType type, String because) {

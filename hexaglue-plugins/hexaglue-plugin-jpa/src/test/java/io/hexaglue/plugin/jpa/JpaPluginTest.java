@@ -433,6 +433,95 @@ class JpaPluginTest {
     }
 
     @Nested
+    @DisplayName("plugs a repository port into the store it is served by")
+    class PlugsAPortIntoTheStore {
+
+        private String invoices() {
+            return source(run(Map.of()), "com.shop.domain.InvoicesJpaAdapter");
+        }
+
+        @Test
+        @DisplayName("implementing the port itself, over the interface written for the aggregate")
+        void implementingThePortItself() {
+            assertThat(flat(invoices()))
+                    .contains("class InvoicesJpaAdapter implements Invoices")
+                    .contains("private final InvoiceJpaRepository repository;")
+                    .contains("public InvoicesJpaAdapter(InvoiceJpaRepository repository)");
+        }
+
+        /**
+         * Which store operation answers a port method is read from what it takes and what it
+         * answers with. The port never called this one save — the shape did.
+         */
+        @Test
+        @DisplayName("reading from the shape of a question which operation answers it")
+        void readingFromTheShapeWhichOperationAnswersIt() {
+            assertThat(flat(invoices()))
+                    .contains("public Invoice store(Invoice invoice) { return InvoiceMapper.toDomain("
+                            + "repository.save(InvoiceMapper.toEntity(invoice))); }")
+                    .contains("public Optional<Invoice> findById(InvoiceId id) { return repository.findById("
+                            + "id.value()).map(InvoiceMapper::toDomain); }")
+                    .contains("public boolean existsById(InvoiceId id) { return repository.existsById("
+                            + "id.value()); }")
+                    .contains("public long howMany() { return repository.count(); }")
+                    .contains("public List<Invoice> all() { return repository.findAll().stream().map("
+                            + "InvoiceMapper::toDomain).toList(); }");
+        }
+
+        @Test
+        @DisplayName("and calling the query the interface was made to declare")
+        void andCallingTheQueryTheInterfaceDeclares() {
+            assertThat(flat(invoices()))
+                    .contains("public List<Invoice> withReference(String reference) { return"
+                            + " repository.findByReference(reference).stream().map(InvoiceMapper::toDomain)"
+                            + ".toList(); }");
+        }
+
+        /**
+         * Taking the whole aggregate and answering nothing is the one shape two store operations
+         * share, so the port's own word settles it — and only a word the store itself uses counts.
+         */
+        @Test
+        @DisplayName("letting the word the store uses settle what the shape leaves open")
+        void lettingTheWordTheStoreUsesSettleIt() {
+            assertThat(flat(invoices()))
+                    .contains("public void save(Invoice invoice) { repository.save(InvoiceMapper.toEntity("
+                            + "invoice)); }")
+                    .contains("public void delete(InvoiceId id) { repository.deleteById(id.value()); }");
+        }
+
+        @Test
+        @DisplayName("and writing nothing at all when the store has no answer for what a port asks")
+        void andWritingNothingWhenTheStoreHasNoAnswer() {
+            PluginRun run = run(Map.of());
+
+            assertThat(run.sources())
+                    .extracting(SourceFile::qualifiedName)
+                    .doesNotContain("com.shop.domain.OrdersJpaAdapter");
+            assertThat(coded(run, JpaPlugin.NO_ANSWER).orElseThrow().message())
+                    .contains("com.shop.domain.Orders")
+                    .contains("byNothingKnown")
+                    .contains("archive");
+        }
+
+        @Test
+        @DisplayName("unless the build plugs its own ports in")
+        void unlessTheBuildPlugsItsOwnPortsIn() {
+            assertThat(run(Map.of("generateAdapters", "false")).sources())
+                    .extracting(SourceFile::qualifiedName)
+                    .doesNotContain("com.shop.domain.InvoicesJpaAdapter");
+        }
+
+        @Test
+        @DisplayName("and nothing either when nothing carries the aggregate across")
+        void andNothingWhenNothingCarriesTheAggregateAcross() {
+            assertThat(run(Map.of("generateMappers", "false")).sources())
+                    .extracting(SourceFile::qualifiedName)
+                    .doesNotContain("com.shop.domain.InvoicesJpaAdapter");
+        }
+    }
+
+    @Nested
     @DisplayName("routes what it writes")
     class RoutesWhatItWrites {
 

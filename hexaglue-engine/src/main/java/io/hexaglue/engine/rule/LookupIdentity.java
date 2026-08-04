@@ -153,11 +153,8 @@ public final class LookupIdentity implements Rule {
 
     private static boolean retrievesAtMostOne(Method method, TypeId aggregate) {
         TypeRef answer = method.returnType();
-        if (aggregate.qualifiedName().equals(answer.qualifiedName())) {
-            return true;
-        }
-        return answer.isOptionalLike()
-                && aggregate.qualifiedName().equals(answer.unwrapElement().qualifiedName());
+        TypeRef held = answer.isOptionalLike() ? answer.unwrapElement() : answer;
+        return aggregate.qualifiedName().equals(held.qualifiedName());
     }
 
     /**

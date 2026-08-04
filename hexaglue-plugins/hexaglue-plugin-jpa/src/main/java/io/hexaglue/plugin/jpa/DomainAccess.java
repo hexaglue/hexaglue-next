@@ -112,9 +112,4 @@ final class DomainAccess {
         }
         return true;
     }
-
-    /** Lower-cases the first letter, for naming a parameter after the type it holds. */
-    static String local(String typeName) {
-        return Character.toLowerCase(typeName.charAt(0)) + typeName.substring(1);
-    }
 }

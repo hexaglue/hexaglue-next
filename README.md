@@ -18,7 +18,7 @@ already describes.
 | `hexaglue-engine` | The solver: rules derive facts to a fixed point, a deterministic weighing turns the evidences into a verdict, and every verdict carries the proof of how it was reached. It also judges the result — the architectural findings and the validation gates live here — and renders both for a reader. No I/O |
 | `hexaglue-spi` | What a backend implements: a manifest and one pure function from what the run concluded to the documents it wants written. Backends are ordered by their declared dependencies and isolated from one another, and none of them ever touches a disk |
 | `hexaglue-render` | The markup a backend writes in: markdown, tables and Mermaid diagrams, with escaping applied by the builders rather than left to the caller |
-| `hexaglue-plugins` | The backends shipped with HexaGlue: `hexaglue-plugin-audit` (the architecture report, in markdown and JSON) and `hexaglue-plugin-living-doc` (the domain and boundary pages, drawn from the model alone) |
+| `hexaglue-plugins` | The backends shipped with HexaGlue: [`hexaglue-plugin-audit`](hexaglue-plugins/hexaglue-plugin-audit/README.md) (the architecture report, in markdown and JSON) and [`hexaglue-plugin-living-doc`](hexaglue-plugins/hexaglue-plugin-living-doc/README.md) (the domain and boundary pages, drawn from the model alone) |
 | `hexaglue-maven-plugin` | The host: where the sources are, what the configuration document says, which backends are installed, and where their documents go. Everything worth testing without a running build lives beside the goal rather than inside it |
 | `hexaglue-testkit` | Published test harness: source fixture helpers, golden-file harness, determinism checks and the reference acceptance corpus |
 | `hexaglue-acceptance` | Where the whole chain is exercised end to end: the only module that sees both the frontend and the engine, and the home of the corpus scoreboard and the golden files |
@@ -43,10 +43,14 @@ mvn hexaglue:report           # run the installed backends over one project
 mvn hexaglue:reactor-report   # run them over a whole reactor, in one reading
 ```
 
-A backend is installed by being declared as a dependency of the plugin. What a
-project asks of the analysis and of each backend goes in a `hexaglue.yaml`
-beside the POM — read strictly, so a key nobody reads or a value nobody can
-honour fails the build rather than being quietly ignored:
+A backend is installed by being declared as a dependency of the plugin — each
+one documents what it writes and what it accepts:
+[audit](hexaglue-plugins/hexaglue-plugin-audit/README.md),
+[living-doc](hexaglue-plugins/hexaglue-plugin-living-doc/README.md).
+
+What a project asks of the analysis and of each backend goes in a
+`hexaglue.yaml` beside the POM — read strictly, so a key nobody reads or a value
+nobody can honour fails the build rather than being quietly ignored:
 
 ```yaml
 analysis:

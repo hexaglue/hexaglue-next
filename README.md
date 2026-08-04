@@ -4,9 +4,9 @@ New reactor for HexaGlue, the architecture compiler for Java applications.
 At compile time, it turns a codebase into a semantic graph of architectural
 intent: sources are parsed into a code model, classified into an architectural
 model with evidence-backed proofs, held to whatever the build states about it,
-and handed to the backends a project installed — today an architecture audit and
-a living documentation, tomorrow the generation of the adapters the model
-already describes.
+and handed to the backends a project installed — an architecture audit, a living
+documentation, and the persistence the model already describes, written and
+handed to the compiler.
 
 ## Modules
 
@@ -16,10 +16,10 @@ already describes.
 | `hexaglue-frontend` | Reads Java sources and their classpath into the code model: type nodes, external stubs for classpath types, typed edges with provenance, typed annotation values and the supertype closure. The only module that sees a parser |
 | `hexaglue-knowledge` | What the frameworks mean, as versioned declarative packs: which annotation, supertype or package carries which technical fact. A symbol is always named in full, never by simple name |
 | `hexaglue-engine` | The solver: rules derive facts to a fixed point, a deterministic weighing turns the evidences into a verdict, and every verdict carries the proof of how it was reached. It also judges the result — the architectural findings and the validation gates live here — and renders both for a reader. No I/O |
-| `hexaglue-spi` | What a backend implements: a manifest and one pure function from what the run concluded to the documents it wants written. Backends are ordered by their declared dependencies and isolated from one another, and none of them ever touches a disk |
+| `hexaglue-spi` | What a backend implements: a manifest — who it is, what it reads, what it will write adapters for — and one pure function from what the run concluded to what it hands over: documents, Java types, and what it declined to write. Backends are ordered by their declared dependencies and isolated from one another, and none of them ever touches a disk |
 | `hexaglue-render` | The markup a backend writes in: markdown, tables and Mermaid diagrams, with escaping applied by the builders rather than left to the caller |
-| `hexaglue-plugins` | The backends shipped with HexaGlue: [`hexaglue-plugin-audit`](hexaglue-plugins/hexaglue-plugin-audit/README.md) (the architecture report, in markdown and JSON) and [`hexaglue-plugin-living-doc`](hexaglue-plugins/hexaglue-plugin-living-doc/README.md) (the domain and boundary pages, drawn from the model alone) |
-| `hexaglue-maven-plugin` | The host: where the sources are, what the configuration document says, which backends are installed, and where their documents go. Everything worth testing without a running build lives beside the goal rather than inside it |
+| `hexaglue-plugins` | The backends shipped with HexaGlue: [`hexaglue-plugin-jpa`](hexaglue-plugins/hexaglue-plugin-jpa/README.md) (the rows a domain is stored in, the ways to and from them, and the adapter that fills a repository port), [`hexaglue-plugin-audit`](hexaglue-plugins/hexaglue-plugin-audit/README.md) (the architecture report, in markdown and JSON) and [`hexaglue-plugin-living-doc`](hexaglue-plugins/hexaglue-plugin-living-doc/README.md) (the domain and boundary pages, drawn from the model alone) |
+| `hexaglue-maven-plugin` | The host: where the sources are, what the configuration document says, which backends are installed, and where what they wrote goes — documents under the build directory, generated types under a source root it hands to the compiler. Everything worth testing without a running build lives beside the goal rather than inside it |
 | `hexaglue-testkit` | Published test harness: source fixture helpers, golden-file harness, determinism checks and the reference acceptance corpus |
 | `hexaglue-acceptance` | Where the whole chain is exercised end to end: the only module that sees both the frontend and the engine, and the home of the corpus scoreboard and the golden files |
 
@@ -48,7 +48,9 @@ mvn hexaglue:reactor-report   # run them over a whole reactor, in one reading
 `target/generated-sources/hexaglue` and hands that directory to the compiler.
 It never writes among your own sources, and it never fails a build on what it
 found: what a backend declined to write is said, and stopping is `validate`'s
-business.
+business. Everything it writes carries a generated marker, which is how the next
+run reads it as what was made of the architecture rather than as the
+architecture.
 
 A backend is installed by being declared as a dependency of the plugin — each
 one documents what it writes and what it accepts:
@@ -76,6 +78,8 @@ modules:
   shop-infra: INFRASTRUCTURE
 
 plugins:
+  io.hexaglue.jpa:
+    entitySuffix: JpaEntity
   io.hexaglue.audit:
     outputDirectory: audit
   io.hexaglue.living-doc:

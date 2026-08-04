@@ -47,6 +47,7 @@ the project provides — this backend depends on neither.
 | Any of the above | a mapper, both ways, calling the type's own accessors and its own constructor |
 | A repository port | a Spring Data interface extending `JpaRepository`, declaring the questions the inherited ones do not answer |
 | A repository port | an adapter implementing it, `@Component`, over that interface and those mappers |
+| A value that is one of a closed set | **nothing** — an enum is kept as itself, in the column of whatever holds it |
 
 Everything it writes carries `@Generated("io.hexaglue.jpa")`, which is how the
 next reading leaves it out of the architecture instead of reading it as one.
@@ -55,6 +56,12 @@ An identity is stored as the value it wraps: an aggregate identified by an
 `OrderId` is found by the `UUID` inside it, because a column holding the wrapper
 is a column no query can match. A reference to another aggregate stays a column
 and never becomes a join.
+
+A value with no state of its own is one the provider already has a shape for, so
+nothing is written for it: the column carries `@Enumerated(EnumType.STRING)` and
+the mapper hands it over untouched. **By name and never by rank** — the
+provider's own default is the rank, and the day a constant is inserted in the
+middle, every row already written means something else.
 
 ## What it reads, and what it refuses to read
 

@@ -132,6 +132,13 @@ A port is checked from both sides on purpose. "Nothing plugs into it" and "the
 core does not use it" are two different failures, and folding them together
 would make the report say half of what it knows.
 
+`HG-HEX-002` and `HG-HEX-005` are the two that a generating build makes wrong:
+what fills the hole is written by the build rather than by an author. A backend
+states which family of ports it writes adapters for before it runs, and a port
+of a covered family is left out of this table — the run then says so, naming the
+ports and the backend that answers for them. A family nobody declared goes on
+being reported: five false alarms are not traded for an unexplained silence.
+
 `HG-NAME-001` reads the vocabulary the **project** declared under
 `classification.namingSuffixes`, never one shipped here. A codebase that states
 no vocabulary gets no naming finding, on anything.

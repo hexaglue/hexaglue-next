@@ -54,10 +54,15 @@ class LookupIdentityTest {
     private static final TypeId BERTH = TypeId.of("com.acme.Berth");
     private static final TypeId MANIFEST = TypeId.of("com.acme.Manifest");
     private static final TypeId CALLER = TypeId.of("com.acme.Checkout");
+    private static final TypeId REGISTRY = TypeId.of("com.acme.Registry");
+    private static final TypeId CONVOY = TypeId.of("com.acme.Convoy");
+    private static final TypeId CONVOY_TAG = TypeId.of("com.acme.ConvoyTag");
     private static final TypeRef AGGREGATE_REF = TypeRef.of(AGGREGATE.qualifiedName());
     private static final TypeRef TAG_REF = TypeRef.of(TAG.qualifiedName());
     private static final TypeRef BERTH_REF = TypeRef.of(BERTH.qualifiedName());
     private static final TypeRef MANIFEST_REF = TypeRef.of(MANIFEST.qualifiedName());
+    private static final TypeRef CONVOY_REF = TypeRef.of(CONVOY.qualifiedName());
+    private static final TypeRef CONVOY_TAG_REF = TypeRef.of(CONVOY_TAG.qualifiedName());
     private static final TypeRef TEXT = TypeRef.of("java.lang.String");
     private static final TypeRef VOID = TypeRef.of("void");
 
@@ -138,6 +143,74 @@ class LookupIdentityTest {
     private static TypeNode caller() {
         return TypeNode.builder(CALLER, TypeNature.CLASS)
                 .fields(List.of(Field.of("ledger", TypeRef.of(PORT.qualifiedName()))))
+                .build();
+    }
+
+    /** A way out that retrieves the aggregate by the first key, and merely filters it by the second. */
+    private static TypeNode retrievingAndFiltering(TypeRef retrieves, TypeRef filters) {
+        return TypeNode.builder(PORT, TypeNature.INTERFACE)
+                .methods(List.of(
+                        Method.builder(
+                                        "locateBy" + retrieves.simpleName(),
+                                        TypeRef.parameterized("java.util.Optional", AGGREGATE_REF))
+                                .parameters(List.of(Parameter.of("key", retrieves)))
+                                .build(),
+                        Method.builder(
+                                        "allBy" + filters.simpleName(),
+                                        TypeRef.parameterized("java.util.List", AGGREGATE_REF))
+                                .parameters(List.of(Parameter.of("key", filters)))
+                                .build(),
+                        Method.builder("keep", VOID)
+                                .parameters(List.of(Parameter.of("subject", AGGREGATE_REF)))
+                                .build()))
+                .build();
+    }
+
+    /** A way out that only ever answers with several aggregates at once. */
+    private static TypeNode filteringOnly(TypeRef filters) {
+        return TypeNode.builder(PORT, TypeNature.INTERFACE)
+                .methods(List.of(
+                        Method.builder(
+                                        "allBy" + filters.simpleName(),
+                                        TypeRef.parameterized("java.util.List", AGGREGATE_REF))
+                                .parameters(List.of(Parameter.of("key", filters)))
+                                .build(),
+                        Method.builder("keep", VOID)
+                                .parameters(List.of(Parameter.of("subject", AGGREGATE_REF)))
+                                .build()))
+                .build();
+    }
+
+    /** A second way out, keeping the convoy and retrieving it by its one tag. */
+    private static TypeNode registry() {
+        return TypeNode.builder(REGISTRY, TypeNature.INTERFACE)
+                .methods(List.of(
+                        Method.builder("locateByConvoyTag", TypeRef.parameterized("java.util.Optional", CONVOY_REF))
+                                .parameters(List.of(Parameter.of("key", CONVOY_TAG_REF)))
+                                .build(),
+                        Method.builder("keep", VOID)
+                                .parameters(List.of(Parameter.of("subject", CONVOY_REF)))
+                                .build()))
+                .build();
+    }
+
+    /** The second aggregate, keeping its own tag. */
+    private static TypeNode convoy() {
+        return TypeNode.builder(CONVOY, TypeNature.CLASS)
+                .fields(List.of(
+                        Field.of("route", TEXT),
+                        Field.builder("keptConvoyTag", CONVOY_TAG_REF)
+                                .modifiers(Set.of(Modifier.FINAL))
+                                .build()))
+                .build();
+    }
+
+    /** A caller of the core holding both ways out, so each is a consumed contract. */
+    private static TypeNode harbourmaster() {
+        return TypeNode.builder(CALLER, TypeNature.CLASS)
+                .fields(List.of(
+                        Field.of("ledger", TypeRef.of(PORT.qualifiedName())),
+                        Field.of("registry", TypeRef.of(REGISTRY.qualifiedName()))))
                 .build();
     }
 
@@ -286,6 +359,102 @@ class LookupIdentityTest {
 
             assertThat(settled.kindOf(AGGREGATE)).contains(ArchKind.VALUE_OBJECT);
             assertThat(settled.kindOf(TAG)).contains(ArchKind.UNCLASSIFIED);
+        }
+    }
+    /**
+     * Several keys are the ordinary case of a real way out, and two structural readings settle
+     * them without a name: what the answer looks like, and what the round has already concluded.
+     */
+    @Nested
+    @DisplayName("settles several keys")
+    class SettlesSeveralKeys {
+
+        @Test
+        @DisplayName("a key taken to filter does not compete with the one that retrieves")
+        void aKeyTakenToFilterDoesNotCompete() {
+            // Retrieving at most one aggregate is a lookup; answering with several is a search
+            // among them. Only the first says how a single aggregate is found again.
+            Verdicts settled = verdicts(
+                    retrievingAndFiltering(TAG_REF, BERTH_REF),
+                    caller(),
+                    aggregate(TAG_REF, BERTH_REF),
+                    wrapper(TAG),
+                    wrapper(BERTH));
+
+            assertThat(settled.kindOf(TAG)).contains(ArchKind.IDENTIFIER);
+            assertThat(settled.kindOf(BERTH)).contains(ArchKind.UNCLASSIFIED);
+        }
+
+        @Test
+        @DisplayName("and filtering alone elects nothing")
+        void filteringAloneElectsNothing() {
+            // A way out that never retrieves one aggregate never says how one is found again.
+            Verdicts settled = verdicts(filteringOnly(TAG_REF), caller(), aggregate(TAG_REF), wrapper(TAG));
+
+            assertThat(settled.kindOf(AGGREGATE)).contains(ArchKind.AGGREGATE_ROOT);
+            assertThat(settled.kindOf(TAG)).contains(ArchKind.UNCLASSIFIED);
+        }
+
+        @Test
+        @DisplayName("a key already identifying another aggregate stands aside")
+        void aKeyAlreadyIdentifyingAnotherStandsAside() {
+            // The fleet is retrieved by its own tag and by the convoy's; the convoy's tag is
+            // already the identity of the convoy, and one value does not identify two things
+            // when anything else can carry the identity of the second.
+            Verdicts settled = verdicts(
+                    storage(TAG_REF, CONVOY_TAG_REF),
+                    registry(),
+                    harbourmaster(),
+                    aggregate(TAG_REF, CONVOY_TAG_REF),
+                    convoy(),
+                    wrapper(TAG),
+                    wrapper(CONVOY_TAG));
+
+            assertThat(settled.kindOf(CONVOY_TAG)).contains(ArchKind.IDENTIFIER);
+            assertThat(settled.kindOf(TAG)).contains(ArchKind.IDENTIFIER);
+        }
+
+        @Test
+        @DisplayName("and each tie lands on the aggregate it belongs to")
+        void eachTieLandsWhereItBelongs() {
+            FactBase facts = settled(
+                    storage(TAG_REF, CONVOY_TAG_REF),
+                    registry(),
+                    harbourmaster(),
+                    aggregate(TAG_REF, CONVOY_TAG_REF),
+                    convoy(),
+                    wrapper(TAG),
+                    wrapper(CONVOY_TAG));
+
+            assertThat(facts.about(AGGREGATE, Relation.class))
+                    .extracting(Relation::kind, Relation::object)
+                    .contains(tuple(RelationKind.IDENTIFIED_BY, TAG));
+            assertThat(facts.about(CONVOY, Relation.class))
+                    .extracting(Relation::kind, Relation::object)
+                    .contains(tuple(RelationKind.IDENTIFIED_BY, CONVOY_TAG));
+        }
+
+        @Test
+        @DisplayName("but never stands aside when it is the only key")
+        void neverStandsAsideWhenItIsTheOnlyKey() {
+            // A way out that only ever retrieves the fleet by the convoy's tag says that this IS
+            // how a fleet is found — a legitimate one-to-one reading. Standing aside is a tiebreak
+            // among several, never a veto on a lone key: under saturation a conclusion may only
+            // grow, and a veto arriving late would have to take back an election already made.
+            FactBase facts = settled(
+                    storage(CONVOY_TAG_REF),
+                    registry(),
+                    harbourmaster(),
+                    aggregate(CONVOY_TAG_REF),
+                    convoy(),
+                    wrapper(CONVOY_TAG));
+
+            assertThat(facts.about(AGGREGATE, Relation.class))
+                    .extracting(Relation::kind, Relation::object)
+                    .contains(tuple(RelationKind.IDENTIFIED_BY, CONVOY_TAG));
+            assertThat(facts.about(CONVOY, Relation.class))
+                    .extracting(Relation::kind, Relation::object)
+                    .contains(tuple(RelationKind.IDENTIFIED_BY, CONVOY_TAG));
         }
     }
 }

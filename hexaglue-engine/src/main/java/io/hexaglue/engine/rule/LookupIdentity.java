@@ -40,10 +40,19 @@ import java.util.stream.Stream;
  * that hands the aggregate back takes that same value to find it. Nothing else in a codebase does
  * that with a plain attribute.</p>
  *
- * <p>Exactly one key must answer. Two of them means the aggregate is searched by two things, and
- * electing one would be a coin flip; the report is a better place for that question than the model.
- * The reading is also stated as a tie between the two types, because a generator writing a
- * repository needs to know which type carries the identity, not merely that one does.</p>
+ * <p>Only the methods that retrieve <em>at most one</em> aggregate — the aggregate itself, or an
+ * optional of it — say how one is found again. A method answering with several is a search among
+ * them, and being searched by a value does not make that value an identity: a way out that lists
+ * orders by customer says something about customers, not about what an order is.</p>
+ *
+ * <p>Exactly one key must remain. When several do, a key the round has already concluded to be the
+ * identity of <em>another</em> aggregate stands aside — one value does not identify two things when
+ * anything else can carry the identity of the second. That reading only ever narrows a tie, never
+ * vetoes a lone key: under saturation a conclusion may only grow, and a veto arriving late would
+ * have to take back an election already made. Past both readings, what is left is silence; the
+ * report is a better place for an aggregate searched two ways than the model. The reading is also
+ * stated as a tie between the two types, because a generator writing a repository needs to know
+ * which type carries the identity, not merely that one does.</p>
  *
  * @since 7.0.0
  */
@@ -89,14 +98,15 @@ public final class LookupIdentity implements Rule {
         }
         List<TypeId> kept = identitiesKeptBy(derivation, aggregate);
         List<TypeId> keys = derivation.code().type(port).stream()
-                .flatMap(node -> searchKeysOf(derivation, node, aggregate))
+                .flatMap(node -> lookupKeysOf(derivation, node, aggregate))
                 .distinct()
                 .filter(kept::contains)
                 .toList();
-        if (keys.size() != 1) {
+        List<TypeId> elected = withoutKeysSpokenFor(derivation, aggregate, keys);
+        if (elected.size() != 1) {
             return;
         }
-        TypeId identity = keys.get(0);
+        TypeId identity = elected.get(0);
         Contracts.speak(
                 derivation,
                 identity,
@@ -128,20 +138,47 @@ public final class LookupIdentity implements Rule {
     }
 
     /**
-     * Returns the types of the perimeter the way out is handed by the methods that answer with the
-     * aggregate. A method that returns something else is not a search for it.
+     * Returns the types of the perimeter the way out is handed by the methods that retrieve at
+     * most one aggregate. A method answering with several is a search among them, and one that
+     * returns something else is not a search for the aggregate at all.
      */
-    private static Stream<TypeId> searchKeysOf(Derivation derivation, TypeNode port, TypeId aggregate) {
+    private static Stream<TypeId> lookupKeysOf(Derivation derivation, TypeNode port, TypeId aggregate) {
         return port.methods().stream()
-                .filter(method -> answersWith(method, aggregate))
+                .filter(method -> retrievesAtMostOne(method, aggregate))
                 .flatMap(method ->
                         Signatures.namedInPerimeter(
                                 derivation, method.parameters().stream().map(Parameter::type))
                                 .stream());
     }
 
-    private static boolean answersWith(Method method, TypeId aggregate) {
-        TypeRef answered = method.returnType().unwrapElement();
-        return aggregate.qualifiedName().equals(answered.qualifiedName());
+    private static boolean retrievesAtMostOne(Method method, TypeId aggregate) {
+        TypeRef answer = method.returnType();
+        if (aggregate.qualifiedName().equals(answer.qualifiedName())) {
+            return true;
+        }
+        return answer.isOptionalLike()
+                && aggregate.qualifiedName().equals(answer.unwrapElement().qualifiedName());
+    }
+
+    /**
+     * Drops, among several candidates, the keys the round has already concluded to identify
+     * another aggregate. Never applied to a lone key — a way out that only ever retrieves this
+     * aggregate by that value has said that this is how it is found, and a tiebreak that could
+     * empty an election would be a conclusion able to shrink under saturation.
+     */
+    private static List<TypeId> withoutKeysSpokenFor(Derivation derivation, TypeId aggregate, List<TypeId> keys) {
+        if (keys.size() < 2) {
+            return keys;
+        }
+        return keys.stream()
+                .filter(key -> !identifiesAnother(derivation, aggregate, key))
+                .toList();
+    }
+
+    private static boolean identifiesAnother(Derivation derivation, TypeId aggregate, TypeId key) {
+        return derivation.all(Relation.class).stream()
+                .anyMatch(relation -> relation.kind() == RelationKind.IDENTIFIED_BY
+                        && relation.object().equals(key)
+                        && !relation.subject().equals(aggregate));
     }
 }

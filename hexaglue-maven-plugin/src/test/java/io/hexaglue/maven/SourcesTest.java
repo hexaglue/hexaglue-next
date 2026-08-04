@@ -19,6 +19,7 @@ import io.hexaglue.spi.SourceFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -77,6 +78,8 @@ class SourcesTest {
     void writingNothingLeavesTheRootAlone() throws Exception {
         Sources.write(List.of(), root);
 
-        assertThat(Files.list(root)).isEmpty();
+        try (Stream<Path> entries = Files.list(root)) {
+            assertThat(entries).isEmpty();
+        }
     }
 }

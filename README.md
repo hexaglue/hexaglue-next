@@ -34,17 +34,25 @@ the host and nothing else.
 
 ## Using it
 
-HexaGlue is used through its Maven plugin. Three goals, and the line between
+HexaGlue is used through its Maven plugin. Four goals, and the line between
 them is that **one of them judges and the others write**:
 
 ```bash
 mvn hexaglue:validate         # hold the architecture to the gates the build armed
+mvn hexaglue:generate         # write the code the backends make of the model
 mvn hexaglue:report           # run the installed backends over one project
 mvn hexaglue:reactor-report   # run them over a whole reactor, in one reading
 ```
 
+`generate` binds to `generate-sources`, writes under
+`target/generated-sources/hexaglue` and hands that directory to the compiler.
+It never writes among your own sources, and it never fails a build on what it
+found: what a backend declined to write is said, and stopping is `validate`'s
+business.
+
 A backend is installed by being declared as a dependency of the plugin — each
 one documents what it writes and what it accepts:
+[jpa](hexaglue-plugins/hexaglue-plugin-jpa/README.md),
 [audit](hexaglue-plugins/hexaglue-plugin-audit/README.md),
 [living-doc](hexaglue-plugins/hexaglue-plugin-living-doc/README.md).
 
@@ -144,6 +152,13 @@ whose adapters were generated into its sources, HexaGlue reports on the part
 that was written by hand.** A driven port whose only implementation is generated
 reads as a port nothing implements — which is true of the sources, and is not
 what the running application does.
+
+Where the generation is HexaGlue's own, the report knows better. A backend
+states which family of ports it writes adapters for, before it runs, and a port
+of a covered family is not reported as unfilled — and the run says so, naming
+the ports it left out and the backend that answers for them. Nothing is inferred
+from what a run produced: the declaration is read from the backends the build
+installed, so the same sources are judged the same way twice.
 
 Whatever is left out is counted rather than dropped in silence. Every goal says
 how many types were not analysed and offers the reasons on request, because a

@@ -27,6 +27,8 @@ import io.hexaglue.model.arch.PortType;
 import io.hexaglue.model.classification.Confidence;
 import io.hexaglue.model.classification.Evidence;
 import io.hexaglue.model.classification.EvidenceTier;
+import io.hexaglue.model.finding.Diagnostic;
+import io.hexaglue.model.finding.DiagnosticSeverity;
 import io.hexaglue.model.finding.Finding;
 import io.hexaglue.model.finding.IssueCode;
 import io.hexaglue.model.finding.Severity;
@@ -72,24 +74,85 @@ public final class HexagonalFindings {
     /** An adapter reaching another adapter without going through the core. */
     static final IssueCode ADAPTER_TO_ADAPTER = IssueCode.of("HG-HEX-007");
 
+    /** Ports left unreported because a backend of this build states it writes what fills them. */
+    static final IssueCode FILLED_BY_GENERATION = IssueCode.of("HG-ENGINE-005");
+
     private HexagonalFindings() {}
 
     /**
      * Runs every hexagonal check.
      *
+     * <p>Two of them ask whether a hole was filled, and those are the two a generating build makes
+     * wrong: what fills the hole is written by the build rather than by an author. Those ports are
+     * left unreported and said to be — five false alarms are not traded for an unexplained
+     * silence.</p>
+     *
      * @param judgement what the checks may read
-     * @return the findings, in the order the checks are stated
+     * @return the findings, in the order the checks are stated, and what was left unsaid
      */
-    static List<Finding> of(Judgement judgement) {
+    static Judged of(Judgement judgement) {
+        List<PortType> unfilled = new ArrayList<>();
+        unfilled.addAll(drivenPortsNothingImplements(judgement));
+        unfilled.addAll(drivingPortsNobodyDrives(judgement));
         List<Finding> findings = new ArrayList<>();
         findings.addAll(applicationTypesNamingAdapters(judgement));
-        findings.addAll(drivenPortsNothingImplements(judgement));
+        findings.addAll(unfilled.stream()
+                .filter(port -> judgement.backends().covering(port).isEmpty())
+                .map(port -> unfilledFinding(port).build())
+                .toList());
         findings.addAll(drivingPortsNothingAnswers(judgement));
         findings.addAll(drivenPortsNobodyCalls(judgement));
-        findings.addAll(drivingPortsNobodyDrives(judgement));
         findings.addAll(portsThatAreNotInterfaces(judgement));
         findings.addAll(adaptersReachingAdapters(judgement));
-        return findings;
+        return new Judged(findings, generatedInstead(judgement, unfilled));
+    }
+
+    /**
+     * Words the ports a check stayed silent about. One statement rather than one per port: what a
+     * reader needs is that some were left out and on whose word, not the same sentence five times.
+     */
+    private static List<Diagnostic> generatedInstead(Judgement judgement, List<PortType> unfilled) {
+        List<String> covered = unfilled.stream()
+                .filter(port -> !judgement.backends().covering(port).isEmpty())
+                .map(port -> port.id().qualifiedName() + " ("
+                        + String.join(", ", judgement.backends().covering(port)) + ")")
+                .sorted()
+                .toList();
+        if (covered.isEmpty()) {
+            return List.of();
+        }
+        return List.of(Diagnostic.builder(
+                        FILLED_BY_GENERATION,
+                        DiagnosticSeverity.INFO,
+                        covered.size()
+                                + " port(s) nothing in these sources fills were not reported: this build writes"
+                                + " what fills them — " + String.join(", ", covered))
+                .build());
+    }
+
+    /**
+     * The one finding both unfilled checks state. A port is a hole from whichever side it is
+     * looked at, and the wording says which side by naming what is missing.
+     */
+    private static Finding.Builder unfilledFinding(PortType port) {
+        if (port instanceof DrivenPort) {
+            return finding(
+                    DRIVEN_PORT_UNPLUGGED,
+                    Severity.MAJOR,
+                    port.id(),
+                    port.id().simpleName()
+                            + " is a driven port nothing implements. It is a hole the core left for the "
+                            + "world to fill, and nothing in these sources fills it.",
+                    evidence("no-adapter", "no adapter implements it", List.of()));
+        }
+        return finding(
+                DRIVING_PORT_UNDRIVEN,
+                Severity.MINOR,
+                port.id(),
+                port.id().simpleName()
+                        + " is a driving port nothing outside drives. It is a way in that nothing "
+                        + "in these sources comes in through.",
+                evidence("no-driving-adapter", "no adapter drives it", List.of()));
     }
 
     /**
@@ -151,7 +214,7 @@ public final class HexagonalFindings {
      * A driven port is a hole the core leaves for the world to fill. Unfilled, the core cannot run
      * — and nothing in the sources says what was supposed to fill it.
      */
-    private static List<Finding> drivenPortsNothingImplements(Judgement judgement) {
+    private static List<PortType> drivenPortsNothingImplements(Judgement judgement) {
         List<TypeId> implemented = judgement
                 .model()
                 .all(DrivenAdapter.class)
@@ -164,15 +227,7 @@ public final class HexagonalFindings {
                 .drivenPorts()
                 .filter(port -> !implemented.contains(port.id()))
                 .filter(port -> implementorsOf(judgement, port.id()).isEmpty())
-                .map(port -> finding(
-                                DRIVEN_PORT_UNPLUGGED,
-                                Severity.MAJOR,
-                                port.id(),
-                                port.id().simpleName()
-                                        + " is a driven port nothing implements. It is a hole the core left for the "
-                                        + "world to fill, and nothing in these sources fills it.",
-                                evidence("no-adapter", "no adapter implements it", List.of()))
-                        .build())
+                .map(PortType.class::cast)
                 .toList();
     }
 
@@ -229,7 +284,7 @@ public final class HexagonalFindings {
     /**
      * A driving port nothing drives is a way in that nothing came in through.
      */
-    private static List<Finding> drivingPortsNobodyDrives(Judgement judgement) {
+    private static List<PortType> drivingPortsNobodyDrives(Judgement judgement) {
         List<TypeId> driven = judgement
                 .model()
                 .all(DrivingAdapter.class)
@@ -244,15 +299,7 @@ public final class HexagonalFindings {
                 .filter(port -> judgement.dependencies().usersOf(port.id()).stream()
                         .flatMap(user -> judgement.model().type(user).stream())
                         .noneMatch(AdapterType.class::isInstance))
-                .map(port -> finding(
-                                DRIVING_PORT_UNDRIVEN,
-                                Severity.MINOR,
-                                port.id(),
-                                port.id().simpleName()
-                                        + " is a driving port nothing outside drives. It is a way in that nothing "
-                                        + "in these sources comes in through.",
-                                evidence("no-driving-adapter", "no adapter drives it", List.of()))
-                        .build())
+                .map(PortType.class::cast)
                 .toList();
     }
 

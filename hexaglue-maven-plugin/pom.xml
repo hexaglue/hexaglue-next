@@ -127,6 +127,7 @@
                     <extraArtifacts>
                         <extraArtifact>io.hexaglue:hexaglue-plugin-audit:${project.version}</extraArtifact>
                         <extraArtifact>io.hexaglue:hexaglue-plugin-living-doc:${project.version}</extraArtifact>
+                        <extraArtifact>io.hexaglue:hexaglue-plugin-jpa:${project.version}</extraArtifact>
                     </extraArtifacts>
                     <goals>
                         <goal>clean</goal>

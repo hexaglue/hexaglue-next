@@ -121,7 +121,8 @@ public class ReactorReportMojo extends AbstractMojo {
             return;
         }
         log.info("HexaGlue is reading the whole reactor as one analysis");
-        ProjectAnalysis.Result analysed = ProjectAnalysis.runReactor(session.getProjects(), config);
+        ProjectAnalysis.Result analysed =
+                ProjectAnalysis.runReactor(session.getProjects(), config, PluginDiscovery.declaredBy(plugins));
         Diagnostics.report(analysed.diagnostics(), log);
         log.info("HexaGlue laid out " + analysed.model().moduleTopology().size()
                 + " module(s) of it, being the ones whose role the project declares");

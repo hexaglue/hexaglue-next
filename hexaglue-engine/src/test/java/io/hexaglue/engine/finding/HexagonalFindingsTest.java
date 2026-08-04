@@ -16,10 +16,16 @@ package io.hexaglue.engine.finding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.hexaglue.model.TypeId;
+import io.hexaglue.model.arch.Backends;
+import io.hexaglue.model.arch.DrivenPortType;
+import io.hexaglue.model.arch.PortFamily;
+import io.hexaglue.model.finding.DiagnosticSeverity;
 import io.hexaglue.model.finding.Finding;
 import io.hexaglue.model.finding.IssueCode;
 import io.hexaglue.model.finding.Severity;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -95,6 +101,105 @@ class HexagonalFindingsTest {
 
             assertThat(findings.stream()
                             .filter(finding -> finding.subject().equals(TypeId.of("com.shop.OrderService"))))
+                    .hasSize(1);
+        }
+    }
+
+    /**
+     * The same sources are right or wrong depending on what the build does with them: a hole
+     * nothing in the sources fills is a fault, unless this very build writes what fills it.
+     */
+    @Nested
+    @DisplayName("a hole this build fills itself")
+    class Generated {
+
+        private ShopJudgements aPortAndAWayIn() {
+            return ShopJudgements.shop()
+                    .repository("com.shop.Orders", "com.shop.Order")
+                    .applicationService("com.shop.OrderService")
+                    .uses("com.shop.OrderService", "com.shop.Orders")
+                    .drivingPort("com.shop.PlaceOrder")
+                    .applicationService("com.shop.PlaceOrderService", "com.shop.PlaceOrder");
+        }
+
+        private Backends writing(PortFamily... families) {
+            return new Backends(Map.of("io.hexaglue.jpa", Set.of(families)));
+        }
+
+        @Test
+        @DisplayName("is not reported as a hole")
+        void isNotReported() {
+            Judged judged =
+                    aPortAndAWayIn().judgeOnABuildThatGenerates(writing(PortFamily.driven(DrivenPortType.REPOSITORY)));
+
+            assertThat(coded(judged.findings(), HexagonalFindings.DRIVEN_PORT_UNPLUGGED))
+                    .isEmpty();
+        }
+
+        @Test
+        @DisplayName("and is said to have been left out, by whose word")
+        void isSaidToHaveBeenLeftOut() {
+            Judged judged =
+                    aPortAndAWayIn().judgeOnABuildThatGenerates(writing(PortFamily.driven(DrivenPortType.REPOSITORY)));
+
+            assertThat(judged.diagnostics()).singleElement().satisfies(diagnostic -> {
+                assertThat(diagnostic.code()).isEqualTo(HexagonalFindings.FILLED_BY_GENERATION);
+                assertThat(diagnostic.severity()).isEqualTo(DiagnosticSeverity.INFO);
+                assertThat(diagnostic.message())
+                        .contains("1 port(s)")
+                        .contains("com.shop.Orders")
+                        .contains("io.hexaglue.jpa");
+            });
+        }
+
+        @Test
+        @DisplayName("while a hole of a family nothing declared goes on being reported")
+        void aFamilyNobodyDeclaredIsStillReported() {
+            Judged judged =
+                    aPortAndAWayIn().judgeOnABuildThatGenerates(writing(PortFamily.driven(DrivenPortType.GATEWAY)));
+
+            assertThat(coded(judged.findings(), HexagonalFindings.DRIVEN_PORT_UNPLUGGED))
+                    .singleElement()
+                    .satisfies(finding -> assertThat(finding.subject()).isEqualTo(TypeId.of("com.shop.Orders")));
+            assertThat(judged.diagnostics()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("and a way in nothing drives falls silent the same way, on the same word")
+        void aWayInFallsSilentTheSameWay() {
+            Judged judged = aPortAndAWayIn().judgeOnABuildThatGenerates(writing(PortFamily.driving()));
+
+            assertThat(coded(judged.findings(), HexagonalFindings.DRIVING_PORT_UNDRIVEN))
+                    .isEmpty();
+            assertThat(coded(judged.findings(), HexagonalFindings.DRIVEN_PORT_UNPLUGGED))
+                    .hasSize(1);
+            assertThat(judged.diagnostics())
+                    .singleElement()
+                    .satisfies(diagnostic -> assertThat(diagnostic.message()).contains("com.shop.PlaceOrder"));
+        }
+
+        @Test
+        @DisplayName("and a build generating nothing says nothing about it")
+        void aBuildGeneratingNothingSaysNothing() {
+            Judged judged = aPortAndAWayIn().judgeOnABuildThatGenerates(Backends.none());
+
+            assertThat(coded(judged.findings(), HexagonalFindings.DRIVEN_PORT_UNPLUGGED))
+                    .hasSize(1);
+            assertThat(judged.diagnostics()).isEmpty();
+        }
+
+        /**
+         * The other checks read a port from a different side, and none of them is about a hole the
+         * build fills: silencing them too would hide what generation does not answer for.
+         */
+        @Test
+        @DisplayName("but the core still has to call the port it declared")
+        void theCoreStillHasToCallIt() {
+            Judged judged = ShopJudgements.shop()
+                    .repository("com.shop.Orders", "com.shop.Order")
+                    .judgeOnABuildThatGenerates(writing(PortFamily.driven(DrivenPortType.REPOSITORY)));
+
+            assertThat(coded(judged.findings(), HexagonalFindings.DRIVEN_PORT_UNUSED))
                     .hasSize(1);
         }
     }

@@ -18,11 +18,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.hexaglue.engine.Gate;
 import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.TypeId;
+import io.hexaglue.model.arch.Backends;
+import io.hexaglue.model.arch.DrivenPortType;
+import io.hexaglue.model.arch.PortFamily;
 import io.hexaglue.model.config.HexaGlueConfig;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.Set;
 import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.DisplayName;
@@ -55,6 +60,65 @@ class ProjectAnalysisTest {
         return project;
     }
 
+    /**
+     * A port nothing implements is a hole in these sources, and not a fault when a backend of this
+     * build states it writes what fills it. The host is where the two facts meet.
+     */
+    @Test
+    @DisplayName("says nothing about a hole this build states it fills, and says it left it out")
+    void saysNothingAboutAHoleThisBuildFills() {
+        MavenProject project = projectWith("com/acme/Order.java", """
+                package com.acme;
+                @org.jmolecules.ddd.annotation.AggregateRoot
+                public class Order {
+                    private final java.util.UUID id;
+                    public Order(java.util.UUID id) { this.id = id; }
+                    public java.util.UUID id() { return id; }
+                }
+                """);
+        write(project, "com/acme/Orders.java", """
+                package com.acme;
+                public interface Orders {
+                    void save(Order order);
+                    java.util.Optional<Order> findById(java.util.UUID id);
+                }
+                """);
+        write(project, "com/acme/PlaceOrder.java", """
+                package com.acme;
+                public class PlaceOrder {
+                    private final Orders orders;
+                    public PlaceOrder(Orders orders) { this.orders = orders; }
+                    public void place(Order order) { orders.save(order); }
+                }
+                """);
+        HexaGlueConfig config = ValidateMojo.configuration(HexaGlueConfig.defaults(), "com.acme", false);
+
+        ProjectAnalysis.Result reported = ProjectAnalysis.run(project, config, Backends.none());
+        ProjectAnalysis.Result generating = ProjectAnalysis.run(
+                project,
+                config,
+                new Backends(Map.of("io.hexaglue.jpa", Set.of(PortFamily.driven(DrivenPortType.REPOSITORY)))));
+
+        assertThat(reported.findings())
+                .anySatisfy(finding -> assertThat(finding.code().value()).isEqualTo("HG-HEX-002"));
+        assertThat(generating.findings())
+                .noneSatisfy(finding -> assertThat(finding.code().value()).isEqualTo("HG-HEX-002"));
+        assertThat(generating.diagnostics())
+                .anySatisfy(diagnostic -> assertThat(diagnostic.message())
+                        .contains("com.acme.Orders")
+                        .contains("io.hexaglue.jpa"));
+    }
+
+    private void write(MavenProject project, String relativePath, String source) {
+        Path file = projectDir.resolve("src/main/java").resolve(relativePath);
+        try {
+            Files.createDirectories(file.getParent());
+            Files.writeString(file, source);
+        } catch (IOException unwritable) {
+            throw new UncheckedIOException("Failed to write " + file, unwritable);
+        }
+    }
+
     @Test
     @DisplayName("classifies what the project declares, and passes when no gate is armed")
     void classifiesWhatTheProjectDeclares() {
@@ -64,8 +128,8 @@ class ProjectAnalysisTest {
                 public class Order {}
                 """);
 
-        ProjectAnalysis.Result result =
-                ProjectAnalysis.run(project, ValidateMojo.configuration(HexaGlueConfig.defaults(), "com.acme", false));
+        ProjectAnalysis.Result result = ProjectAnalysis.run(
+                project, ValidateMojo.configuration(HexaGlueConfig.defaults(), "com.acme", false), Backends.none());
 
         assertThat(result.model()
                         .type(TypeId.of("com.acme.Order"))
@@ -80,8 +144,8 @@ class ProjectAnalysisTest {
     void stopsTheBuildOnAnUndecidedType() {
         MavenProject project = projectWith("com/acme/Thing.java", "package com.acme; public class Thing {}");
 
-        ProjectAnalysis.Result result =
-                ProjectAnalysis.run(project, ValidateMojo.configuration(HexaGlueConfig.defaults(), "com.acme", true));
+        ProjectAnalysis.Result result = ProjectAnalysis.run(
+                project, ValidateMojo.configuration(HexaGlueConfig.defaults(), "com.acme", true), Backends.none());
 
         assertThat(result.validation().passed()).isFalse();
         assertThat(result.validation().refusals()).singleElement().satisfies(refusal -> {
@@ -102,8 +166,8 @@ class ProjectAnalysisTest {
             throw new UncheckedIOException("Failed to write " + outside, unwritable);
         }
 
-        ProjectAnalysis.Result result =
-                ProjectAnalysis.run(project, ValidateMojo.configuration(HexaGlueConfig.defaults(), "com.acme", false));
+        ProjectAnalysis.Result result = ProjectAnalysis.run(
+                project, ValidateMojo.configuration(HexaGlueConfig.defaults(), "com.acme", false), Backends.none());
 
         // Read on purpose — what it says about its neighbours counts — and then left without a
         // verdict. The frontend cannot report it: from where it stands, the type was read.
@@ -122,8 +186,8 @@ class ProjectAnalysisTest {
                 public class OrderAdapter {}
                 """);
 
-        ProjectAnalysis.Result result =
-                ProjectAnalysis.run(project, ValidateMojo.configuration(HexaGlueConfig.defaults(), "com.acme", false));
+        ProjectAnalysis.Result result = ProjectAnalysis.run(
+                project, ValidateMojo.configuration(HexaGlueConfig.defaults(), "com.acme", false), Backends.none());
 
         assertThat(result.model().type(TypeId.of("com.acme.OrderAdapter"))).isEmpty();
         assertThat(result.diagnostics())

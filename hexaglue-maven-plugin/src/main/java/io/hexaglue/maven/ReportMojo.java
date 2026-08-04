@@ -99,7 +99,7 @@ public class ReportMojo extends AbstractMojo {
             log.info("HexaGlue found no backend on the classpath; nothing to report");
             return;
         }
-        ProjectAnalysis.Result analysed = ProjectAnalysis.run(project, config);
+        ProjectAnalysis.Result analysed = ProjectAnalysis.run(project, config, PluginDiscovery.declaredBy(plugins));
         Diagnostics.report(analysed.diagnostics(), log);
         PluginRun run = ProjectAnalysis.contribute(
                 analysed, plugins, config.generation().minConfidence(), options);

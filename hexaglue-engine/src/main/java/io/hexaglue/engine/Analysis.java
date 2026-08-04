@@ -14,10 +14,11 @@
 package io.hexaglue.engine;
 
 import io.hexaglue.engine.finding.Findings;
+import io.hexaglue.engine.finding.Judged;
 import io.hexaglue.model.arch.ArchModel;
+import io.hexaglue.model.arch.Backends;
 import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.model.finding.DiagnosticSeverity;
-import io.hexaglue.model.finding.Finding;
 import io.hexaglue.model.finding.IssueCode;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,31 +50,52 @@ public final class Analysis {
      * @throws EngineException when the verdicts have not settled within the round ceiling
      */
     public static AnalysisResult analyze(EngineContext context) {
-        return analyze(RuleSet.standard(), context);
+        return analyze(context, Backends.none());
+    }
+
+    /**
+     * Analyzes the given context, told what this build will generate for it.
+     *
+     * @param context what the rules may read
+     * @param backends what the backends this build installed state they will write
+     * @return the classified model, and what was read without being classified
+     * @throws EngineException when the verdicts have not settled within the round ceiling
+     */
+    public static AnalysisResult analyze(EngineContext context, Backends backends) {
+        return analyze(RuleSet.standard(), context, backends);
     }
 
     /**
      * Analyzes the given context with the given rules.
      *
+     * <p>What the backends declare reaches the checks and nothing else: it is handed to the
+     * judgement rather than put in the context, because no rule may read it. What a build will
+     * write is not evidence of what a type is, and a classification that moved with the plugins
+     * installed would be a classification of the build rather than of the code.</p>
+     *
      * @param rules the rules to run
      * @param context what the rules may read
+     * @param backends what the backends this build installed state they will write
      * @return the classified model, and what was read without being classified
      * @throws EngineException when the verdicts have not settled within the round ceiling
      */
-    public static AnalysisResult analyze(RuleSet rules, EngineContext context) {
+    public static AnalysisResult analyze(RuleSet rules, EngineContext context, Backends backends) {
         Objects.requireNonNull(rules, "rules must not be null");
         Objects.requireNonNull(context, "context must not be null");
+        Objects.requireNonNull(backends, "backends must not be null");
         Verdicts verdicts = Classifier.classify(rules, context);
         FactBase facts = Saturation.saturate(rules, context.withVerdicts(verdicts));
         Modules modules = Modules.read(context.code(), context.config().modules(), facts);
         ArchModel model = Assembly.assemble(context, facts, verdicts, modules.topology());
-        List<Finding> findings = Findings.of(
+        Judged judged = Findings.of(
                 model,
                 Dependencies.of(context.code(), context.perimeter()),
-                context.config().classification());
+                context.config().classification(),
+                backends);
         List<Diagnostic> diagnostics = new ArrayList<>(modules.diagnostics());
+        diagnostics.addAll(judged.diagnostics());
         diagnostics.addAll(leftUnclassified(context));
-        return new AnalysisResult(model, findings, diagnostics);
+        return new AnalysisResult(model, judged.findings(), diagnostics);
     }
 
     /**

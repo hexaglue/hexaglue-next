@@ -24,6 +24,7 @@ import io.hexaglue.frontend.FrontendResult;
 import io.hexaglue.frontend.SpoonFrontend;
 import io.hexaglue.knowledge.KnowledgePacks;
 import io.hexaglue.model.arch.ArchModel;
+import io.hexaglue.model.arch.Backends;
 import io.hexaglue.model.classification.Confidence;
 import io.hexaglue.model.config.HexaGlueConfig;
 import io.hexaglue.model.finding.Diagnostic;
@@ -56,12 +57,13 @@ final class ProjectAnalysis {
      *
      * @param project the project being built
      * @param config what the build states about the analysis
+     * @param backends what the backends this build installed state they will write
      * @return the model, everything the run left out of it, and what the gates made of it
      */
-    static Result run(MavenProject project, HexaGlueConfig config) {
+    static Result run(MavenProject project, HexaGlueConfig config, Backends backends) {
         Objects.requireNonNull(project, "project must not be null");
         Objects.requireNonNull(config, "config must not be null");
-        return run(ProjectSources.request(project, config.analysis()), config);
+        return run(ProjectSources.request(project, config.analysis()), config, backends);
     }
 
     /**
@@ -73,17 +75,20 @@ final class ProjectAnalysis {
      *
      * @param modules the projects of the reactor, in build order
      * @param config what the build states about the analysis
+     * @param backends what the backends this build installed state they will write
      * @return the model, everything the run left out of it, and what the gates made of it
      */
-    static Result runReactor(List<MavenProject> modules, HexaGlueConfig config) {
+    static Result runReactor(List<MavenProject> modules, HexaGlueConfig config, Backends backends) {
         Objects.requireNonNull(modules, "modules must not be null");
         Objects.requireNonNull(config, "config must not be null");
-        return run(ProjectSources.reactorRequest(modules, config.analysis()), config);
+        return run(ProjectSources.reactorRequest(modules, config.analysis()), config, backends);
     }
 
-    private static Result run(FrontendRequest request, HexaGlueConfig config) {
+    private static Result run(FrontendRequest request, HexaGlueConfig config, Backends backends) {
+        Objects.requireNonNull(backends, "backends must not be null");
         FrontendResult read = SpoonFrontend.analyze(request);
-        AnalysisResult analysed = Analysis.analyze(EngineContext.of(read.code(), KnowledgePacks.embedded(), config));
+        AnalysisResult analysed =
+                Analysis.analyze(EngineContext.of(read.code(), KnowledgePacks.embedded(), config), backends);
         ArchModel model = analysed.model();
         List<Diagnostic> diagnostics = new ArrayList<>(read.diagnostics());
         diagnostics.addAll(analysed.diagnostics());

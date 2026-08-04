@@ -16,9 +16,11 @@ package io.hexaglue.maven;
 import io.hexaglue.engine.Explanation;
 import io.hexaglue.engine.Outcome;
 import io.hexaglue.engine.Validation;
+import io.hexaglue.model.arch.Backends;
 import io.hexaglue.model.config.AnalysisScope;
 import io.hexaglue.model.config.HexaGlueConfig;
 import io.hexaglue.model.config.ValidationConfig;
+import io.hexaglue.spi.PluginDiscovery;
 import java.util.Optional;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
@@ -86,8 +88,12 @@ public class ValidateMojo extends AbstractMojo {
             return;
         }
         HexaGlueConfig stated = ConfigLoader.read(project.getBasedir().toPath());
+        // The gate reads what the backends declare for the same reason the report does: a port this
+        // build generates the adapter for is not a hole, and a build must not fail on one.
+        Backends backends = PluginDiscovery.declaredBy(
+                PluginDiscovery.on(Thread.currentThread().getContextClassLoader()));
         ProjectAnalysis.Result result =
-                ProjectAnalysis.run(project, configuration(stated, basePackage, failOnUnclassified));
+                ProjectAnalysis.run(project, configuration(stated, basePackage, failOnUnclassified), backends);
         Diagnostics.report(result.diagnostics(), log);
         Explanation.of(Outcome.of(result.model())).forEach(log::info);
 

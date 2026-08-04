@@ -47,15 +47,27 @@ final class Diagnostics {
     static void report(List<Diagnostic> diagnostics, Log log) {
         Objects.requireNonNull(diagnostics, "diagnostics must not be null");
         Objects.requireNonNull(log, "log must not be null");
-        long expected = diagnostics.stream()
-                .filter(diagnostic -> diagnostic.severity() == DiagnosticSeverity.INFO)
-                .count();
+        long expected = diagnostics.stream().filter(Diagnostics::isAboutOneType).count();
         diagnostics.stream()
                 .filter(diagnostic -> diagnostic.severity() != DiagnosticSeverity.INFO)
                 .forEach(diagnostic -> log.warn(diagnostic.code() + ": " + diagnostic.message()));
         if (expected > 0) {
             log.info(expected + " type(s) were not analysed; run with -X to see which and why");
         }
+        diagnostics.stream()
+                .filter(diagnostic -> diagnostic.severity() == DiagnosticSeverity.INFO)
+                .filter(diagnostic -> !isAboutOneType(diagnostic))
+                .forEach(diagnostic -> log.info(diagnostic.code() + ": " + diagnostic.message()));
         diagnostics.forEach(diagnostic -> log.debug(diagnostic.code() + ": " + diagnostic.message()));
+    }
+
+    /**
+     * What is counted rather than said: one type the analysis left out. What a run says about
+     * itself — a check that fell silent, a step that ran degraded — names no type, and hiding it
+     * among thousands of expected exclusions would be hiding the one thing worth reading.
+     */
+    private static boolean isAboutOneType(Diagnostic diagnostic) {
+        return diagnostic.severity() == DiagnosticSeverity.INFO
+                && diagnostic.subject().isPresent();
     }
 }

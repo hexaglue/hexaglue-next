@@ -1,0 +1,6 @@
+analysis:
+  basePackage: com.example.shop
+
+plugins:
+  io.hexaglue.audit:
+    writeJson: false

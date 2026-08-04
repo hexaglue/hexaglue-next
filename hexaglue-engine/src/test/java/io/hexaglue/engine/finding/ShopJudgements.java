@@ -25,6 +25,7 @@ import io.hexaglue.model.arch.AggregateRoot;
 import io.hexaglue.model.arch.ApplicationService;
 import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.arch.ArchType;
+import io.hexaglue.model.arch.Backends;
 import io.hexaglue.model.arch.DomainEvent;
 import io.hexaglue.model.arch.DrivenAdapter;
 import io.hexaglue.model.arch.DrivenPort;
@@ -298,14 +299,24 @@ final class ShopJudgements {
     }
 
     List<Finding> judgeWith(ClassificationConfig vocabulary) {
-        return judge(vocabulary);
+        return judge(vocabulary, Backends.none()).findings();
     }
 
     List<Finding> judge() {
-        return judge(ClassificationConfig.defaults());
+        return judge(ClassificationConfig.defaults(), Backends.none()).findings();
     }
 
-    private List<Finding> judge(ClassificationConfig vocabulary) {
+    /**
+     * Judges the same shop on a build that generates part of it.
+     *
+     * @param backends what the installed backends state they will write
+     * @return what the checks found, and what they left unsaid
+     */
+    Judged judgeOnABuildThatGenerates(Backends backends) {
+        return judge(ClassificationConfig.defaults(), backends);
+    }
+
+    private Judged judge(ClassificationConfig vocabulary, Backends backends) {
         ArchModel.Builder model = ArchModel.builder();
         types.forEach(model::addType);
         CodeModel.Builder code = CodeModel.builder();
@@ -315,6 +326,9 @@ final class ShopJudgements {
         edges.forEach(code::addEdge);
         CodeModel built = code.build();
         return Findings.of(
-                model.build(), Dependencies.of(built, Perimeter.of(built, AnalysisScope.everything())), vocabulary);
+                model.build(),
+                Dependencies.of(built, Perimeter.of(built, AnalysisScope.everything())),
+                vocabulary,
+                backends);
     }
 }

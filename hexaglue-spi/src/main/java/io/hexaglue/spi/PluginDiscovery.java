@@ -13,10 +13,16 @@
 
 package io.hexaglue.spi;
 
+import io.hexaglue.model.arch.Backends;
+import io.hexaglue.model.arch.PortFamily;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Finding the backends a build put on its classpath.
@@ -53,5 +59,34 @@ public final class PluginDiscovery {
         plugins.sort(
                 (left, right) -> left.manifest().id().compareTo(right.manifest().id()));
         return List.copyOf(plugins);
+    }
+
+    /**
+     * Returns what the given backends state they will write, for the checks to read.
+     *
+     * <p>Read from the manifests and never from a run: this is handed to the analysis before any
+     * backend contributes anything, so a build judges its sources the same way whether or not the
+     * generation that follows succeeds.</p>
+     *
+     * @param plugins the backends installed on this build
+     * @return what they declare, empty when none writes an adapter
+     */
+    public static Backends declaredBy(List<HexaGluePlugin> plugins) {
+        Objects.requireNonNull(plugins, "plugins must not be null");
+        Map<String, Set<PortFamily>> declared = new TreeMap<>();
+        for (HexaGluePlugin plugin : plugins) {
+            PluginManifest manifest = plugin.manifest();
+            if (!manifest.produces().isEmpty()) {
+                declared.merge(manifest.id(), manifest.produces(), PluginDiscovery::both);
+            }
+        }
+        return new Backends(declared);
+    }
+
+    /** Two backends under one identifier is the executor's problem to report, not a reason to fail here. */
+    private static Set<PortFamily> both(Set<PortFamily> first, Set<PortFamily> second) {
+        Set<PortFamily> union = new LinkedHashSet<>(first);
+        union.addAll(second);
+        return union;
     }
 }

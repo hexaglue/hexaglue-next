@@ -15,6 +15,7 @@ package io.hexaglue.engine.finding;
 
 import io.hexaglue.engine.Dependencies;
 import io.hexaglue.model.arch.ArchModel;
+import io.hexaglue.model.arch.Backends;
 import io.hexaglue.model.config.ClassificationConfig;
 import java.util.Objects;
 
@@ -34,12 +35,19 @@ import java.util.Objects;
  * convention about itself, and conformity may hold it to what it stated. It never invents one —
  * with no vocabulary configured, every check that reads it says nothing.</p>
  *
+ * <p>What the installed backends will write is here for a related reason: a hole the core leaves is
+ * a thing to report unless this very build fills it. That is a declaration of the project, read
+ * before anything runs — never an observation of what a run produced — so the same sources are
+ * judged the same way twice.</p>
+ *
  * @param model the classified model
  * @param dependencies who names whom, between types and between packages
  * @param vocabulary the naming convention the codebase opted into, empty by default
+ * @param backends what the backends this build installed state they will write
  * @since 7.0.0
  */
-public record Judgement(ArchModel model, Dependencies dependencies, ClassificationConfig vocabulary) {
+public record Judgement(
+        ArchModel model, Dependencies dependencies, ClassificationConfig vocabulary, Backends backends) {
 
     /**
      * Validates every component.
@@ -48,5 +56,6 @@ public record Judgement(ArchModel model, Dependencies dependencies, Classificati
         Objects.requireNonNull(model, "model must not be null");
         Objects.requireNonNull(dependencies, "dependencies must not be null");
         Objects.requireNonNull(vocabulary, "vocabulary must not be null");
+        Objects.requireNonNull(backends, "backends must not be null");
     }
 }

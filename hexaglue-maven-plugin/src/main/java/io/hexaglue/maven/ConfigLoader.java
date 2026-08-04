@@ -219,14 +219,6 @@ final class ConfigLoader {
     private record Document(Path path, String origin) {}
 
     /**
-     * Reads a configuration from its YAML text.
-     *
-     * @param origin where the document comes from, named in every diagnostic
-     * @param yaml the document text
-     * @return what the document states
-     * @throws ConfigException when the document cannot be honoured as written
-     */
-    /**
      * Reads what the document asks of each backend.
      *
      * <p>The inner keys are left alone on purpose: only a plugin knows its own vocabulary, and it

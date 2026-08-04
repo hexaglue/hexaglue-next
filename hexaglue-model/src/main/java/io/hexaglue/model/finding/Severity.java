@@ -47,6 +47,6 @@ public enum Severity {
      * @return true when this severity is the threshold or worse
      */
     public boolean isAtLeast(Severity threshold) {
-        return ordinal() <= threshold.ordinal();
+        return compareTo(threshold) <= 0;
     }
 }

@@ -99,7 +99,8 @@ public final class Markdown {
     static String escape(String text) {
         Objects.requireNonNull(text, "text must not be null");
         StringBuilder escaped = new StringBuilder(text.length());
-        for (char character : text.toCharArray()) {
+        for (int index = 0; index < text.length(); index++) {
+            char character = text.charAt(index);
             if ("\\`*_{}[]()#+-.!|<>".indexOf(character) >= 0) {
                 escaped.append('\\');
             }

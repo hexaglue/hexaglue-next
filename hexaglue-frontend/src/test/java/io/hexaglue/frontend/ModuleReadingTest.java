@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.hexaglue.model.TypeId;
 import io.hexaglue.model.code.CodeModel;
 import io.hexaglue.model.code.ModuleNode;
-import io.hexaglue.model.code.TypeNode;
 import io.hexaglue.testkit.SourceFixtures;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -53,8 +52,8 @@ class ModuleReadingTest {
 
         CodeModel code = read("shop-domain");
 
-        assertThat(code.type(TypeId.of("com.acme.Order")).map(TypeNode::moduleName))
-                .contains(Optional.of("shop-domain"));
+        assertThat(code.type(TypeId.of("com.acme.Order")).orElseThrow().moduleName())
+                .contains("shop-domain");
         assertThat(code.modules()).containsExactly(new ModuleNode("shop-domain", Optional.empty()));
     }
 
@@ -65,8 +64,8 @@ class ModuleReadingTest {
 
         CodeModel code = read(null);
 
-        assertThat(code.type(TypeId.of("com.acme.Order")).map(TypeNode::moduleName))
-                .contains(Optional.empty());
+        assertThat(code.type(TypeId.of("com.acme.Order")).orElseThrow().moduleName())
+                .isEmpty();
         assertThat(code.modules()).isEmpty();
     }
 
@@ -78,8 +77,8 @@ class ModuleReadingTest {
 
         CodeModel code = read("shop-domain");
 
-        assertThat(code.type(TypeId.of("java.util.ArrayList")).map(TypeNode::moduleName))
-                .contains(Optional.empty());
+        assertThat(code.type(TypeId.of("java.util.ArrayList")).orElseThrow().moduleName())
+                .isEmpty();
     }
 
     @Test
@@ -99,10 +98,12 @@ class ModuleReadingTest {
                         .build())
                 .code();
 
-        assertThat(code.type(TypeId.of("com.acme.Order")).map(TypeNode::moduleName))
-                .contains(Optional.of("shop-domain"));
-        assertThat(code.type(TypeId.of("com.acme.jpa.OrderRecord")).map(TypeNode::moduleName))
-                .contains(Optional.of("shop-infra"));
+        assertThat(code.type(TypeId.of("com.acme.Order")).orElseThrow().moduleName())
+                .contains("shop-domain");
+        assertThat(code.type(TypeId.of("com.acme.jpa.OrderRecord"))
+                        .orElseThrow()
+                        .moduleName())
+                .contains("shop-infra");
         assertThat(code.modules())
                 .containsExactly(
                         new ModuleNode("shop-domain", Optional.empty()),
@@ -128,8 +129,8 @@ class ModuleReadingTest {
 
         assertThat(code.edges())
                 .anySatisfy(edge -> assertThat(edge.source().qualifiedName()).isEqualTo("com.acme.jpa.OrderRecord"));
-        assertThat(code.type(TypeId.of("com.acme.Order")).map(TypeNode::moduleName))
-                .contains(Optional.of("shop-domain"));
+        assertThat(code.type(TypeId.of("com.acme.Order")).orElseThrow().moduleName())
+                .contains("shop-domain");
     }
 
     @Test
@@ -146,8 +147,8 @@ class ModuleReadingTest {
                         .build())
                 .code();
 
-        assertThat(code.type(TypeId.of("com.acme.Tooling")).map(TypeNode::moduleName))
-                .contains(Optional.empty());
+        assertThat(code.type(TypeId.of("com.acme.Tooling")).orElseThrow().moduleName())
+                .isEmpty();
         assertThat(code.modules()).containsExactly(new ModuleNode("shop-domain", Optional.empty()));
     }
 }

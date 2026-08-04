@@ -77,6 +77,7 @@ final class StoredRepository {
         String name = options.repositoryFor(aggregate.id().simpleName());
         TypeSpec.Builder spec = TypeSpec.interfaceBuilder(name)
                 .addModifiers(javax.lang.model.element.Modifier.PUBLIC)
+                .addAnnotation(Written.by(JpaPlugin.ID))
                 .addSuperinterface(ParameterizedTypeName.get(
                         JPA_REPOSITORY,
                         stored.entity(reference()),

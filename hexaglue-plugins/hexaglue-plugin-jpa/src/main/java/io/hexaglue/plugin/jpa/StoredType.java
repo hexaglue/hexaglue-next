@@ -60,6 +60,7 @@ final class StoredType {
         String generatedName = identity.isPresent() ? options.entityFor(simpleName) : options.embeddableFor(simpleName);
         TypeSpec.Builder spec = TypeSpec.classBuilder(generatedName)
                 .addModifiers(javax.lang.model.element.Modifier.PUBLIC)
+                .addAnnotation(Written.by(JpaPlugin.ID))
                 .addJavadoc(
                         "How $L is stored.\n\n<p>Written from the classified model. Anything changed here is"
                                 + " lost the next time the sources are read.</p>\n",

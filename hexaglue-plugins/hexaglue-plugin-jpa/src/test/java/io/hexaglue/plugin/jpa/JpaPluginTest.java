@@ -208,6 +208,23 @@ class JpaPluginTest {
     }
 
     @Nested
+    @DisplayName("says of everything it writes that it was written")
+    class SaysWhatItWrote {
+
+        @Test
+        @DisplayName("so the next reading leaves it out instead of reading it as the architecture")
+        void soTheNextReadingLeavesItOut() {
+            PluginRun run = run(Map.of());
+
+            assertThat(run.sources())
+                    .isNotEmpty()
+                    .allSatisfy(file -> assertThat(flat(file.content()))
+                            .as(file.qualifiedName())
+                            .contains("@Generated(\"io.hexaglue.jpa\")"));
+        }
+    }
+
+    @Nested
     @DisplayName("declines rather than writing something it is unsure of")
     class DeclinesRatherThanGuessing {
 

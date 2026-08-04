@@ -97,6 +97,7 @@ final class StoredMapper {
         TypeName entity = row();
         TypeSpec spec = TypeSpec.classBuilder(name)
                 .addModifiers(javax.lang.model.element.Modifier.PUBLIC, javax.lang.model.element.Modifier.FINAL)
+                .addAnnotation(Written.by(JpaPlugin.ID))
                 .addJavadoc(
                         "Between $L and the row that stores it.\n\n<p>Written from the classified"
                                 + " model. Anything changed here is lost the next time the sources are"

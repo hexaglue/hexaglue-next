@@ -76,14 +76,14 @@ class ProjectAnalysisTest {
                     public java.util.UUID id() { return id; }
                 }
                 """);
-        write(project, "com/acme/Orders.java", """
+        write("com/acme/Orders.java", """
                 package com.acme;
                 public interface Orders {
                     void save(Order order);
                     java.util.Optional<Order> findById(java.util.UUID id);
                 }
                 """);
-        write(project, "com/acme/PlaceOrder.java", """
+        write("com/acme/PlaceOrder.java", """
                 package com.acme;
                 public class PlaceOrder {
                     private final Orders orders;
@@ -109,7 +109,7 @@ class ProjectAnalysisTest {
                         .contains("io.hexaglue.jpa"));
     }
 
-    private void write(MavenProject project, String relativePath, String source) {
+    private void write(String relativePath, String source) {
         Path file = projectDir.resolve("src/main/java").resolve(relativePath);
         try {
             Files.createDirectories(file.getParent());

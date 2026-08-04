@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
@@ -45,7 +46,7 @@ public record Backends(Map<String, Set<PortFamily>> declared) {
      */
     public Backends {
         Objects.requireNonNull(declared, "declared must not be null");
-        TreeMap<String, Set<PortFamily>> ordered = new TreeMap<>();
+        SortedMap<String, Set<PortFamily>> ordered = new TreeMap<>();
         declared.forEach((backend, families) -> ordered.put(
                 Objects.requireNonNull(backend, "a backend identifier must not be null"), Set.copyOf(families)));
         declared = Collections.unmodifiableSortedMap(ordered);

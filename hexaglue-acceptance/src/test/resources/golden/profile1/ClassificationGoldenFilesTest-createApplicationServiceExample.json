@@ -19,12 +19,12 @@
         {
           "name": "id",
           "type": "com.example.order.domain.OrderId",
-          "cardinality": "SINGLE"
+          "wrappedType": "java.util.UUID",
+          "roles": ["IDENTITY", "EMBEDDED"]
         },
         {
           "name": "product",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     },
@@ -38,8 +38,7 @@
       "properties": [
         {
           "name": "value",
-          "type": "java.util.UUID",
-          "cardinality": "SINGLE"
+          "type": "java.util.UUID"
         }
       ]
     }

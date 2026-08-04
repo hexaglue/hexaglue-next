@@ -11,18 +11,15 @@
       "properties": [
         {
           "name": "id",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "productName",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "quantity",
-          "type": "int",
-          "cardinality": "SINGLE"
+          "type": "int"
         }
       ]
     },
@@ -35,13 +32,11 @@
       "properties": [
         {
           "name": "store",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "table",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     },
@@ -64,17 +59,19 @@
         {
           "name": "id",
           "type": "com.coffeeshop.order.OrderId",
-          "cardinality": "SINGLE"
+          "wrappedType": "java.lang.String",
+          "roles": ["IDENTITY", "EMBEDDED"]
         },
         {
           "name": "items",
           "type": "java.util.List",
-          "cardinality": "SINGLE"
+          "elementType": "com.coffeeshop.order.LineItem",
+          "roles": ["COLLECTION"]
         },
         {
           "name": "location",
           "type": "com.coffeeshop.order.Location",
-          "cardinality": "SINGLE"
+          "roles": ["EMBEDDED"]
         }
       ]
     },
@@ -88,8 +85,7 @@
       "properties": [
         {
           "name": "value",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     }

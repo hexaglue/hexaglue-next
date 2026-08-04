@@ -56,7 +56,8 @@ class ExplanationTest {
                         .sourceLocation(DECLARATION)
                         .build())
                 .build();
-        return Structures.of(code).of(code.type(ORDER).orElseThrow());
+        TypeNode order = code.type(ORDER).orElseThrow();
+        return Structures.of(code).of(order, order.fields());
     }
 
     private static Evidence evidence(EvidenceTier tier, String fact, String justification) {

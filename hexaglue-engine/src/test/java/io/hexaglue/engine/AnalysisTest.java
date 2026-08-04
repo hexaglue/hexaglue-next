@@ -51,6 +51,7 @@ import io.hexaglue.model.config.HexaGlueConfig;
 import io.hexaglue.model.declaration.Annotation;
 import io.hexaglue.model.declaration.Constructor;
 import io.hexaglue.model.declaration.Field;
+import io.hexaglue.model.declaration.FieldRole;
 import io.hexaglue.model.declaration.Method;
 import io.hexaglue.model.declaration.Parameter;
 import java.util.List;
@@ -291,6 +292,206 @@ class AnalysisTest {
                             .structure()
                             .nestedTypes())
                     .isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("says of each field what the analysis reached about it")
+    class SaysOfEachFieldWhatWasReached {
+
+        private Field fieldOf(TypeId owner, String name) {
+            return read(modelOf(hexagon()), owner, ArchType.class).structure().fields().stream()
+                    .filter(field -> name.equals(field.name()))
+                    .findFirst()
+                    .orElseThrow();
+        }
+
+        @Test
+        @DisplayName("unwrapping a container down to what it holds")
+        void unwrappingAContainer() {
+            assertThat(fieldOf(FLEET, "hulls").elementType())
+                    .map(TypeRef::qualifiedName)
+                    .contains(HULL.qualifiedName());
+            assertThat(fieldOf(FLEET, "hulls").hasRole(FieldRole.COLLECTION)).isTrue();
+        }
+
+        @Test
+        @DisplayName("and leaving what holds nothing alone")
+        void leavingWhatHoldsNothingAlone() {
+            assertThat(fieldOf(FLEET, "manifest").elementType()).isEmpty();
+            assertThat(fieldOf(FLEET, "manifest").hasRole(FieldRole.COLLECTION)).isFalse();
+        }
+
+        @Test
+        @DisplayName("naming the identity from the tie, on the aggregate a way out searches")
+        void namingTheIdentityFromTheTie() {
+            assertThat(fieldOf(FLEET, "tag").hasRole(FieldRole.IDENTITY)).isTrue();
+            assertThat(fieldOf(FLEET, "hulls").hasRole(FieldRole.IDENTITY)).isFalse();
+            assertThat(fieldOf(FLEET, "manifest").hasRole(FieldRole.IDENTITY)).isFalse();
+        }
+
+        @Test
+        @DisplayName("and from the verdict on its type, on a part that carries one")
+        void andFromTheVerdictOnAPart() {
+            assertThat(fieldOf(HULL, "tag").hasRole(FieldRole.IDENTITY)).isTrue();
+            assertThat(fieldOf(HULL, "code").hasRole(FieldRole.IDENTITY)).isFalse();
+        }
+
+        @Test
+        @DisplayName("but never on something no owner of an identity declared")
+        void butNeverOnSomethingNoOwnerDeclared() {
+            assertThat(fieldOf(DOOR, "berthing").hasRole(FieldRole.IDENTITY)).isFalse();
+            assertThat(fieldOf(DOOR, "manifest").hasRole(FieldRole.IDENTITY)).isFalse();
+        }
+
+        @Test
+        @DisplayName("marking as embedded what its type was read to be a value of")
+        void markingAsEmbeddedWhatItsTypeWasReadToBe() {
+            assertThat(fieldOf(FLEET, "manifest").hasRole(FieldRole.EMBEDDED)).isTrue();
+            assertThat(fieldOf(FLEET, "tag").hasRole(FieldRole.EMBEDDED)).isTrue();
+            assertThat(fieldOf(FLEET, "hulls").hasRole(FieldRole.EMBEDDED)).isFalse();
+        }
+
+        @Test
+        @DisplayName("naming the single value an identity is written around")
+        void namingTheSingleValueAnIdentityIsWrittenAround() {
+            assertThat(fieldOf(FLEET, "tag").wrappedType())
+                    .map(TypeRef::qualifiedName)
+                    .contains("java.lang.String");
+        }
+
+        @Test
+        @DisplayName("and saying nothing when it is written around several")
+        void andSayingNothingWhenWrittenAroundSeveral() {
+            assertThat(fieldOf(DECK, "tag").hasRole(FieldRole.IDENTITY)).isTrue();
+            assertThat(fieldOf(DECK, "tag").wrappedType()).isEmpty();
+        }
+
+        /**
+         * Two aggregates, one holding the other whole and the other's identity beside it. Nothing
+         * in the corpus does either — well-drawn domains reference one another by identity, and
+         * none of the fixtures crosses two aggregates — so both readings would otherwise ship
+         * covered by nothing.
+         */
+        private static CodeModel twoAggregates() {
+            return CodeModel.builder()
+                    .addType(TypeNode.builder(FLEET, TypeNature.CLASS)
+                            .fields(List.of(
+                                    Field.builder("NONE", ref(FLEET_TAG))
+                                            .modifiers(Set.of(Modifier.STATIC, Modifier.FINAL))
+                                            .build(),
+                                    Field.builder("tag", ref(FLEET_TAG))
+                                            .documentation("What this fleet is searched by.")
+                                            .sourceLocation(new SourceLocation("Fleet.java", 7, 20))
+                                            .build(),
+                                    keeps("berth", DECK_TAG)))
+                            .methods(List.of(Method.of("sail", ref(SAILING))))
+                            .build())
+                    .addType(TypeNode.builder(FLEET_TAG, TypeNature.RECORD)
+                            .fields(List.of(frozen("value", TEXT)))
+                            .build())
+                    .addType(TypeNode.builder(DECK, TypeNature.CLASS)
+                            .fields(List.of(keeps("tag", DECK_TAG)))
+                            .build())
+                    .addType(TypeNode.builder(DECK_TAG, TypeNature.RECORD)
+                            .fields(List.of(frozen("value", TEXT)))
+                            .build())
+                    .addType(TypeNode.builder(SAILING, TypeNature.RECORD)
+                            .fields(List.of(frozen("reference", TEXT)))
+                            .build())
+                    .addType(TypeNode.builder(BOOKS, TypeNature.INTERFACE)
+                            .methods(List.of(takes("find", ref(FLEET), FLEET_TAG), takes("keep", VOID, FLEET)))
+                            .build())
+                    .addType(TypeNode.builder(BERTHING, TypeNature.INTERFACE)
+                            .methods(List.of(takes("find", ref(DECK), DECK_TAG), takes("keep", VOID, DECK)))
+                            .build())
+                    .addType(TypeNode.builder(DISPATCH, TypeNature.CLASS)
+                            .fields(List.of(
+                                    keeps("books", BOOKS),
+                                    keeps("berthing", BERTHING),
+                                    keeps("flagship", FLEET),
+                                    keeps("berth", DECK)))
+                            .build())
+                    .build();
+        }
+
+        @Test
+        @DisplayName("marking as a reference a field holding a whole other aggregate")
+        void markingAsAReferenceAFieldHoldingAWholeAggregate() {
+            ArchType dispatch = read(modelOf(twoAggregates()), DISPATCH, ArchType.class);
+
+            assertThat(dispatch.structure().fields())
+                    .filteredOn(field -> field.hasRole(FieldRole.AGGREGATE_REFERENCE))
+                    .extracting(Field::name)
+                    .containsExactly("flagship", "berth");
+        }
+
+        /**
+         * {@code berth} holds an aggregate written around a single field, which is the shape an
+         * identity has: what keeps the two apart is the verdict on the type, never its shape.
+         */
+        @Test
+        @DisplayName("and saying nothing of what a whole aggregate is written around")
+        void andSayingNothingOfWhatAWholeAggregateIsWrittenAround() {
+            ArchType dispatch = read(modelOf(twoAggregates()), DISPATCH, ArchType.class);
+
+            assertThat(dispatch.structure().fields())
+                    .filteredOn(field -> field.hasRole(FieldRole.AGGREGATE_REFERENCE))
+                    .allSatisfy(field -> assertThat(field.wrappedType()).isEmpty());
+        }
+
+        @Test
+        @DisplayName("keeping the identity to the one a way out searches by, not to any it holds")
+        void keepingTheIdentityToTheOneAWayOutSearchesBy() {
+            ArchType fleet = read(modelOf(twoAggregates()), FLEET, ArchType.class);
+
+            assertThat(fleet.structure().fields())
+                    .filteredOn(field -> field.hasRole(FieldRole.IDENTITY))
+                    .extracting(Field::name)
+                    .containsExactly("tag");
+        }
+
+        @Test
+        @DisplayName("and never to what belongs to the class rather than to one of its instances")
+        void andNeverToWhatBelongsToTheClass() {
+            ArchType fleet = read(modelOf(twoAggregates()), FLEET, ArchType.class);
+
+            assertThat(fleet.structure().fields())
+                    .filteredOn(field -> "NONE".equals(field.name()))
+                    .allSatisfy(field -> assertThat(field.hasRole(FieldRole.IDENTITY))
+                            .isFalse());
+        }
+
+        @Test
+        @DisplayName("without losing what the sources wrote around the field")
+        void withoutLosingWhatTheSourcesWroteAroundTheField() {
+            ArchType fleet = read(modelOf(twoAggregates()), FLEET, ArchType.class);
+
+            assertThat(fleet.structure().fields())
+                    .filteredOn(field -> "tag".equals(field.name()))
+                    .singleElement()
+                    .satisfies(field -> {
+                        assertThat(field.documentation()).contains("What this fleet is searched by.");
+                        assertThat(field.sourceLocation())
+                                .map(SourceLocation::lineStart)
+                                .contains(7);
+                    });
+        }
+
+        @Test
+        @DisplayName("leaving audit and plumbing unsaid, which no pack can name on a member")
+        void leavingAuditAndPlumbingUnsaid() {
+            assertThat(read(modelOf(hexagon()), FLEET, ArchType.class).structure().fields())
+                    .flatExtracting(Field::roles)
+                    .doesNotContain(FieldRole.AUDIT, FieldRole.TECHNICAL);
+        }
+
+        @Test
+        @DisplayName("and telling the same field the same way wherever the model holds it")
+        void andTellingTheSameFieldTheSameWayEverywhere() {
+            AggregateRoot fleet = read(modelOf(hexagon()), FLEET, AggregateRoot.class);
+
+            assertThat(fleet.identityField()).contains(fieldOf(FLEET, "tag"));
         }
     }
 

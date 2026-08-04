@@ -18,18 +18,17 @@
       "properties": [
         {
           "name": "email",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "id",
           "type": "com.ecommerce.customer.CustomerId",
-          "cardinality": "SINGLE"
+          "wrappedType": "java.util.UUID",
+          "roles": ["IDENTITY", "EMBEDDED"]
         },
         {
           "name": "name",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     },
@@ -43,8 +42,7 @@
       "properties": [
         {
           "name": "value",
-          "type": "java.util.UUID",
-          "cardinality": "SINGLE"
+          "type": "java.util.UUID"
         }
       ]
     },
@@ -66,28 +64,27 @@
       "properties": [
         {
           "name": "createdAt",
-          "type": "java.time.Instant",
-          "cardinality": "SINGLE"
+          "type": "java.time.Instant"
         },
         {
           "name": "customerId",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "id",
           "type": "com.ecommerce.order.OrderId",
-          "cardinality": "SINGLE"
+          "wrappedType": "java.util.UUID",
+          "roles": ["IDENTITY", "EMBEDDED"]
         },
         {
           "name": "productIds",
           "type": "java.util.List",
-          "cardinality": "SINGLE"
+          "elementType": "java.lang.String",
+          "roles": ["COLLECTION"]
         },
         {
           "name": "status",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     },
@@ -101,8 +98,7 @@
       "properties": [
         {
           "name": "value",
-          "type": "java.util.UUID",
-          "cardinality": "SINGLE"
+          "type": "java.util.UUID"
         }
       ]
     },
@@ -124,28 +120,25 @@
       "properties": [
         {
           "name": "description",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "id",
           "type": "com.ecommerce.product.ProductId",
-          "cardinality": "SINGLE"
+          "wrappedType": "java.util.UUID",
+          "roles": ["IDENTITY", "EMBEDDED"]
         },
         {
           "name": "name",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "price",
-          "type": "java.math.BigDecimal",
-          "cardinality": "SINGLE"
+          "type": "java.math.BigDecimal"
         },
         {
           "name": "stockQuantity",
-          "type": "int",
-          "cardinality": "SINGLE"
+          "type": "int"
         }
       ]
     },
@@ -159,8 +152,7 @@
       "properties": [
         {
           "name": "value",
-          "type": "java.util.UUID",
-          "cardinality": "SINGLE"
+          "type": "java.util.UUID"
         }
       ]
     }

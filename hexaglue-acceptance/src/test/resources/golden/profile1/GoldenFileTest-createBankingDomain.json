@@ -19,22 +19,23 @@
         {
           "name": "balance",
           "type": "com.example.banking.domain.Money",
-          "cardinality": "SINGLE"
+          "roles": ["EMBEDDED"]
         },
         {
           "name": "id",
           "type": "com.example.banking.domain.AccountId",
-          "cardinality": "SINGLE"
+          "wrappedType": "java.util.UUID",
+          "roles": ["IDENTITY", "EMBEDDED"]
         },
         {
           "name": "ownerName",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "transactions",
           "type": "java.util.List",
-          "cardinality": "SINGLE"
+          "elementType": "com.example.banking.domain.Transaction",
+          "roles": ["COLLECTION"]
         }
       ]
     },
@@ -48,8 +49,7 @@
       "properties": [
         {
           "name": "value",
-          "type": "java.util.UUID",
-          "cardinality": "SINGLE"
+          "type": "java.util.UUID"
         }
       ]
     },
@@ -62,13 +62,11 @@
       "properties": [
         {
           "name": "amount",
-          "type": "java.math.BigDecimal",
-          "cardinality": "SINGLE"
+          "type": "java.math.BigDecimal"
         },
         {
           "name": "currency",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     },
@@ -84,22 +82,19 @@
         {
           "name": "amount",
           "type": "com.example.banking.domain.Money",
-          "cardinality": "SINGLE"
+          "roles": ["EMBEDDED"]
         },
         {
           "name": "description",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "id",
-          "type": "java.util.UUID",
-          "cardinality": "SINGLE"
+          "type": "java.util.UUID"
         },
         {
           "name": "timestamp",
-          "type": "java.time.Instant",
-          "cardinality": "SINGLE"
+          "type": "java.time.Instant"
         }
       ]
     }

@@ -9,13 +9,11 @@
       "properties": [
         {
           "name": "amount",
-          "type": "double",
-          "cardinality": "SINGLE"
+          "type": "double"
         },
         {
           "name": "currency",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     }

@@ -11,13 +11,11 @@
       "properties": [
         {
           "name": "id",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "name",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     }

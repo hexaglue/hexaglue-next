@@ -10,8 +10,7 @@
       "properties": [
         {
           "name": "value",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     }

@@ -14,13 +14,11 @@
       "properties": [
         {
           "name": "route",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "tag",
-          "type": "java.util.UUID",
-          "cardinality": "SINGLE"
+          "type": "java.util.UUID"
         }
       ]
     }

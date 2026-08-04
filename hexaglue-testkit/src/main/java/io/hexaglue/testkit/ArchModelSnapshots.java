@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -193,22 +194,31 @@ public final class ArchModelSnapshots {
         if (sorted.isEmpty()) {
             return member("properties", "[]");
         }
-        List<String> entries = sorted.stream()
-                .map(field -> "        {\n"
-                        + String.join(
-                                ",\n",
-                                List.of(
-                                        "          " + quote("name") + ": " + quote(field.name()),
-                                        "          " + quote("type") + ": "
-                                                + quote(field.type().qualifiedName()),
-                                        "          " + quote("cardinality") + ": " + quote(cardinality(field))))
-                        + "\n        }")
-                .toList();
+        List<String> entries = sorted.stream().map(ArchModelSnapshots::property).toList();
         return member("properties", "[\n" + String.join(",\n", entries) + "\n" + INDENT + "]");
     }
 
-    private static String cardinality(Field field) {
-        return field.elementType().isPresent() ? "COLLECTION" : "SINGLE";
+    /**
+     * What a field is, and what the analysis reached about it. Whatever the analysis did not reach
+     * is left out rather than spelled as empty, so a snapshot shows what is known — and so that
+     * recording one of these is a diff a person reads rather than a wall of absences.
+     */
+    private static String property(Field field) {
+        List<String> members = new ArrayList<>(List.of(
+                "          " + quote("name") + ": " + quote(field.name()),
+                "          " + quote("type") + ": " + quote(field.type().qualifiedName())));
+        field.elementType()
+                .ifPresent(element ->
+                        members.add("          " + quote("elementType") + ": " + quote(element.qualifiedName())));
+        field.wrappedType()
+                .ifPresent(wrapped ->
+                        members.add("          " + quote("wrappedType") + ": " + quote(wrapped.qualifiedName())));
+        if (!field.roles().isEmpty()) {
+            String roles =
+                    field.roles().stream().map(role -> quote(role.name())).collect(Collectors.joining(", "));
+            members.add("          " + quote("roles") + ": [" + roles + "]");
+        }
+        return "        {\n" + String.join(",\n", members) + "\n        }";
     }
 
     private static String entry(List<String> members) {

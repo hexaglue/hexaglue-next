@@ -42,11 +42,13 @@ final class Assembly {
 
     private final Links links;
     private final Structures structures;
+    private final Fields fields;
     private final DomainAssembly domain;
 
     private Assembly(EngineContext context, FactBase facts, Verdicts verdicts) {
         this.links = new Links(context, facts, verdicts);
         this.structures = Structures.of(context.code());
+        this.fields = new Fields(links);
         this.domain = new DomainAssembly(links);
     }
 
@@ -73,8 +75,8 @@ final class Assembly {
                 .orElseThrow(() -> EngineException.of(
                         EngineException.MISSING_VERDICT,
                         "no verdict was reached on " + type.id().qualifiedName() + ", which the perimeter owes one"));
-        TypeStructure structure = structures.of(type);
         ArchKind kind = verdict.kind();
+        TypeStructure structure = structures.of(type, fields.of(type, kind));
         if (kind.isDomain()) {
             return domain.of(type, structure, verdict);
         }

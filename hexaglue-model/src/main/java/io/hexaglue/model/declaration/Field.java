@@ -28,8 +28,12 @@ import java.util.Set;
  * <p>The frontend fills the syntactic components and leaves {@code wrappedType},
  * {@code elementType} and {@code roles} empty; the engine fills them when the architectural model
  * is assembled: {@code wrappedType} for identifier wrappers ({@code OrderId} wrapping
- * {@code UUID}), {@code elementType} for collections ({@code List<Item>} carrying {@code Item}),
+ * {@code UUID}), {@code elementType} for containers ({@code List<Item>} carrying {@code Item}),
  * roles for the semantic reading of the field.</p>
+ *
+ * <p>The three are shortcuts, never a second source: each one answers from what the analysis had
+ * already reached about the type this field names, so a consumer reading them and a rule walking
+ * the model cannot come to different conclusions.</p>
  *
  * @param name the field name
  * @param type the declared field type

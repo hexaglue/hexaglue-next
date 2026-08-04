@@ -61,15 +61,19 @@ final class Structures {
     /**
      * Returns the declaration of the given type as the model holds it.
      *
+     * <p>The fields are handed in rather than copied from the declaration: they are the one member
+     * the analysis has something to add to, and {@link Fields} is where that addition is made.</p>
+     *
      * @param type the analyzed declaration
+     * @param fields its fields, as the analysis reached them
      * @return its structure
      */
-    TypeStructure of(TypeNode type) {
+    TypeStructure of(TypeNode type, List<Field> fields) {
         TypeStructure.Builder structure = TypeStructure.builder(type.nature())
                 .modifiers(type.modifiers())
                 .interfaces(type.interfaces())
                 .permittedSubtypes(type.permittedSubtypes())
-                .fields(type.fields())
+                .fields(fields)
                 .methods(type.methods())
                 .constructors(type.constructors())
                 .annotations(type.annotations())
@@ -105,7 +109,17 @@ final class Structures {
      * @return its state fields, in declaration order
      */
     static List<Field> state(TypeNode type) {
-        return type.fields().stream()
+        return state(type.fields());
+    }
+
+    /**
+     * Returns the fields carrying state among the given ones.
+     *
+     * @param fields the fields to filter, in declaration order
+     * @return the state fields, in the same order
+     */
+    static List<Field> state(List<Field> fields) {
+        return fields.stream()
                 .filter(field -> !field.modifiers().contains(Modifier.STATIC))
                 .toList();
     }

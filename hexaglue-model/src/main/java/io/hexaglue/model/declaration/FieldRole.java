@@ -17,26 +17,36 @@ package io.hexaglue.model.declaration;
  * Semantic role of a field in the domain model, assigned by the classification engine — the
  * frontend leaves roles empty.
  *
+ * <p>{@link #AUDIT} and {@link #TECHNICAL} are never assigned: telling them apart takes an
+ * annotation a knowledge pack would have to name on a member, and none does. Reading them off the
+ * field's name, as was once done, is the one thing this engine will not do.</p>
+ *
  * @since 7.0.0
  */
 public enum FieldRole {
 
-    /** The field carries the identity of its owner (e.g. {@code OrderId id}). */
+    /**
+     * The field carries the identity of its owner: the value a way out searches the aggregate by,
+     * or, on a part, a field whose own type was read as an identifier.
+     */
     IDENTITY,
 
-    /** The field is a collection of owned or referenced elements. */
+    /** The field is a collection or an array of whatever it holds. */
     COLLECTION,
 
-    /** The field references another aggregate by its identifier. */
+    /**
+     * The field holds a whole other aggregate rather than naming it by identity — which is what
+     * makes it a reference to store rather than a part to embed.
+     */
     AGGREGATE_REFERENCE,
 
-    /** The field embeds a value object. */
+    /** The field holds something read as a value or an identity, and is stored inside its owner. */
     EMBEDDED,
 
-    /** The field carries audit metadata (created/modified timestamps, users). */
+    /** The field carries audit metadata (created/modified timestamps, users). Never assigned. */
     AUDIT,
 
-    /** The field is technical plumbing (version columns, serialization ids). */
+    /** The field is technical plumbing (version columns, serialization ids). Never assigned. */
     TECHNICAL;
 
     /**

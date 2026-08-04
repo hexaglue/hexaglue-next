@@ -9,13 +9,11 @@
       "properties": [
         {
           "name": "hulls",
-          "type": "int",
-          "cardinality": "SINGLE"
+          "type": "int"
         },
         {
           "name": "reference",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     },
@@ -28,13 +26,11 @@
       "properties": [
         {
           "name": "code",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "weight",
-          "type": "int",
-          "cardinality": "SINGLE"
+          "type": "int"
         }
       ]
     }

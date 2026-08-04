@@ -18,17 +18,17 @@
         {
           "name": "id",
           "type": "java.lang.Integer",
-          "cardinality": "SINGLE"
+          "roles": ["IDENTITY"]
         },
         {
           "name": "lastName",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "pets",
           "type": "java.util.List",
-          "cardinality": "SINGLE"
+          "elementType": "com.acme.clinic.owner.Pet",
+          "roles": ["COLLECTION"]
         }
       ]
     },
@@ -41,13 +41,11 @@
       "properties": [
         {
           "name": "id",
-          "type": "java.lang.Integer",
-          "cardinality": "SINGLE"
+          "type": "java.lang.Integer"
         },
         {
           "name": "name",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     }

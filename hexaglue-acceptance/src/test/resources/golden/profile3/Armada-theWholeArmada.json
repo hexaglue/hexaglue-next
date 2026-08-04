@@ -19,17 +19,18 @@
         {
           "name": "hulls",
           "type": "java.util.List",
-          "cardinality": "SINGLE"
+          "elementType": "com.acme.armada.yard.Hull",
+          "roles": ["COLLECTION"]
         },
         {
           "name": "tag",
           "type": "com.acme.armada.yard.FleetTag",
-          "cardinality": "SINGLE"
+          "wrappedType": "java.util.UUID",
+          "roles": ["IDENTITY", "EMBEDDED"]
         },
         {
           "name": "yard",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     },
@@ -48,12 +49,12 @@
         {
           "name": "tag",
           "type": "com.acme.armada.yard.FleetTag",
-          "cardinality": "SINGLE"
+          "wrappedType": "java.util.UUID",
+          "roles": ["IDENTITY", "EMBEDDED"]
         },
         {
           "name": "yard",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     },
@@ -67,8 +68,7 @@
       "properties": [
         {
           "name": "value",
-          "type": "java.util.UUID",
-          "cardinality": "SINGLE"
+          "type": "java.util.UUID"
         }
       ]
     },
@@ -81,13 +81,11 @@
       "properties": [
         {
           "name": "berths",
-          "type": "int",
-          "cardinality": "SINGLE"
+          "type": "int"
         },
         {
           "name": "designation",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     }

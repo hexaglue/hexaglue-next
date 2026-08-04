@@ -18,18 +18,17 @@
       "properties": [
         {
           "name": "berth",
-          "type": "com.acme.hangar.core.Berth",
-          "cardinality": "SINGLE"
+          "type": "com.acme.hangar.core.Berth"
         },
         {
           "name": "reference",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "tag",
           "type": "com.acme.hangar.core.FleetTag",
-          "cardinality": "SINGLE"
+          "wrappedType": "java.lang.String",
+          "roles": ["IDENTITY", "EMBEDDED"]
         }
       ]
     },
@@ -43,8 +42,7 @@
       "properties": [
         {
           "name": "value",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     }

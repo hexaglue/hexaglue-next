@@ -55,7 +55,8 @@ class ValidationTest {
         CodeModel code = CodeModel.builder()
                 .addType(TypeNode.builder(id, TypeNature.CLASS).build())
                 .build();
-        return Structures.of(code).of(code.type(id).orElseThrow());
+        TypeNode declared = code.type(id).orElseThrow();
+        return Structures.of(code).of(declared, declared.fields());
     }
 
     private static Classification.Builder verdict(ArchKind kind, Confidence confidence, Basis basis) {

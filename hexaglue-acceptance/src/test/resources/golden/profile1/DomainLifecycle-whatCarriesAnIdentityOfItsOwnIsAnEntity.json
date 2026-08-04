@@ -19,12 +19,14 @@
         {
           "name": "hulls",
           "type": "java.util.List",
-          "cardinality": "SINGLE"
+          "elementType": "com.acme.hangar.core.Hull",
+          "roles": ["COLLECTION"]
         },
         {
           "name": "tag",
           "type": "com.acme.hangar.core.FleetTag",
-          "cardinality": "SINGLE"
+          "wrappedType": "java.lang.String",
+          "roles": ["IDENTITY", "EMBEDDED"]
         }
       ]
     },
@@ -38,8 +40,7 @@
       "properties": [
         {
           "name": "value",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     },
@@ -58,12 +59,13 @@
         {
           "name": "manifest",
           "type": "com.acme.hangar.core.Manifest",
-          "cardinality": "SINGLE"
+          "roles": ["EMBEDDED"]
         },
         {
           "name": "tag",
           "type": "com.acme.hangar.core.HullTag",
-          "cardinality": "SINGLE"
+          "wrappedType": "java.lang.String",
+          "roles": ["IDENTITY", "EMBEDDED"]
         }
       ]
     },
@@ -77,8 +79,7 @@
       "properties": [
         {
           "name": "value",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     },
@@ -91,13 +92,11 @@
       "properties": [
         {
           "name": "code",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "weight",
-          "type": "int",
-          "cardinality": "SINGLE"
+          "type": "int"
         }
       ]
     }

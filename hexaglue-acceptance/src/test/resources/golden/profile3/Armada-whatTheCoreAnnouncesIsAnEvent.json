@@ -11,13 +11,11 @@
       "properties": [
         {
           "name": "designation",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "when",
-          "type": "java.time.Instant",
-          "cardinality": "SINGLE"
+          "type": "java.time.Instant"
         }
       ]
     }

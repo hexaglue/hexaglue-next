@@ -9,18 +9,15 @@
       "properties": [
         {
           "name": "amount",
-          "type": "int",
-          "cardinality": "SINGLE"
+          "type": "int"
         },
         {
           "name": "currency",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         },
         {
           "name": "id",
-          "type": "java.lang.String",
-          "cardinality": "SINGLE"
+          "type": "java.lang.String"
         }
       ]
     }

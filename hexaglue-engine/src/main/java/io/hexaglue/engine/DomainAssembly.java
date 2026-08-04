@@ -78,7 +78,7 @@ final class DomainAssembly {
                 type.id(),
                 structure,
                 verdict,
-                identity.flatMap(carrier -> fieldHolding(type, carrier)),
+                identityIn(structure),
                 identity.flatMap(
                         carrier -> Structures.wrappedValueOf(links.code().type(carrier))),
                 partsOf(type.id(), ArchKind.ENTITY),
@@ -93,7 +93,7 @@ final class DomainAssembly {
                 type.id(),
                 structure,
                 verdict,
-                fieldCarryingAnIdentity(type),
+                identityIn(structure),
                 Links.single(links.subjects(RelationKind.OWNS, type.id())
                                 .filter(owner -> links.is(owner, ArchKind.AGGREGATE_ROOT)))
                         .map(Links::reference));
@@ -108,7 +108,7 @@ final class DomainAssembly {
                 type.id(),
                 structure,
                 verdict,
-                fieldCarryingAnIdentity(type),
+                identityIn(structure),
                 Optional.empty(),
                 Links.single(links.subjects(RelationKind.ANNOUNCES, type.id())).map(Links::reference));
     }
@@ -126,16 +126,14 @@ final class DomainAssembly {
         return Links.references(links.heldBy(type).filter(links::isAPort));
     }
 
-    private Optional<Field> fieldCarryingAnIdentity(TypeNode type) {
-        return Structures.state(type).stream()
-                .filter(field -> links.is(TypeId.of(field.type().qualifiedName()), ArchKind.IDENTIFIER))
-                .findFirst();
-    }
-
-    private static Optional<Field> fieldHolding(TypeNode type, TypeId carrier) {
-        return Structures.state(type).stream()
-                .filter(field -> carrier.qualifiedName()
-                        .equals(field.type().unwrapElement().qualifiedName()))
+    /**
+     * Which field carries the identity was settled when the fields were read; asking again here
+     * would be a second definition of the same thing, free to answer otherwise than the field the
+     * structure already carries the mark on.
+     */
+    private static Optional<Field> identityIn(TypeStructure structure) {
+        return Structures.state(structure.fields()).stream()
+                .filter(Field::isIdentity)
                 .findFirst();
     }
 }

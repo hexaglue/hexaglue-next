@@ -65,7 +65,8 @@ class ArchModelSnapshotsTest {
 
     private static ArchModel shopModel() {
         Field identity = Field.builder("id", TypeRef.of("com.shop.OrderId"))
-                .roles(Set.of(FieldRole.IDENTITY))
+                .wrappedType(TypeRef.of("java.util.UUID"))
+                .roles(Set.of(FieldRole.IDENTITY, FieldRole.EMBEDDED))
                 .build();
         Field lines = Field.builder(
                         "lines", new TypeRef.Named("java.util.List", List.of(TypeRef.of("com.shop.OrderLine"))))
@@ -192,12 +193,13 @@ class ArchModelSnapshotsTest {
                             {
                               "name": "id",
                               "type": "com.shop.OrderId",
-                              "cardinality": "SINGLE"
+                              "wrappedType": "java.util.UUID",
+                              "roles": ["IDENTITY", "EMBEDDED"]
                             },
                             {
                               "name": "lines",
                               "type": "java.util.List",
-                              "cardinality": "COLLECTION"
+                              "elementType": "com.shop.OrderLine"
                             }
                           ]
                         },

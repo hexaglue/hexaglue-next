@@ -59,6 +59,7 @@
       "useCases": ["createOrder: COMMAND", "findOrder: QUERY"],
       "inputTypes": ["com.example.order.domain.OrderId"],
       "outputTypes": ["com.example.order.domain.Order"],
+      "subject": "com.example.order.domain.Order",
       "confidence": "HIGH",
       "basis": "INFERRED",
       "methods": ["createOrder", "findOrder"]

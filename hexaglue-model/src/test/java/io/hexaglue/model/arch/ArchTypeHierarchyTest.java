@@ -281,7 +281,8 @@ class ArchTypeHierarchyTest {
                             Optional.empty(),
                             UseCase.UseCaseType.COMMAND)),
                     List.of(),
-                    List.of());
+                    List.of(),
+                    Optional.empty());
 
             assertThat(port.direction()).isEqualTo(PortDirection.DRIVING);
             assertThat(port.useCases()).hasSize(1);

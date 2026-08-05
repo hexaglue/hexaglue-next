@@ -51,7 +51,8 @@ class BackendsTest {
                 verdict(ArchKind.DRIVING_PORT, PortDirection.DRIVING),
                 List.of(),
                 List.of(),
-                List.of());
+                List.of(),
+                Optional.empty());
     }
 
     private static Classification verdict(ArchKind kind, PortDirection direction) {

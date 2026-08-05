@@ -106,6 +106,7 @@
       "useCases": ["assemble: COMMAND", "at: QUERY"],
       "inputTypes": ["com.acme.armada.yard.Hull", "com.acme.armada.yard.FleetTag"],
       "outputTypes": ["com.acme.armada.yard.Fleet"],
+      "subject": "com.acme.armada.yard.Fleet",
       "confidence": "HIGH",
       "basis": "INFERRED",
       "methods": ["assemble", "at"]

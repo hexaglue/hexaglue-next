@@ -687,6 +687,24 @@ class AnalysisTest {
         }
 
         @Test
+        @DisplayName("giving a way in the aggregate its use cases are about, when they are about one")
+        void givingAWayInTheAggregateItIsAbout() {
+            DrivingPort mooring = read(modelOf(hangarThatChanges()), MOORING, DrivingPort.class);
+
+            assertThat(mooring.subject()).map(TypeRef::qualifiedName).contains(FLEET.qualifiedName());
+        }
+
+        @Test
+        @DisplayName("and none when nothing it names has a life of its own")
+        void givingAWayInNoAggregateWhenItNamesNone() {
+            // Berthing hands out a tag and answers with a sailing: neither is an aggregate, so
+            // there is no resource behind it and the model says so with nothing.
+            DrivingPort berthing = read(modelOf(hexagon()), BERTHING, DrivingPort.class);
+
+            assertThat(berthing.subject()).isEmpty();
+        }
+
+        @Test
         @DisplayName("giving a way in the types of the perimeter it takes and answers with")
         void givingAWayInItsTypes() {
             DrivingPort berthing = read(modelOf(hexagon()), BERTHING, DrivingPort.class);

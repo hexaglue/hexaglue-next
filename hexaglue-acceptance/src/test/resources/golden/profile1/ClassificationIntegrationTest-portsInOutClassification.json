@@ -17,6 +17,7 @@
       "useCases": ["forOrder: COMMAND"],
       "inputTypes": [],
       "outputTypes": [],
+      "subject": null,
       "confidence": "EXPLICIT",
       "basis": "DECLARED",
       "methods": ["forOrder"]

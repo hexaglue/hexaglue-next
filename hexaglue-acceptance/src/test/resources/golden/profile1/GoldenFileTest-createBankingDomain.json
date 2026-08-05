@@ -107,6 +107,7 @@
       "useCases": ["transfer: COMMAND"],
       "inputTypes": ["com.example.banking.domain.AccountId", "com.example.banking.domain.Money"],
       "outputTypes": [],
+      "subject": null,
       "confidence": "EXPLICIT",
       "basis": "DECLARED",
       "methods": ["transfer"]

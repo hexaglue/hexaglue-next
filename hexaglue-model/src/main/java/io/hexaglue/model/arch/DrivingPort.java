@@ -20,6 +20,7 @@ import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.classification.Classification;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A driving port: the interface through which the outside world drives the hexagon, with the use
@@ -31,6 +32,7 @@ import java.util.Objects;
  * @param useCases the use cases exposed by this port, in declaration order
  * @param inputTypes the domain types accepted by the port, in discovery order
  * @param outputTypes the domain types produced by the port, in discovery order
+ * @param subject the aggregate this port's use cases are about, when the engine established one
  * @since 7.0.0
  */
 public record DrivingPort(
@@ -39,7 +41,8 @@ public record DrivingPort(
         Classification classification,
         List<UseCase> useCases,
         List<TypeRef> inputTypes,
-        List<TypeRef> outputTypes)
+        List<TypeRef> outputTypes,
+        Optional<TypeRef> subject)
         implements PortType {
 
     /**
@@ -52,6 +55,7 @@ public record DrivingPort(
         Objects.requireNonNull(useCases, "useCases must not be null");
         Objects.requireNonNull(inputTypes, "inputTypes must not be null");
         Objects.requireNonNull(outputTypes, "outputTypes must not be null");
+        Objects.requireNonNull(subject, "subject must not be null");
         KindCoherence.require(ArchKind.DRIVING_PORT, classification, id);
         useCases = List.copyOf(useCases);
         inputTypes = List.copyOf(inputTypes);

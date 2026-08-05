@@ -132,7 +132,8 @@ class ArchModelSnapshotsTest {
                 verdict(ArchKind.DRIVING_PORT),
                 List.of(new UseCase(execute, Optional.empty(), UseCase.UseCaseType.QUERY)),
                 List.of(TypeRef.of("com.shop.OrderId")),
-                List.of(TypeRef.of("com.shop.Order")));
+                List.of(TypeRef.of("com.shop.Order")),
+                Optional.of(TypeRef.of("com.shop.Order")));
         DrivenAdapter jpaRepository = new DrivenAdapter(
                 TypeId.of("com.shop.JpaOrderRepository"),
                 TypeStructure.builder(TypeNature.CLASS).build(),
@@ -273,6 +274,7 @@ class ArchModelSnapshotsTest {
                           "useCases": ["execute: QUERY"],
                           "inputTypes": ["com.shop.OrderId"],
                           "outputTypes": ["com.shop.Order"],
+                          "subject": "com.shop.Order",
                           "confidence": "HIGH",
                           "basis": "INFERRED",
                           "methods": ["execute"]

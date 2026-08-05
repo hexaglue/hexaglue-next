@@ -188,7 +188,8 @@ final class ShopFixture {
                 verdict(ArchKind.DRIVING_PORT),
                 List.of(),
                 List.of(TypeRef.of("com.shop.application.PlaceOrderCommand")),
-                List.of(TypeRef.of(ORDER_ID.toString())));
+                List.of(TypeRef.of(ORDER_ID.toString())),
+                Optional.empty());
     }
 
     private static UnclassifiedType stringUtils() {

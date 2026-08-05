@@ -59,6 +59,7 @@
       "useCases": ["board: COMMAND"],
       "inputTypes": ["com.acme.hangar.core.FleetTag"],
       "outputTypes": [],
+      "subject": null,
       "confidence": "HIGH",
       "basis": "INFERRED",
       "methods": ["board"]

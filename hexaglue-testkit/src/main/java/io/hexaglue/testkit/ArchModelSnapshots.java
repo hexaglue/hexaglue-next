@@ -143,6 +143,7 @@ public final class ArchModelSnapshots {
             members.add(inline("useCases", driving.useCases().stream().map(ArchModelSnapshots::useCase)));
             members.add(list("inputTypes", driving.inputTypes()));
             members.add(list("outputTypes", driving.outputTypes()));
+            members.add(member("subject", named(driving.subject())));
         }
         members.add(
                 member("confidence", quote(port.classification().confidence().name())));

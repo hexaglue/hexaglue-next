@@ -182,7 +182,8 @@ final class ShopModelFixtures {
                 verdict(ArchKind.DRIVING_PORT),
                 List.of(),
                 List.of(),
-                List.of());
+                List.of(),
+                Optional.empty());
     }
 
     static DrivingAdapter orderRestController() {

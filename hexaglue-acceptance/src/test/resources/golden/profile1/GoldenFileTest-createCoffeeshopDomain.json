@@ -91,6 +91,7 @@
       "useCases": ["createOrder: QUERY", "findOrder: QUERY"],
       "inputTypes": ["com.coffeeshop.domain.order.Location", "com.coffeeshop.domain.order.OrderId"],
       "outputTypes": ["com.coffeeshop.domain.order.Order"],
+      "subject": "com.coffeeshop.domain.order.Order",
       "confidence": "EXPLICIT",
       "basis": "DECLARED",
       "methods": ["createOrder", "findOrder"]

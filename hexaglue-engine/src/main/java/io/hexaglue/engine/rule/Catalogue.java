@@ -53,6 +53,7 @@ public final class Catalogue {
                 new ExposedContract(),
                 new OfferedContract(),
                 new PortSignatures(),
+                new ExposedAggregate(),
                 new PortPivot(),
                 new AdapterCollaborator(),
                 new DomainCollaboration());

@@ -111,7 +111,8 @@ final class Assembly {
                 Links.references(links.namedInPerimeter(type.methods().stream()
                         .flatMap(method -> method.parameters().stream())
                         .map(Parameter::type))),
-                Links.references(links.namedInPerimeter(type.methods().stream().map(Method::returnType))));
+                Links.references(links.namedInPerimeter(type.methods().stream().map(Method::returnType))),
+                Links.single(links.objects(RelationKind.CONCERNS, type.id())).map(Links::reference));
     }
 
     /**

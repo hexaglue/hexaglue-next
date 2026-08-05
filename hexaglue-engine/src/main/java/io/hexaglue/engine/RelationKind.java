@@ -31,5 +31,8 @@ public enum RelationKind {
     OWNS,
 
     /** The subject aggregate hands the object type back as something that has happened. */
-    ANNOUNCES
+    ANNOUNCES,
+
+    /** The use cases the subject driving port declares are about the object aggregate. */
+    CONCERNS
 }

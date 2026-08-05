@@ -16,6 +16,7 @@
       "useCases": ["board: COMMAND"],
       "inputTypes": [],
       "outputTypes": [],
+      "subject": null,
       "confidence": "HIGH",
       "basis": "INFERRED",
       "methods": ["board"]

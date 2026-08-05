@@ -16,6 +16,7 @@
       "useCases": ["assemble: COMMAND"],
       "inputTypes": [],
       "outputTypes": [],
+      "subject": null,
       "confidence": "HIGH",
       "basis": "INFERRED",
       "methods": ["assemble"]

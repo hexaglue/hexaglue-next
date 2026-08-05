@@ -257,7 +257,8 @@ final class ShopJudgements {
                 verdict(ArchKind.DRIVING_PORT),
                 List.of(),
                 List.of(),
-                List.of()));
+                List.of(),
+                Optional.empty()));
         return this;
     }
 
@@ -268,7 +269,8 @@ final class ShopJudgements {
                 verdict(ArchKind.DRIVING_PORT),
                 List.of(),
                 List.of(),
-                List.of()));
+                List.of(),
+                Optional.empty()));
         return this;
     }
 

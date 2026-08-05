@@ -16,6 +16,7 @@
       "useCases": ["query: QUERY"],
       "inputTypes": [],
       "outputTypes": [],
+      "subject": null,
       "confidence": "HIGH",
       "basis": "INFERRED",
       "methods": ["query"]

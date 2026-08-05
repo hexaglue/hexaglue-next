@@ -1,10 +1,12 @@
 # Plan de reprise
 
-> **Statut : révision 4 — trois amendements arbitrés le 2026-08-05.** La
-> révision 3 (commit `ab52fb5`) a été adoptée puis amendée sur trois clauses
-> identifiées, et sur elles seules : l'articulation des règles, l'indépendance de
-> validation, et l'ouverture d'E1 par la caractérisation `E1a`. **Les quatre
-> arbitrages ci-dessous sont inchangés.**
+> **Statut : révision 5 — quatre amendements arbitrés le 2026-08-05.** La
+> révision 3 (commit `ab52fb5`) a été adoptée, puis amendée sur des clauses
+> identifiées et sur elles seules : l'articulation des règles, l'indépendance de
+> validation et l'ouverture d'E1 par la caractérisation `E1a` (révision 4,
+> commit `9a109d3`), puis l'ouverture de la file de sujets nommés d'E7 avec
+> `E7-MODÈLE-1` (révision 5). **Les quatre arbitrages ci-dessous sont
+> inchangés.**
 >
 > **Statut hérité : échange clos, quatre arbitrages pris le 2026-08-05.**
 > Le désaccord entre A et B est vidé
@@ -383,6 +385,26 @@ d'un trou de lecture.
 
 **Condition d'ouverture d'une famille** : le corpus rebasé apporte un cas
 nominal, un contre-exemple et une mesure d'impact.
+
+#### Sujets nommés de la file
+
+Un sujet est une **question normative identifiée avant d'avoir son matériel**.
+Il n'a pas de numéro de décision et n'autorise rien : il devient une décision
+`PENDING` le jour où le cas nominal, le contre-exemple et la mesure d'impact
+exigés ci-dessus sont réunis. Le nommer tôt évite qu'une question de fond se
+dissolve dans les constats qui l'ont fait apparaître.
+
+**E7-MODÈLE-1 — Visibilité des enveloppes immuables à une valeur.**
+*Famille* : modèle métier. *Question* : faut-il exclure de la composition, par
+leur seule forme, les types immuables enveloppant une valeur unique — ou
+distinguer identité, valeur et autre rôle par des preuves supplémentaires ?
+*Ce qui la fonde* : le constat que `Lifecycle.isPart` écarte tout type reconnu
+par `Shapes.readsAsIdentity` `[LU]` ; la mesure sur deux projets — `Address` et
+`Money` reçoivent leurs signaux de possession, `Email` et `Iban` aucun, avec les
+mêmes propriétaires reconnus `[MESURÉ]` ; et l'hypothèse H-2 sur ce que
+l'exclusion déplace dans le corpus. *Ce qu'elle n'est pas* : le périmètre de
+D33, qui reste borné à son cas. *Ne pas instruire* avant l'ouverture de la
+famille « modèle métier », où elle rejoint D7, D13 et D16.
 
 **P7 est une porte, pas un item de backlog** : caractérisée dès E3a, relue sur au
 moins deux projets en E4a, premier sujet de la famille génération, et **franchie

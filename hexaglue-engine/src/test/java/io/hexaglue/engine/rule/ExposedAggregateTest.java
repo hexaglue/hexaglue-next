@@ -64,7 +64,8 @@ class ExposedAggregateTest {
                         .fields(List.of(Field.of("value", TypeRef.of("java.lang.String"))))
                         .build())
                 .addType(TypeNode.builder(store, TypeNature.INTERFACE)
-                        .methods(List.of(takes("find", ref(aggregate), tag), takes("keep", TypeRef.of("void"), aggregate)))
+                        .methods(List.of(
+                                takes("find", ref(aggregate), tag), takes("keep", TypeRef.of("void"), aggregate)))
                         .build());
     }
 
@@ -107,7 +108,8 @@ class ExposedAggregateTest {
                         .fields(List.of(Field.of("value", TypeRef.of("java.lang.String"))))
                         .build())
                 .addType(TypeNode.builder(BERTHS, TypeNature.INTERFACE)
-                        .methods(List.of(takes("find", ref(BERTH), BERTH_TAG), takes("keep", TypeRef.of("void"), BERTH)))
+                        .methods(
+                                List.of(takes("find", ref(BERTH), BERTH_TAG), takes("keep", TypeRef.of("void"), BERTH)))
                         .build())
                 .addType(TypeNode.builder(WAY_IN, TypeNature.INTERFACE)
                         .methods(List.of(takes("at", ref(FLEET), FLEET_TAG), takes("moor", ref(BERTH), BERTH_TAG)))

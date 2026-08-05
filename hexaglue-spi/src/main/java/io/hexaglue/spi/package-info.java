@@ -30,6 +30,11 @@
  * other plugins still run, and what depended on the failed one is skipped rather than run against
  * half a result.</p>
  *
+ * <p>Beside the contract sits the one reading every backend needs and none should answer on its
+ * own: how generated code reaches into a domain type somebody else wrote. Persistence reads a
+ * field to put it in a row and a web layer reads the same field to put it in a response — two
+ * answers to that would mean one of them is wrong.</p>
+ *
  * @since 7.0.0
  */
 package io.hexaglue.spi;

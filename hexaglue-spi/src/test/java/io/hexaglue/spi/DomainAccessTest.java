@@ -11,7 +11,7 @@
  * Contact: info@hexaglue.io
  */
 
-package io.hexaglue.plugin.jpa;
+package io.hexaglue.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

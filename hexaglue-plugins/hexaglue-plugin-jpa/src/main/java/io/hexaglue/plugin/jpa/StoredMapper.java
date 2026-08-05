@@ -22,6 +22,7 @@ import io.hexaglue.model.ArchKind;
 import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.arch.DomainType;
 import io.hexaglue.model.declaration.Field;
+import io.hexaglue.spi.DomainAccess;
 import io.hexaglue.spi.SourceFile;
 import java.util.ArrayList;
 import java.util.List;

@@ -22,6 +22,7 @@ import io.hexaglue.model.TypeRef;
 import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.arch.ArchType;
 import io.hexaglue.model.arch.DomainType;
+import io.hexaglue.spi.DomainAccess;
 import java.util.Objects;
 import java.util.Optional;
 

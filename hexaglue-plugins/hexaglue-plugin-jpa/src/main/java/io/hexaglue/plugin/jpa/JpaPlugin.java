@@ -29,6 +29,7 @@ import io.hexaglue.model.finding.Diagnostic;
 import io.hexaglue.model.finding.DiagnosticSeverity;
 import io.hexaglue.model.finding.IssueCode;
 import io.hexaglue.spi.Contribution;
+import io.hexaglue.spi.DomainAccess;
 import io.hexaglue.spi.HexaGluePlugin;
 import io.hexaglue.spi.PluginManifest;
 import io.hexaglue.spi.SourceFile;

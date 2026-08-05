@@ -11,7 +11,7 @@
  * Contact: info@hexaglue.io
  */
 
-package io.hexaglue.plugin.jpa;
+package io.hexaglue.spi;
 
 import io.hexaglue.model.Modifier;
 import io.hexaglue.model.arch.ArchType;
@@ -35,8 +35,15 @@ import java.util.Optional;
  * <p>Building goes the same way: the constructor whose parameters line up with the state of the
  * type, which the canonical constructor of a record always does. When nothing lines up, the answer
  * is nothing at all — a diagnostic rather than a guess that compiles here and breaks there.</p>
+ *
+ * <p>It sits here rather than inside one backend because the question is the same wherever
+ * generated code has to reach a domain type: persistence reads a field to put it in a row, a web
+ * layer reads the same field to put it in a response, and the two answering differently would mean
+ * one of them is wrong. What each backend does with the answer is its own business.</p>
+ *
+ * @since 7.0.0
  */
-final class DomainAccess {
+public final class DomainAccess {
 
     private DomainAccess() {}
 
@@ -46,7 +53,7 @@ final class DomainAccess {
      * @param type the domain type
      * @return its state fields
      */
-    static List<Field> state(ArchType type) {
+    public static List<Field> state(ArchType type) {
         return type.structure().fields().stream()
                 .filter(field -> !field.modifiers().contains(Modifier.STATIC))
                 .toList();
@@ -59,7 +66,7 @@ final class DomainAccess {
      * @param field the field to read
      * @return the name of the accessor, or empty when the type does not offer one unambiguously
      */
-    static Optional<String> accessorOf(ArchType type, Field field) {
+    public static Optional<String> accessorOf(ArchType type, Field field) {
         List<Method> answering = type.structure().methods().stream()
                 .filter(method -> method.parameters().isEmpty())
                 .filter(method -> !method.modifiers().contains(Modifier.STATIC))
@@ -94,7 +101,7 @@ final class DomainAccess {
      * @param type the domain type
      * @return true when such a constructor exists
      */
-    static boolean isRebuildable(ArchType type) {
+    public static boolean isRebuildable(ArchType type) {
         return type.structure().constructors().stream().anyMatch(constructor -> takesTheState(constructor, type));
     }
 

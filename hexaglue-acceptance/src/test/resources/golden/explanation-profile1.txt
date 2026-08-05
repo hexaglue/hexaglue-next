@@ -536,17 +536,16 @@ ClassificationGoldenFilesTest-createApplicationServiceExample
   5 types analysed
     1 AGGREGATE_ROOT
     1 IDENTIFIER
+    1 DRIVING_PORT
     1 DRIVEN_PORT
     1 APPLICATION_SERVICE
-    1 UNCLASSIFIED
-      1 UNKNOWN
   0 declared, 5 inferred, 0 left ambiguous
   com.example.order.application.OrderService: APPLICATION_SERVICE (HIGH, inferred)
-    [graph relation] com.example.order.application.OrderService is a APPLICATION_SERVICE because it stands on OrderRepository, through which the application reaches outside
-      involving com.example.order.ports.out.OrderRepository
+    [graph relation] com.example.order.application.OrderService is a APPLICATION_SERVICE because it stands on OrderUseCases, through which the outside reaches the application
+      involving com.example.order.ports.in.OrderUseCases
     derivation:
       [DECISION] APPLICATION_SERVICE(com.example.order.application.OrderService) [decided on 1 signal of graph relation]
-        [R6] APPLICATION_SERVICE(com.example.order.application.OrderService) [graph relation: CALLS_DRIVEN_PORT(com.example.order.ports.out.OrderRepository)]
+        [R6] APPLICATION_SERVICE(com.example.order.application.OrderService) [graph relation: ANSWERS_DRIVING_PORT(com.example.order.ports.in.OrderUseCases)]
     rules cited:
       DECISION: weighs every signal held about a type and commits to one kind
       R6: reads the type standing between the ports as the application service it is
@@ -572,11 +571,15 @@ ClassificationGoldenFilesTest-createApplicationServiceExample
       DECISION: weighs every signal held about a type and commits to one kind
       R2: reads the key a way out searches an aggregate by as the identity of that aggregate
       SHAPE: reads what the shape of a declaration says, on its own, about the kind of type it is
-  com.example.order.ports.in.OrderUseCases: UNCLASSIFIED (LOW, inferred)
-    UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
-    to make it explicit: com.example.order.ports.in.OrderUseCases is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
+  com.example.order.ports.in.OrderUseCases: DRIVING_PORT (HIGH, inferred)
+    [local structure] com.example.order.ports.in.OrderUseCases is a DRIVING_PORT because OrderService answers it and nothing inside the hexagon takes it, so whoever calls it is outside
+      involving com.example.order.application.OrderService
     derivation:
-      no signal about com.example.order.ports.in.OrderUseCases
+      [DECISION] DRIVING_PORT(com.example.order.ports.in.OrderUseCases) [decided on 1 signal of local structure]
+        [R5b] DRIVING_PORT(com.example.order.ports.in.OrderUseCases) [local structure: OFFERED_BY_THE_CORE(com.example.order.application.OrderService)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R5b: reads a contract the core fulfils and nothing inside takes as the way in it can only be
   com.example.order.ports.out.OrderRepository: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.example.order.ports.out.OrderRepository is a DRIVEN_PORT because OrderService calls it and nothing inside the hexagon implements it
       involving com.example.order.application.OrderService
@@ -2206,25 +2209,28 @@ DomainLifecycle-whatCarriesAnIdentityOfItsOwnIsAnEntity
 
 FlexibleApplicationServiceCriteriaTest-shouldMatchPivotClass
   3 types analysed
+    1 DRIVING_PORT
     1 DRIVEN_PORT
     1 APPLICATION_SERVICE
-    1 UNCLASSIFIED
-      1 UNKNOWN
   0 declared, 3 inferred, 0 left ambiguous
   com.example.application.OrderService: APPLICATION_SERVICE (HIGH, inferred)
-    [graph relation] com.example.application.OrderService is a APPLICATION_SERVICE because it stands on OrderRepository, through which the application reaches outside
-      involving com.example.ports.out.OrderRepository
+    [graph relation] com.example.application.OrderService is a APPLICATION_SERVICE because it stands on OrderUseCases, through which the outside reaches the application
+      involving com.example.ports.in.OrderUseCases
     derivation:
       [DECISION] APPLICATION_SERVICE(com.example.application.OrderService) [decided on 1 signal of graph relation]
-        [R6] APPLICATION_SERVICE(com.example.application.OrderService) [graph relation: CALLS_DRIVEN_PORT(com.example.ports.out.OrderRepository)]
+        [R6] APPLICATION_SERVICE(com.example.application.OrderService) [graph relation: ANSWERS_DRIVING_PORT(com.example.ports.in.OrderUseCases)]
     rules cited:
       DECISION: weighs every signal held about a type and commits to one kind
       R6: reads the type standing between the ports as the application service it is
-  com.example.ports.in.OrderUseCases: UNCLASSIFIED (LOW, inferred)
-    UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
-    to make it explicit: com.example.ports.in.OrderUseCases is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
+  com.example.ports.in.OrderUseCases: DRIVING_PORT (HIGH, inferred)
+    [local structure] com.example.ports.in.OrderUseCases is a DRIVING_PORT because OrderService answers it and nothing inside the hexagon takes it, so whoever calls it is outside
+      involving com.example.application.OrderService
     derivation:
-      no signal about com.example.ports.in.OrderUseCases
+      [DECISION] DRIVING_PORT(com.example.ports.in.OrderUseCases) [decided on 1 signal of local structure]
+        [R5b] DRIVING_PORT(com.example.ports.in.OrderUseCases) [local structure: OFFERED_BY_THE_CORE(com.example.application.OrderService)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R5b: reads a contract the core fulfils and nothing inside takes as the way in it can only be
   com.example.ports.out.OrderRepository: DRIVEN_PORT (HIGH, inferred)
     [graph relation] com.example.ports.out.OrderRepository is a DRIVEN_PORT because OrderService calls it and nothing inside the hexagon implements it
       involving com.example.application.OrderService
@@ -2237,35 +2243,51 @@ FlexibleApplicationServiceCriteriaTest-shouldMatchPivotClass
 
 FlexibleApplicationServiceCriteriaTest-shouldNotMatchAbstractClass
   2 types analysed
-    2 UNCLASSIFIED
-      2 UNKNOWN
+    1 DRIVING_PORT
+    1 APPLICATION_SERVICE
   0 declared, 2 inferred, 0 left ambiguous
-  com.example.application.AbstractService: UNCLASSIFIED (LOW, inferred)
-    UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
-    to make it explicit: com.example.application.AbstractService is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
+  com.example.application.AbstractService: APPLICATION_SERVICE (HIGH, inferred)
+    [graph relation] com.example.application.AbstractService is a APPLICATION_SERVICE because it stands on OrderUseCases, through which the outside reaches the application
+      involving com.example.ports.in.OrderUseCases
     derivation:
-      no signal about com.example.application.AbstractService
-  com.example.ports.in.OrderUseCases: UNCLASSIFIED (LOW, inferred)
-    UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
-    to make it explicit: com.example.ports.in.OrderUseCases is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
+      [DECISION] APPLICATION_SERVICE(com.example.application.AbstractService) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.example.application.AbstractService) [graph relation: ANSWERS_DRIVING_PORT(com.example.ports.in.OrderUseCases)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
+  com.example.ports.in.OrderUseCases: DRIVING_PORT (HIGH, inferred)
+    [local structure] com.example.ports.in.OrderUseCases is a DRIVING_PORT because AbstractService answers it and nothing inside the hexagon takes it, so whoever calls it is outside
+      involving com.example.application.AbstractService
     derivation:
-      no signal about com.example.ports.in.OrderUseCases
+      [DECISION] DRIVING_PORT(com.example.ports.in.OrderUseCases) [decided on 1 signal of local structure]
+        [R5b] DRIVING_PORT(com.example.ports.in.OrderUseCases) [local structure: OFFERED_BY_THE_CORE(com.example.application.AbstractService)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R5b: reads a contract the core fulfils and nothing inside takes as the way in it can only be
 
 FlexibleApplicationServiceCriteriaTest-shouldNotMatchInboundOnlyClass
   2 types analysed
-    2 UNCLASSIFIED
-      2 UNKNOWN
+    1 DRIVING_PORT
+    1 APPLICATION_SERVICE
   0 declared, 2 inferred, 0 left ambiguous
-  com.example.application.SimpleQueryHandler: UNCLASSIFIED (LOW, inferred)
-    UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
-    to make it explicit: com.example.application.SimpleQueryHandler is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
+  com.example.application.SimpleQueryHandler: APPLICATION_SERVICE (HIGH, inferred)
+    [graph relation] com.example.application.SimpleQueryHandler is a APPLICATION_SERVICE because it stands on QueryHandler, through which the outside reaches the application
+      involving com.example.ports.in.QueryHandler
     derivation:
-      no signal about com.example.application.SimpleQueryHandler
-  com.example.ports.in.QueryHandler: UNCLASSIFIED (LOW, inferred)
-    UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
-    to make it explicit: com.example.ports.in.QueryHandler is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
+      [DECISION] APPLICATION_SERVICE(com.example.application.SimpleQueryHandler) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.example.application.SimpleQueryHandler) [graph relation: ANSWERS_DRIVING_PORT(com.example.ports.in.QueryHandler)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
+  com.example.ports.in.QueryHandler: DRIVING_PORT (HIGH, inferred)
+    [local structure] com.example.ports.in.QueryHandler is a DRIVING_PORT because SimpleQueryHandler answers it and nothing inside the hexagon takes it, so whoever calls it is outside
+      involving com.example.application.SimpleQueryHandler
     derivation:
-      no signal about com.example.ports.in.QueryHandler
+      [DECISION] DRIVING_PORT(com.example.ports.in.QueryHandler) [decided on 1 signal of local structure]
+        [R5b] DRIVING_PORT(com.example.ports.in.QueryHandler) [local structure: OFFERED_BY_THE_CORE(com.example.application.SimpleQueryHandler)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R5b: reads a contract the core fulfils and nothing inside takes as the way in it can only be
 
 FlexibleApplicationServiceCriteriaTest-shouldNotMatchInterface
   1 types analysed
@@ -2571,21 +2593,29 @@ GoldenFileTest-createEcommerceDomain
       DECISION: weighs every signal held about a type and commits to one kind
       INTENT: takes the kind the author declared in the sources, by an intent annotation or interface
 
-PortBoundary-contractNoRingCallsStaysSilent
+PortBoundary-contractNoRingCallsIsStillAWayIn
   2 types analysed
-    2 UNCLASSIFIED
-      2 UNKNOWN
+    1 DRIVING_PORT
+    1 APPLICATION_SERVICE
   0 declared, 2 inferred, 0 left ambiguous
-  com.acme.hangar.core.Assembly: UNCLASSIFIED (LOW, inferred)
-    UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
-    to make it explicit: com.acme.hangar.core.Assembly is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
+  com.acme.hangar.core.Assembly: DRIVING_PORT (HIGH, inferred)
+    [local structure] com.acme.hangar.core.Assembly is a DRIVING_PORT because AssemblyLine answers it and nothing inside the hexagon takes it, so whoever calls it is outside
+      involving com.acme.hangar.core.AssemblyLine
     derivation:
-      no signal about com.acme.hangar.core.Assembly
-  com.acme.hangar.core.AssemblyLine: UNCLASSIFIED (LOW, inferred)
-    UNKNOWN: nothing in the perimeter uses it, so there was no context to read it in
-    to make it explicit: com.acme.hangar.core.AssemblyLine is used nowhere the analysis can see: declare its kind in the classification configuration, or give it the context that would settle it
+      [DECISION] DRIVING_PORT(com.acme.hangar.core.Assembly) [decided on 1 signal of local structure]
+        [R5b] DRIVING_PORT(com.acme.hangar.core.Assembly) [local structure: OFFERED_BY_THE_CORE(com.acme.hangar.core.AssemblyLine)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R5b: reads a contract the core fulfils and nothing inside takes as the way in it can only be
+  com.acme.hangar.core.AssemblyLine: APPLICATION_SERVICE (HIGH, inferred)
+    [graph relation] com.acme.hangar.core.AssemblyLine is a APPLICATION_SERVICE because it stands on Assembly, through which the outside reaches the application
+      involving com.acme.hangar.core.Assembly
     derivation:
-      no signal about com.acme.hangar.core.AssemblyLine
+      [DECISION] APPLICATION_SERVICE(com.acme.hangar.core.AssemblyLine) [decided on 1 signal of graph relation]
+        [R6] APPLICATION_SERVICE(com.acme.hangar.core.AssemblyLine) [graph relation: ANSWERS_DRIVING_PORT(com.acme.hangar.core.Assembly)]
+    rules cited:
+      DECISION: weighs every signal held about a type and commits to one kind
+      R6: reads the type standing between the ports as the application service it is
 
 PortBoundary-contractOnlyTheRingCallsIsNotAPort
   2 types analysed

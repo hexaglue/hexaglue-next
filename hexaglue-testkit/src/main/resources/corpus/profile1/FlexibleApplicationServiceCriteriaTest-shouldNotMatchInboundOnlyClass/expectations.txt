@@ -6,12 +6,11 @@
 #
 #   assertThat(result.matched()).isFalse()
 
-# Reviewed under the doctrine: the wiring reaches the driven side but stops before the
-# edge. A driving port is an interface the core implements AND an adapter calls; this
-# fixture has the implementation and no adapter, so the interface stays undecided. That is
-# the measured gap, not an oversight of the review.
-#
-# The implementer consumes no port either, so R6 has nothing to read on it.
+# Reviewed under the doctrine: an adapter calling the interface would be the strongest
+# reading (R5), and there is none here. The weaker one applies: the core answers the
+# interface and nothing inside holds it, so whoever calls it is outside (R5b) — and a
+# contract that only answers questions is a way in like any other. Answering it is what
+# makes the implementer the application layer (R6), with no port consumed on the far side.
 status: reviewed
-expect: com.example.application.SimpleQueryHandler = UNCLASSIFIED
-expect: com.example.ports.in.QueryHandler = UNCLASSIFIED
+expect: com.example.application.SimpleQueryHandler = APPLICATION_SERVICE
+expect: com.example.ports.in.QueryHandler = DRIVING_PORT

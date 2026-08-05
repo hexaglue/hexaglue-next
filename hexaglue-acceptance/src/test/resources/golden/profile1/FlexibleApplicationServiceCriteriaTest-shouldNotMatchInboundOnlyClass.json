@@ -1,18 +1,26 @@
 {
   "domain": [],
-  "application": [],
-  "ports": [],
-  "adapters": [],
-  "unclassified": [
+  "application": [
     {
       "qualifiedName": "com.example.application.SimpleQueryHandler",
-      "category": "UNKNOWN",
-      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
-    },
+      "kind": "APPLICATION_SERVICE",
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "nature": "CLASS"
+    }
+  ],
+  "ports": [
     {
       "qualifiedName": "com.example.ports.in.QueryHandler",
-      "category": "UNKNOWN",
-      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
+      "direction": "DRIVING",
+      "useCases": ["query: QUERY"],
+      "inputTypes": [],
+      "outputTypes": [],
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["query"]
     }
-  ]
+  ],
+  "adapters": [],
+  "unclassified": []
 }

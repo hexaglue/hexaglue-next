@@ -6,7 +6,7 @@ in the candidates behind a verdict, or in its confidence, is not visible here, a
 neither is anything outside the corpus: the examples of the previous reactor are
 frozen and not wired to this one.
 
-profile1: damage 55, gain 0, unarbitrated 0, neither 0, indifferent 0 — over 47 scenario(s) whose reading moved
+profile1: damage 53, gain 0, unarbitrated 0, neither 0, indifferent 0 — over 45 scenario(s) whose reading moved
   ClassificationConfigIntegrationTest-exclusionsAndExplicitsShouldWorkTogether
     damage  com.example.OrderId: UNCLASSIFIED -> IDENTIFIER
   ClassificationConfigIntegrationTest-generatedInterfacesShouldBeSkippedFromPortClassification
@@ -89,10 +89,6 @@ profile1: damage 55, gain 0, unarbitrated 0, neither 0, indifferent 0 — over 4
     damage  com.example.OrderService: UNCLASSIFIED -> APPLICATION_SERVICE
   DomainCriteriaTest-shouldNotMatchTypeWithoutIdField
     damage  com.example.OrderRepository: UNCLASSIFIED -> DRIVEN_PORT
-  FlexibleApplicationServiceCriteriaTest-shouldNotMatchAbstractClass
-    damage  com.example.application.AbstractService: UNCLASSIFIED -> APPLICATION_SERVICE
-  FlexibleApplicationServiceCriteriaTest-shouldNotMatchInboundOnlyClass
-    damage  com.example.application.SimpleQueryHandler: UNCLASSIFIED -> QUERY_HANDLER
   FlexibleApplicationServiceCriteriaTest-shouldNotMatchNonCoreAppClass
     damage  com.example.application.PlainService: UNCLASSIFIED -> APPLICATION_SERVICE
   PortClassifierTest-interfaceWithUseCaseSuffixShouldNotBeDriven

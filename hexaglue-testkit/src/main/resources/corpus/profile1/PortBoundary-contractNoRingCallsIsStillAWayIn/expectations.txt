@@ -1,0 +1,17 @@
+# PortBoundary-contractNoRingCallsIsStillAWayIn
+#
+# Authored for the boundary of the hexagon. The vocabulary is deliberately
+# unconventional: what makes an interface a port is who writes it and who calls
+# it, never the word its name ends with or the package it sits in.
+
+# The same core as the scenario above, with the entry point removed. No adapter calls the
+# contract, so the strongest reading (R5) is unavailable — and the weaker one answers:
+# an agreement the core keeps with itself is one the core holds, and nothing here holds
+# this one. What is left calls it from outside, whether or not that caller is written yet.
+#
+# This is the shape an inbound port takes in a perimeter reduced to the domain, which is
+# also the shape a hexagon has before its web layer exists — the case where a generator has
+# the most to offer and the ring-side reading, by construction, can see nothing.
+status: reviewed
+expect: com.acme.hangar.core.Assembly = DRIVING_PORT
+expect: com.acme.hangar.core.AssemblyLine = APPLICATION_SERVICE

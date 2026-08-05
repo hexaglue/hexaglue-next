@@ -51,6 +51,7 @@ public final class Catalogue {
                 new PortImplementation(),
                 new ConsumedContract(),
                 new ExposedContract(),
+                new OfferedContract(),
                 new PortSignatures(),
                 new PortPivot(),
                 new AdapterCollaborator(),

@@ -36,6 +36,7 @@ import io.hexaglue.model.config.ModulesConfig;
 import io.hexaglue.model.declaration.Annotation;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -118,8 +119,11 @@ class PortImplementationTest {
         @Test
         @DisplayName("about what implements an interface no rule established as a port")
         void aboutWhatImplementsAPlainInterface() {
+            // What the class becomes is decided elsewhere — a contract nothing inside holds is
+            // read as a way in, which makes its implementer the application layer. This rule
+            // reads adapters, and an interface no rule called a way out yields none.
             assertThat(verdicts(plainContract(), implementer(TypeNature.CLASS)).kindOf(IMPLEMENTER))
-                    .contains(ArchKind.UNCLASSIFIED);
+                    .isNotEqualTo(Optional.of(ArchKind.DRIVEN_ADAPTER));
         }
 
         @Test

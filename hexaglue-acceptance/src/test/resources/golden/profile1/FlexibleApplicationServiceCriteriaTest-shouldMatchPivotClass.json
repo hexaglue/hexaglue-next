@@ -11,6 +11,16 @@
   ],
   "ports": [
     {
+      "qualifiedName": "com.example.ports.in.OrderUseCases",
+      "direction": "DRIVING",
+      "useCases": ["createOrder: COMMAND"],
+      "inputTypes": [],
+      "outputTypes": [],
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["createOrder"]
+    },
+    {
       "qualifiedName": "com.example.ports.out.OrderRepository",
       "direction": "DRIVEN",
       "portType": "GATEWAY",
@@ -21,11 +31,5 @@
     }
   ],
   "adapters": [],
-  "unclassified": [
-    {
-      "qualifiedName": "com.example.ports.in.OrderUseCases",
-      "category": "UNKNOWN",
-      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
-    }
-  ]
+  "unclassified": []
 }

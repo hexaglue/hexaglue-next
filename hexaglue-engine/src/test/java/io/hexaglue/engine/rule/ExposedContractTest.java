@@ -137,7 +137,14 @@ class ExposedContractTest {
         @Test
         @DisplayName("about a contract of the core no entry point reaches for")
         void aboutAContractNoEntryPointReachesFor() {
-            assertThat(verdicts(model(contract(), core())).kindOf(CONTRACT)).contains(ArchKind.UNCLASSIFIED);
+            // The verdict is not the subject here: another rule reads that contract from the
+            // absence of a holder. What is owed is that this one, which reads a caller, stays
+            // quiet when there is no caller to read.
+            assertThat(verdicts(model(contract(), core()))
+                            .verdict(CONTRACT)
+                            .orElseThrow()
+                            .evidences())
+                    .noneMatch(evidence -> evidence.tier() == EvidenceTier.GRAPH_RELATION);
         }
 
         @Test
@@ -150,11 +157,15 @@ class ExposedContractTest {
         @Test
         @DisplayName("about a contract the entry point bypasses by holding the implementation itself")
         void aboutAContractTheEntryPointBypasses() {
-            // Reaching past the port is exactly what a port exists to prevent, and the engine
-            // states what it sees: no port was used, so no port is read. Naming the shortcut is
-            // the conformity question, answered elsewhere.
-            assertThat(verdicts(model(contract(), core(), entryPoint(CORE))).kindOf(CONTRACT))
-                    .contains(ArchKind.UNCLASSIFIED);
+            // Reaching past the port is exactly what a port exists to prevent, and this rule
+            // states what it sees: no port was used, so it reads none. That the contract is a
+            // way in all the same is another rule's reading, and naming the shortcut is the
+            // conformity question, answered elsewhere.
+            assertThat(verdicts(model(contract(), core(), entryPoint(CORE)))
+                            .verdict(CONTRACT)
+                            .orElseThrow()
+                            .evidences())
+                    .noneMatch(evidence -> evidence.tier() == EvidenceTier.GRAPH_RELATION);
         }
     }
 }

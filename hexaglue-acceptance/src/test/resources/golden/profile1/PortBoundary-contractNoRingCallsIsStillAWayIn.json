@@ -2,7 +2,7 @@
   "domain": [],
   "application": [
     {
-      "qualifiedName": "com.example.application.AbstractService",
+      "qualifiedName": "com.acme.hangar.core.AssemblyLine",
       "kind": "APPLICATION_SERVICE",
       "confidence": "HIGH",
       "basis": "INFERRED",
@@ -11,14 +11,14 @@
   ],
   "ports": [
     {
-      "qualifiedName": "com.example.ports.in.OrderUseCases",
+      "qualifiedName": "com.acme.hangar.core.Assembly",
       "direction": "DRIVING",
-      "useCases": ["createOrder: COMMAND"],
+      "useCases": ["assemble: COMMAND"],
       "inputTypes": [],
       "outputTypes": [],
       "confidence": "HIGH",
       "basis": "INFERRED",
-      "methods": ["createOrder"]
+      "methods": ["assemble"]
     }
   ],
   "adapters": [],

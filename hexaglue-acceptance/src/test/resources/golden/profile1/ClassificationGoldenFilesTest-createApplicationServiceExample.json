@@ -54,6 +54,16 @@
   ],
   "ports": [
     {
+      "qualifiedName": "com.example.order.ports.in.OrderUseCases",
+      "direction": "DRIVING",
+      "useCases": ["createOrder: COMMAND", "findOrder: QUERY"],
+      "inputTypes": ["com.example.order.domain.OrderId"],
+      "outputTypes": ["com.example.order.domain.Order"],
+      "confidence": "HIGH",
+      "basis": "INFERRED",
+      "methods": ["createOrder", "findOrder"]
+    },
+    {
       "qualifiedName": "com.example.order.ports.out.OrderRepository",
       "direction": "DRIVEN",
       "portType": "REPOSITORY",
@@ -64,11 +74,5 @@
     }
   ],
   "adapters": [],
-  "unclassified": [
-    {
-      "qualifiedName": "com.example.order.ports.in.OrderUseCases",
-      "category": "UNKNOWN",
-      "reason": "nothing in the perimeter uses it, so there was no context to read it in"
-    }
-  ]
+  "unclassified": []
 }

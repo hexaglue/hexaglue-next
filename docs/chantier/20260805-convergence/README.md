@@ -81,6 +81,13 @@ utilement.
 | [12-B-accord-portage.md](12-B-accord-portage.md) | B | accord ; duplication normalisée, `_internal/` non versionné, état manquant |
 | [13-A-avis-complements-portage.md](13-A-avis-complements-portage.md) | A | D39/D40 séparées, l'empreinte ne remplace pas un historique, `BLOQUÉE` est sur un 4e axe |
 | [14-B-reponse-complements.md](14-B-reponse-complements.md) | B | accord ; **l'étape 0 est déjà exécutée** (commit `ab52fb5`) |
+| [15-B-projet-de-portage.md](15-B-projet-de-portage.md) | B | les sept textes du portage, rédigés pour être critiqués avant écriture |
+| [16-A-relecture-projet-portage.md](16-A-relecture-projet-portage.md) | A | sept corrections demandées avant portage |
+| [17-B-questions-avant-revision.md](17-B-questions-avant-revision.md) | B | cinq corrections acceptées, quatre questions ouvertes |
+| [18-A-reponse-aux-quatre-questions.md](18-A-reponse-aux-quatre-questions.md) | A | les quatre réponses ; A révise deux de ses propres recommandations |
+| [19-B-remarques-et-choix.md](19-B-remarques-et-choix.md) | B | vérifications, remarques, et les trois choix |
+| [20-A-avis-sur-les-trois-choix.md](20-A-avis-sur-les-trois-choix.md) | A | adopter les trois, le 2e sous forme généralisée |
+| [21-B-choix-prets-a-arbitrer.md](21-B-choix-prets-a-arbitrer.md) | B | **les trois choix en forme finale, à trancher** |
 | [signaux/](signaux/) | B | harnais affichant les signaux retenus sur un type, hors du réacteur |
 | [MESURES.md](MESURES.md) | B | sortie datée de `mesures.sh`, avec le commit mesuré |
 | [mesures.sh](mesures.sh) | B | les mesures, relançables |

@@ -16,12 +16,12 @@
 
 | Élément | État |
 |---|---|
-| Révision du plan à épingler | `PLAN.md`, commit **`f2450df`** (révision 5), `sha256 127b62693b3c75bfd58029755f977d0f823c005086f92d2685b1557ce9b9a24d` |
-| Révisions antérieures, conservées comme témoins | `ab52fb5` (révision 3, adoptée) puis `9a109d3` (révision 4, trois amendements) |
+| Révision du plan à épingler | `PLAN.md`, commit **`5b4c421`** (révision 6), `sha256 944998954d73fb3650355b65cf1718ddddecc18f5a33e53777ed1bd27c87c613` |
+| Révisions antérieures, conservées comme témoins | `ab52fb5` (r3, adoptée), `9a109d3` (r4, trois amendements), `f2450df` (r5, sujets nommés d'E7) |
 | Registre | intact, D0 à D38, une seule `PENDING` : D33 |
 | Jalons | M7 encore `EN COURS`, M8 `À FAIRE` |
 | Règle 13 | encore dans sa version « corpus vert » |
-| Code | cinq commits poussés, CI et CodeQL vertes 4/4 ; quatre commits locaux non poussés (`9a109d3`, `13e8efd`, `f2450df`, et celui-ci) |
+| Code | cinq commits poussés, CI et CodeQL vertes 4/4 ; cinq commits locaux non poussés, `9a109d3` → `5b4c421` |
 
 **Tous les points d'arbitrage sont tranchés** — le dernier, la place de
 `E7-MODÈLE-1`, l'a été le 2026-08-05 : voir §8.
@@ -268,15 +268,16 @@ explicitement**.
 
 ```text
 docs/chantier/20260805-convergence/PLAN.md
-commit  f2450df                        (révision 5)
-sha256  127b62693b3c75bfd58029755f977d0f823c005086f92d2685b1557ce9b9a24d
+commit  5b4c421                        (révision 6)
+sha256  944998954d73fb3650355b65cf1718ddddecc18f5a33e53777ed1bd27c87c613
 ```
 
 La révision `ab52fb5` a été adoptée le même jour, puis amendée sur des clauses
 identifiées et sur elles seules : l'articulation des règles, l'indépendance de
 validation et l'ouverture d'E1 par `E1a` (`9a109d3`), puis l'ouverture de la
-file de sujets nommés d'E7 (`f2450df`). Les deux révisions antérieures sont
-conservées comme témoins. Une révision ultérieure ne modifie pas cette
+file de sujets nommés d'E7 (`f2450df`). La révision 6 (`5b4c421`) ne fait que
+suivre le reclassement des fichiers : **aucun changement normatif**. Les
+révisions antérieures sont conservées comme témoins. Une révision ultérieure ne modifie pas cette
 décision ; si un volet change, une décision nouvelle remplace explicitement la
 clause concernée.
 
@@ -372,7 +373,7 @@ faux, la réalisation est incomplète — c'est le constat C-8, affecté à E3a.
 > Le chantier ne reprend pas à M7b. **D40** adopte un plan de reprise couvrant la
 > séquence E0 à E8 et ses sous-étapes, qui répare l'étalon et le moteur avant que
 > la trajectoire produit continue. Le plan est
-> `docs/chantier/20260805-convergence/PLAN.md`, commit `f2450df`.
+> `docs/chantier/20260805-convergence/PLAN.md`, commit `5b4c421`.
 >
 > **Le motif, tel qu'adopté par D40** : le chantier a été conduit en pensant
 > migration d'abord, et ce qui a été transplanté sans requalification est la
@@ -435,7 +436,7 @@ vigueur jusqu'au 2026-08-05, remplacé par D40* ».
 section E7, et non dans `CHANTIER.md` où il se perdrait. La file de réévaluation
 appartient au plan.
 
-C'est le **quatrième amendement** du plan, commit `f2450df`, révision 5. Il
+C'est le **quatrième amendement** du plan, commit `f2450df`, révision 5 — la révision 6 qui suit ne fait que reclasser les fichiers. Il
 ouvre une sous-section « Sujets nommés de la file » qui pose ce qu'est un
 sujet — une question normative identifiée avant d'avoir son matériel, sans
 numéro de décision et sans autorisation — puis inscrit `E7-MODÈLE-1` avec sa
@@ -450,7 +451,7 @@ de l'instruire avant l'ouverture de la famille « modèle métier ».
 2. Appliquer la grammaire — en-tête de `DECISIONS.md`, trois rubriques de
    `CHANTIER.md`.
 3. Amender **D33**, statut `PENDING` inchangé.
-4. Écrire **D40**, épinglant `f2450df`.
+4. Écrire **D40**, épinglant `5b4c421`.
 5. Porter les **huit constats**, les **six hypothèses** et les **deux errata**
    dans `CHANTIER.md`. `E7-MODÈLE-1` est déjà écrit dans `PLAN.md` (§8).
 6. Passer **M7 `SUSPENDU`** et réécrire le point de reprise.

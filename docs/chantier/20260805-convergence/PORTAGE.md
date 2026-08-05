@@ -8,7 +8,9 @@
 > ce qui a été corrigé entre-temps est intégré : les sept corrections du tour 16,
 > les quatre réponses du tour 18, les trois amendements arbitrés au tour 21.
 >
-> **Rien n'est encore porté.** `DECISIONS.md` et `CHANTIER.md` sont intacts.
+> ✅ **PORTÉ le 2026-08-05.** Les sept gestes sont écrits dans `DECISIONS.md`
+> et `CHANTIER.md`. Ce document reste la référence de ce qui a été écrit et
+> pourquoi ; le registre fait foi.
 
 ---
 
@@ -18,9 +20,9 @@
 |---|---|
 | Révision du plan à épingler | `PLAN.md`, commit **`5b4c421`** (révision 6), `sha256 944998954d73fb3650355b65cf1718ddddecc18f5a33e53777ed1bd27c87c613` |
 | Révisions antérieures, conservées comme témoins | `ab52fb5` (r3, adoptée), `9a109d3` (r4, trois amendements), `f2450df` (r5, sujets nommés d'E7) |
-| Registre | intact, D0 à D38, une seule `PENDING` : D33 |
-| Jalons | M7 encore `EN COURS`, M8 `À FAIRE` |
-| Règle 13 | encore dans sa version « corpus vert » |
+| Registre | **D39 et D40 écrites**, D33 requalifiée et toujours `PENDING` |
+| Jalons | **M7 `SUSPENDU`**, M8 `À FAIRE` |
+| Règle 13 | **réécrite**, ancien texte conservé en citation |
 | Code | cinq commits poussés, CI et CodeQL vertes 4/4 ; cinq commits locaux non poussés, `9a109d3` → `5b4c421` |
 
 **Tous les points d'arbitrage sont tranchés** — le dernier, la place de

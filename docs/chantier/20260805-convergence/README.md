@@ -22,7 +22,7 @@ relançables.
 | Fichier | Rôle | Vivant ? |
 |---|---|---|
 | [PLAN.md](PLAN.md) | **Le plan de reprise**, E0 à E8. C'est la révision épinglée par la décision qui l'adopte. | oui — se lit avant tout lot |
-| [PORTAGE.md](PORTAGE.md) | **Ce qu'il reste à écrire** dans `DECISIONS.md` et `CHANTIER.md` : sept gestes, textes prêts. | oui — jusqu'à ce que le portage soit fait |
+| [PORTAGE.md](PORTAGE.md) | Ce qui a été écrit au registre le 2026-08-05, et pourquoi. | non — porté, gardé comme référence |
 | [MESURES.md](MESURES.md) | La sortie datée de `mesures.sh`, avec le commit mesuré. | oui — à recalculer quand le code bouge |
 | [mesures.sh](mesures.sh) | Les mesures du corpus, du moteur, de l'échelle, de l'outillage et des bancs. | oui |
 | [MESURE-D33.md](MESURE-D33.md) | Le mécanisme énoncé par D33 n'existe pas : un signal, aucune possession, aucune pesée. | oui — cité par le registre |
@@ -35,8 +35,8 @@ relançables.
 - **Vous ouvrez un lot** → [PLAN.md](PLAN.md), puis
   [CHANTIER.md](../20260731-refactoring-audit/CHANTIER.md) pour l'état et les
   règles de conduite.
-- **Vous voulez savoir ce qui reste à écrire au registre** →
-  [PORTAGE.md](PORTAGE.md), §9 pour l'ordre.
+- **Vous voulez savoir ce que le registre dit et d'où ça vient** →
+  [PORTAGE.md](PORTAGE.md), puis le registre lui-même.
 - **Vous doutez d'un chiffre** → [mesures.sh](mesures.sh), et relancez-le.
 - **Vous voulez savoir pourquoi le moteur dit ce qu'il dit d'un type** →
   [signaux/](signaux/), avec son classpath.
@@ -57,10 +57,10 @@ les trois qui reviennent le plus souvent :
 
 ## État au 2026-08-05
 
-**Le plan est adopté**, après quatre amendements arbitrés le même jour. **Le
-portage au registre n'est pas fait** : `DECISIONS.md` et `CHANTIER.md` sont
-intacts, M7 y figure encore `EN COURS`, et D33 y porte encore une explication
-que la mesure a démentie.
+**Le plan est adopté** et **le portage au registre est fait** : D39 pose le
+contrat de gouvernance, D40 adopte le plan, D33 est requalifiée en append-only et
+reste `PENDING`, M7 est `SUSPENDU`, la règle 13 est réécrite, et les constats,
+hypothèses et errata sont dans leurs trois rubriques.
 
 **Prochaine action du chantier : `E1a`** — caractériser ce que le marqueur de
 génération change, avant qu'E1 décide le traitement d'un verdict fondé sur

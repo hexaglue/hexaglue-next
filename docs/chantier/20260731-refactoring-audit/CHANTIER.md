@@ -63,11 +63,38 @@ En cas de doute : lire le code, pas la doc.
     carrière arrive avec ses tests dans le même lot.
 12. **Périmètre gelé jusqu'à M8 (D12)** : fonctionnalités actuelles + cible
     des docs 06/07 ; toute idée nouvelle va au backlog post-7.0.0.
-13. **Clôture de jalon (D12, amendée le 2026-08-04)** : corpus vert + revue
-    contre les interdits du doc 07 §10 + **relecture ligne à ligne de la
-    section du doc 07 que le jalon livrait** (un différé se consigne, jamais
-    ne s'omet — c'est ce filtre qui manquait quand `DiagnosticSink` et
-    `produces` ont été omis sans trace à M6) + journal mis à jour.
+13. **Clôture d'une étape ou d'un jalon (D12, amendée le 2026-08-04, réécrite
+    par D40 le 2026-08-05)** : la clôture se fait contre les critères de sortie
+    déclarés **avant** l'exécution.
+
+    - Une étape de **caractérisation** est clôturable lorsque ses mesures sont
+      relançables, ses résultats consignés — y compris les contre-exemples
+      rouges — et qu'aucune correction implicite n'a été introduite. **Une
+      instruction `BLOQUÉE` ne satisfait le critère que si son différé a été
+      explicitement arbitré et si le résultat absent n'est pas une précondition
+      d'une étape aval.**
+    - Une étape d'**implémentation** est clôturable lorsque le comportement
+      attendu est démontré par les tests déclarés, les régressions applicables
+      vertes, et la documentation et les diagnostics mis en cohérence.
+    - Une étape de **conformité** est clôturable lorsque ses portes approuvées
+      sont vertes.
+
+    Toute mesure précise la révision, les racines, le **classpath**, la
+    configuration, la commande et le corpus. La clôture comprend la relecture
+    des sections applicables du plan, du doc 07 **et des errata actifs** ; une
+    contradiction connue est corrigée par l'étape qui en a la charge ou fait
+    l'objet d'un différé explicite, elle n'est jamais masquée par la relecture
+    du texte historique. **Une étape ne clôt pas si un erratum de son périmètre
+    reste `OUVERT` ou `CORRIGÉ À RELIRE`**, sauf différé autorisé par décision
+    citée. **Un corpus n'est une porte que si la décision qui l'institue comme
+    oracle est citée.** Journal mis à jour.
+
+    > *Texte en vigueur jusqu'au 2026-08-05, remplacé par D40* : « Clôture de
+    > jalon (D12, amendée le 2026-08-04) : corpus vert + revue contre les
+    > interdits du doc 07 §10 + relecture ligne à ligne de la section du doc 07
+    > que le jalon livrait (un différé se consigne, jamais ne s'omet — c'est ce
+    > filtre qui manquait quand `DiagnosticSink` et `produces` ont été omis sans
+    > trace à M6) + journal mis à jour. »
 
 ## Plan et état — jalons M0-M8 (réécriture ancrée, D12)
 
@@ -87,10 +114,41 @@ En cas de doute : lire le code, pas la doc.
 | M4 | Explain : la restitution (sans hôte) | FAIT (2026-08-03) | **Le CLI est sorti du jalon (D17)** : c'est un hôte, et toutes les décisions d'hôte sont à M5. Livré : `Explanation` (verdict, raisons, arbre de dérivation) et `Outcome` (bilan agrégé d'un run) dans `hexaglue-engine`, plus le cliquet — un golden de restitution par profil et quatre invariants sur les 154 scénarios. La restitution est indépendante de l'hôte : logs du plugin Maven (M5), rapport d'audit (M6), CLI éventuel |
 | M5 | L'hôte : YAML strict, diagnostics, gates validate, maven-plugin | FAIT (2026-08-03) | **Jalon redéfini à son ouverture (D18)** : le SPI, les sinks, le DAG deux passes et l'isolation `LinkageError` sortent du jalon — aucun consommateur avant M6 — et passent en tête de M6, écrits contre leur premier plugin. Les quatre décisions d'hôte sont prises : D18 (périmètre), D19 (racine de sources déclarée seule), D20 (le frontend rend un résultat porteur), D21 (multi-module, amendée en cours de jalon). Six commits ; 951 tests, 7 cas d'intégration sur des builds réels, cliquet inchangé. Deux décisions de plus en cours de jalon : **D21 amendée** (topologie et S5 → M6, faute de substrat) et **D22** (le moteur rend ses propres diagnostics). Trois `test-param-*` non portés, écarts assumés au journal |
 | M6 | SPI + living-doc + audit (findings codés, provenance) | **FAIT (2026-08-04)** — neuf lots, vingt commits ; 1 163 tests, 10/10 en intégration, cliquet inchangé. Clôture au journal : 14 `test-param-*` arbitrés, `case-study-banking` rejoué et comparé, revue des dix interdits (trois violations trouvées et corrigées) | **Jalon cadré à son ouverture par quatre décisions** : D25 (le SPI est écrit contre living-doc, le plus petit consommateur), D24 (les règles de findings et le substrat de graphe vivent au moteur — `findingThresholds` trouve son sujet et B9 devient vrai par construction), D23 (le rapport publié fait foi : sept sections, quatre sorties de la carrière au backlog), **D16 tranchée** (option C : Q1 muet, Q2 le dit). Neuf lots ; B1, B7, B8, B9, B10 en tests de régression ; l'analyse réacteur au lot 8 (D21 amendée) |
-| M7 | jpa + rest (seuil de certitude) | **EN COURS** (ouvert 2026-08-04) | **Scindé : M7a = jpa, M7b = rest** (le premier consommateur arbitre, comme D25). Cadré par **D27** (`produces` au manifeste, le jugement le lit), **D28** (`SourceSink` + `DiagnosticSink`, seuil typé dans la `Contribution`, goal `generate`) et **D29** (l'assemblage remplit `Field`). **M7a CLOS** — huit lots au journal. **M7b ouvert le 2026-08-05**, cadré par **D34** (les corps lus en production, `UseCase.type()` véridique), **D35** (ce dont un port pilotant parle = un lien du moteur), **D36** (la lecture du domaine extraite hors de jpa) et **D37** (handler d'exceptions et câblage de beans hors périmètre) ; huit lots au journal |
+| M7 | jpa + rest (seuil de certitude) | **SUSPENDU** (2026-08-05) | `EN COURS` jusqu'au 2026-08-05, **SUSPENDU** à cette date par D40. M7a clos ; M7b lots 1-4 faits et poussés, **lots conservés, reprise interdite** avant les portes définies par D40. Le vocabulaire des statuts gagne `SUSPENDU` : `EN COURS` laissait entendre que le lot suivant pouvait s'ouvrir. |
 | M8 | Gate de parité, bascule, release 7.0.0 | À FAIRE | Levée de D5 = décision explicite |
 
-### Point de reprise (au 2026-08-05, **ARRÊT DEMANDÉ — revue des dérives avant tout autre lot**)
+### Point de reprise (au 2026-08-05, **M7 SUSPENDU — plan de reprise adopté**)
+
+> Le chantier ne reprend pas à M7b. **D40** adopte un plan de reprise couvrant la
+> séquence E0 à E8 et ses sous-étapes, qui répare l'étalon et le moteur avant que
+> la trajectoire produit continue. Le plan est
+> [`../20260805-convergence/PLAN.md`](../20260805-convergence/PLAN.md), commit
+> `5b4c421` ; son répertoire porte aussi les mesures, le harnais `signaux/` et
+> ce qu'il reste à écrire.
+>
+> **Le motif, tel qu'adopté par D40** : le chantier a été conduit en pensant
+> migration d'abord, et ce qui a été transplanté sans requalification est la
+> définition de ce qui est correct. Les mesures qui l'établissent sont au
+> contexte de D40 et dans
+> [`../20260805-convergence/MESURES.md`](../20260805-convergence/MESURES.md).
+>
+> **Prochaine action : `E1a`** — caractériser ce que le marqueur de génération
+> change, avant qu'E1 décide le traitement d'un verdict fondé sur l'absence
+> seule. **Pas le lot 5 de M7b.** Ni E5 ni E7 ne s'ouvrent avant leur tour ;
+> **aucune décision de la file de réévaluation ne se rouvre**.
+>
+> **État du code** `[MESURÉ]` : six commits poussés, `5a53135` → `e5db3a9`,
+> arbre propre ; **1 401 tests**, `make ci` vert, **12/12 en intégration**,
+> cliquet 143/143 + 6/6 + 5/5. Commandes : `make ci`, `make integration`.
+>
+> **Le registre porte une décision `PENDING` : D33**, dont l'explication a été
+> démentie par la mesure et requalifiée le 2026-08-05. Ne pas agir dessus.
+
+### Point de reprise précédent (au 2026-08-05, **ARRÊT DEMANDÉ — revue des dérives avant tout autre lot**)
+
+> **PÉRIMÉ — conservé pour trace.** Le point de reprise en vigueur est celui
+> au-dessus. La revue demandée ici a eu lieu : elle a produit le plan adopté
+> par D40.
 
 > **⚠ NE PAS ENCHAÎNER SUR LE LOT 5.** L'utilisateur a arrêté la session du
 > 2026-08-05 en énonçant que **le chantier a connu des dérives**, qu'il faut les
@@ -545,7 +603,81 @@ En cas de doute : lire le code, pas la doc.
   l'assemblage, rôles relus des liens énoncés (doctrine `Links`), jamais du
   frontend. Porté par le lot 1 de M7a ; les 154 goldens y bougent une fois.
 
-## Découvertes en cours de chantier
+## Constats et découvertes
+
+> Rubrique renommée par D39 le 2026-08-05 (« Découvertes en cours de chantier »).
+> Les entrées antérieures à cette date sont conservées **sans balise
+> rétroactive** ; elles ne peuvent pas servir de prémisse à une décision nouvelle
+> sans reprise datée portant leur provenance. Les entrées postérieures portent
+> `[MESURÉ]` ou `[LU]`.
+
+### Ajouts du 2026-08-05 — mesures de la reprise
+
+Détail, commandes et sorties complètes dans
+[`../20260805-convergence/`](../20260805-convergence/) : `MESURES.md`,
+`MESURE-D33.md`, `MESURE-PROJETS.md`.
+
+| # | Énoncé | Provenance | Étape |
+|---|---|---|---|
+| **C-1** | Sur `case-study-ecommerce`, `Email` sort `DOMAIN_EVENT` à `HIGH` avec **un seul signal** (`ANNOUNCED_BY(NotificationSender)`) et **aucun signal de possession** : aucune pesée n'a lieu | `[MESURÉ]` | E7 |
+| **C-2** | `Lifecycle.isPart` écarte tout type que `Shapes.readsAsIdentity` reconnaît, donc **toute enveloppe immuable à une valeur** est invisible à la composition, qu'elle soit une identité ou une valeur | `[LU]` | E7 |
+| **C-3** | Sur `case-study-banking`, cinq agrégats reconnus : `Address` reçoit un `OWNED_BY`, `Money` en reçoit cinq, `Email` et `Iban` **zéro** — et sortent tous deux sur un duel IDENTIFIER 100 / VALUE_OBJECT 100 | `[MESURÉ]` | E7 |
+| **C-4a** | Sans classpath, `spring-petclinic` passe de 3 agrégats à 1 et de 10 à 14 non classés ; `Owner` cesse d'être un agrégat | `[MESURÉ]` | E4a |
+| **C-4b** | `VetRepository extends Repository<…>` s'apparie par FQN direct ; `OwnerRepository extends JpaRepository<…>` exige la fermeture transitive lue en bytecode | `[LU]` | E4a |
+| **C-5** | Deux exceptions immuables de banking sortent `VALUE_OBJECT` à `HIGH` par `IMMUTABLE_SHAPE` ; le banc e-commerce excluait le paquet `exception` par configuration | `[MESURÉ]` | E4a |
+| **C-6** | `HG-FRONTEND-006` rend un compteur agrégé de récupérations du parser, sans nommer les déclarations incomplètes | `[MESURÉ]` | E4a |
+| **C-7** | La clé de déduplication d'un signal est `(sujet, kind, palier, jeton fact(), distance)` : elle contient le texte écrit à la main et **pas la `RuleId`**, ce qui **rend possible** qu'une modification de message déplace une pondération | `[LU]` | E3a |
+| **C-8** | jqwik est absent de tous les `pom.xml` du réacteur, alors que le doc 07 §7 l'annonce comme choix cible pour les propriétés du point fixe | `[MESURÉ]` | E3a |
+
+## Hypothèses à instruire
+
+> Rubrique ouverte par D39 le 2026-08-05. **Deux champs, jamais un** : l'état
+> épistémique dit ce qu'on sait de la proposition, l'état d'instruction dit si
+> son protocole est exécutable. Une fixture absente ne dit rien de la vérité
+> d'une hypothèse. Ces états **n'autorisent aucune correction du comportement
+> produit**.
+
+| # | Proposition falsifiable | Épistémique | Instruction | Protocole | Étape |
+|---|---|---|---|---|---|
+| **H-1a** | Un adapter pilotant marqué `@jakarta.annotation.Generated` rend R5 inatteignable, et R5b devient la seule voix sur les ports qu'il servait | `OUVERTE` | `À PRÉPARER` | mêmes sources en deux variantes, seul le marqueur varie ; comparer registre de passage, signaux R5/R5b, verdict et autorisation | **E1a** |
+| **H-1b** | Le cycle se referme : HexaGlue régénère l'adapter qu'il vient d'écarter | `OUVERTE` | **`BLOQUÉE`** — demande un générateur d'adapters pilotants | deux exécutions successives sur un projet dont l'adapter pilotant est généré | **E8** |
+| **H-2** | L'invisibilité des enveloppes déplace des attentes relues sur les 154 scénarios | `OUVERTE` | `À PRÉPARER` — demande une variante expérimentale du moteur | passer le corpus avec et sans l'exclusion de `readsAsIdentity`, sans toucher au comportement de référence ni aux goldens | E3a |
+| **H-3** | Adopter la clé `(ruleFamily, subject, candidateKind, ancre)` déplace le corpus **dans les deux sens** | `OUVERTE` | `À PRÉPARER` — variante expérimentale | comparer les verdicts sous les deux clés | E3a |
+| **H-4** | **Il existe deux états initiaux admissibles** — dont éventuellement `Verdicts.none()` — **qui convergent vers des verdicts finaux différents** | `OUVERTE` | `PRÊTE` | comparer les points fixes atteints depuis les seeds admissibles définis par P3a | E3a |
+| **H-5** | ~~Masquer les détenteurs de `InventoryUseCases` le rend générable~~ | **`RÉFUTÉE`** | `EXÉCUTÉE` le 2026-08-05 | exclusion de `com.acme.shop.application` : le type reste UNCLASSIFIED, l'implémenteur partageant le paquet des détenteurs | — |
+
+**H-2 et H-3 demandent une variante expérimentale du moteur.** E3a les
+enregistre comme **interventions de caractérisation** — isolées, reproductibles,
+sans modifier le comportement de référence ni les goldens. Leur sortie est une
+mesure destinée à E3b, jamais un correctif anticipé.
+
+**P0a et P0b** (propriétés du plan) ont la même instruction bloquée qu'H-1b,
+mais leur prérequis est levable : c'est l'objet d'E2b.
+
+## Errata actifs
+
+> Rubrique ouverte par D39 le 2026-08-05. Index opérationnel **consommé par la
+> règle 13** : une étape ne clôt pas si un erratum de son périmètre reste
+> `OUVERT` ou `CORRIGÉ À RELIRE`.
+>
+> Cycle : `OUVERT` → `CORRIGÉ À RELIRE` → `FERMÉ`. **L'étape affectée corrige et
+> passe à `CORRIGÉ À RELIRE` ; elle ne ferme pas.** Une session distincte vérifie
+> que le texte fautif est corrigé, que le nouveau texte correspond à la décision
+> ou à la mesure citée, et qu'aucun passage dépendant ne conserve l'ancienne
+> affirmation — puis passe à `FERMÉ` en inscrivant la révision relue.
+> `DIFFÉRÉ (Dxx)` exige une décision citée et ne vaut pas fermeture ; `RÉFUTÉ`
+> conserve la trace d'un erratum mal fondé.
+
+| ID | Cible | Défaut | Fondement | Affectation | Statut | Fermeture attendue |
+|---|---|---|---|---|---|---|
+| **ERR-001** | doc 07 §4.1, « Terminaison garantie : on n'ajoute que des faits (monotonie) » | Le solveur n'est pas monotone : `Classifier` repart d'une base vide à chaque tour et la convergence est surveillée par un plafond | `[LU]`, contexte de D40 | **E2** | `OUVERT` | sémantique réelle nommée dans le code et §4.1 corrigé |
+| **ERR-002** | doc 07 §4.1, « Preuves gratuites : chaque fait dérivé mémorise (règle, prémisses) » | La formulation laisse entendre une dérivation complète, alors que la restitution ne recolle pas les verdicts cités en prémisses | `[LU]`, `Explanation.java:46-50` | **E2** | `OUVERT` | promesse documentaire bornée et explication raccordée |
+
+**jqwik n'est pas un erratum** : le doc 07 §7 l'annonce en colonne « Choix », à
+côté de « PIT (déjà) » qui marque ce qui est en place. Le document n'est pas
+faux, la réalisation est incomplète — c'est le constat **C-8**, affecté à E3a.
+
+## Découvertes antérieures au 2026-08-05
 
 - 2026-08-01 — 17 faits nouveaux (absents de l'audit du 31/07) recensés avec
   fichier:ligne dans l'Annexe A de

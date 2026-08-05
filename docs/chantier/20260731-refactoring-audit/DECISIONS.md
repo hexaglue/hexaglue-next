@@ -9,10 +9,24 @@ Règles du registre :
 - Statuts : `PENDING` (ne pas agir), `CONFIRMÉE` (applicable), `CADUQUE`
   (remplacée — garder la trace, ne pas supprimer la ligne).
 - Chaque décision : contexte en une phrase, options, décision, date, impact.
+- **Provenance (D39)** : toute affirmation factuelle porte `[MESURÉ]`, `[LU]` ou
+  `[HYPOTHÈSE]`. `[MESURÉ]` renvoie à une commande relançable et à ses entrées —
+  révision, racines, **classpath**, configuration, corpus. Une attente normative
+  ou métier n'est dans aucune des trois : avant E4a, elle cite une décision
+  `CONFIRMÉE` ou reste explicitement une question à arbitrer.
+- **Append-only (D39)** : une entrée porteuse de preuve ou d'arbitrage ne se
+  réécrit pas ; ce qui est démenti reçoit une requalification datée, à côté.
+- **Legs (D39)** : une affirmation antérieure au 2026-08-05 peut rester non
+  balisée pour trace, mais ne peut pas servir de prémisse à une décision
+  nouvelle sans reprise datée portant sa provenance.
 
 ## Décisions en attente
 
 ### D33 — Une valeur détenue par un agrégat lue DOMAIN_EVENT parce qu'un port de notification la transporte — PENDING (2026-08-04)
+
+> ⚠ **Explication causale du contexte : `[HYPOTHÈSE — DÉMENTIE PAR MESURE le
+> 2026-08-05]`.** Le symptôme mesuré demeure ; le mécanisme qui l'expliquait est
+> conservé ci-dessous pour trace, puis requalifié en fin d'entrée.
 
 - **Contexte** : sur le premier banc réel (`_probes/ecommerce-hexagonal`),
   `Email` sort **DOMAIN_EVENT à HIGH**. `NotificationSender` (deux méthodes
@@ -29,7 +43,221 @@ Règles du registre :
 - **Ne pas agir avant arbitrage.** Sans effet sur M7 ; à trancher au plus tard
   avec le gate de parité M8.
 
+#### Requalification du 2026-08-05
+
+- `[MESURÉ]` — sur `case-study-ecommerce`, `Email` sort **`DOMAIN_EVENT` à
+  `HIGH`**. C'est le verdict à l'origine de cette décision, et il est inchangé.
+- `[MESURÉ]` — `Email` porte **un seul signal**,
+  `[S3/HIGH] ANNOUNCED_BY(NotificationSender)`, et **aucun signal de
+  possession**. Commande relançable, entrées épinglées et sortie complète :
+  `docs/chantier/20260805-convergence/MESURE-D33.md`.
+- `[MESURÉ]` — sur le même run, R3b émet **cinq signaux `OWNED_BY` sur `Money`**
+  et **aucun sur `Email`**.
+- `[LU]` — `Lifecycle.isPart` écarte tout type que `Shapes.readsAsIdentity`
+  reconnaît, et `readsAsIdentity = isImmutable && wrapsSingleValue`.
+  `record Email(String value)` n'est donc jamais une partie d'un agrégat.
+- `[LU]` — R7 émet un jeton nommant le **port**, sur des types transportés
+  `.distinct()` : les deux méthodes de `NotificationSender` produisent une seule
+  clé.
+
+**Ce que la mesure invalide** : les trois affirmations du contexte — « deux
+signaux R7 » (il y en a un), « la possession par `Customer` (R3b, un signal) »
+(il y en a zéro), et la pesée entre les deux (**il n'y en a aucune** : le verdict
+est acquis 1-0, sans adversaire).
+
+**Ce qui survit** : deux des trois questions à instruire. « R7 devrait-il se
+taire sur un type que le domaine GARDE ? » et « le rôle EVENT_PUBLISHER est-il
+trop large ? » restent posées, R7 étant désormais **le seul à parler** sur ce
+verdict. La première — « la possession devrait-elle primer la publication à
+palier égal ? » — est **sans objet** : il n'y a pas de signal de possession à
+faire primer.
+
+**Ce qui est ouvert ailleurs** : la cause réelle dépasse ce cas et ne se greffe
+pas rétroactivement au périmètre de D33. Elle est enregistrée en constats C-2 et
+C-3, en hypothèse H-2, et son arbitrage revient au sujet `E7-MODÈLE-1` de la file
+de réévaluation (`docs/chantier/20260805-convergence/PLAN.md`, §E7).
+
+**Statut inchangé : `PENDING`.** Les questions survivantes ne sont pas tranchées.
+
 ## Décisions confirmées
+
+### D40 — Adoption du plan de reprise du chantier — CONFIRMÉE (2026-08-05)
+
+- **Contexte** `[MESURÉ]` : le corpus d'acceptation, qui sert de cliquet de
+  clôture à chaque jalon, compte 143 / 6 / 5 scénarios. **122 des 143 du profil 1
+  portent encore le nom d'une méthode de test de l'ancien réacteur** ; **77 ne
+  posent qu'un type et 120 au plus deux** ; **80 n'attestent que du silence** ; et
+  sur les trois profils les attentes ne portent que `HIGH` (122) et `EXPLICIT`
+  (50), **aucune `MEDIUM` ni `LOW`** — donc la porte de génération, qui compare
+  `confidence >= HIGH`, n'a jamais été exercée comme un refus. Commande :
+  `docs/chantier/20260805-convergence/mesures.sh`, sortie datée dans `MESURES.md`.
+- **Contexte** `[LU]` : `EvidenceTier` traduit S2, S3 et S4 sur la même valeur
+  `Confidence.HIGH` ; `Classifier` repart d'une base de faits vide à chaque tour
+  et sort quand les verdicts ne bougent plus, là où le doc 07 §4.1 annonce une
+  saturation monotone ; sept fichiers de règles sur vingt-huit concluent d'une
+  absence ; jqwik, annoncé au doc 07 §7, est absent de tous les `pom.xml`.
+- **Décision** (utilisateur, 2026-08-05) : **le plan de reprise est adopté** dans
+  la révision épinglée ci-dessous, et **M7b est gelé après son lot 4**.
+
+#### Les quatre arbitrages, recopiés
+
+Ils font foi ici, indépendamment de toute évolution ultérieure du plan.
+
+1. **Ordre des étapes** : E0 gel, E1 séparer palier / confiance / autorisation —
+   **ouverte par `E1a`**, la caractérisation du marqueur de génération —, E2
+   nommer la sémantique du solveur, E2b produire les fixtures manquantes, E3a
+   caractériser, E3b décider les garanties, E4a construire l'étalon, E4b
+   calibrer, E5 périmètre des sources, E6 politiques des absences, E7 familles de
+   décisions, E8 reprise de M7b. **E5 et E6 ne sont pas regroupées** : la première
+   porte la complétude des entrées, la seconde la sémantique des règles sur une
+   entrée connue.
+2. **E5 est maintenue** : l'axe d'autorisation de E1 traite le droit d'agir, il ne
+   rend pas l'observation complète.
+3. **Les 122 scénarios transplantés sont requalifiés un par un**, quatre issues —
+   conserver et renommer, réécrire en scénario câblé, remplacer par une propriété,
+   supprimer. Les survivants perdent le nom des anciennes méthodes de test et
+   portent celui de l'invariant.
+4. **La relecture des attentes se fait en quatre temps** : passe aveugle sans
+   afficher le verdict courant, arbitrage utilisateur, révélation et score,
+   enregistrement par une session distincte. L'agent ne fabrique pas seul l'oracle
+   qu'il devra satisfaire ; le dénominateur reste exhaustif.
+
+#### Les six règles de conduite
+
+Elles gouvernent le plan de reprise ; les treize règles de `CHANTIER.md` restent
+applicables, et **toute contradiction est consignée et arbitrée explicitement**.
+
+1. Une trouvaille faite dans un lot est enregistrée, jamais tranchée ni
+   implémentée dans ce lot.
+2. Toute mesure qui étaye une décision est une commande relançable, avec ses
+   entrées et son résultat attendu.
+3. Une décision de portée générale présente un cas nominal, un contre-exemple et
+   son effet sur plusieurs projets.
+4. « Débloque le lot » est un impact de calendrier, jamais un argument de
+   justesse.
+5. **Indépendance de validation.** Une même session ne peut pas à la fois
+   proposer ou implémenter une modification d'un artefact qui détermine ce qui est
+   correct, puis **valider seule** cette modification. Pour le déplacement d'un
+   cliquet et l'enregistrement d'une attente d'oracle, la session de validation
+   est distincte de celle qui a produit la modification, l'arbitrage de
+   l'utilisateur ne s'y substituant pas ; pour la fermeture d'un erratum,
+   l'arbitrage de l'utilisateur suffit.
+6. **Caractériser n'est pas garantir** : mesurer une propriété et exiger qu'elle
+   soit vraie sont deux gestes séparés, dans deux sessions séparées.
+
+#### Révision adoptée
+
+```text
+docs/chantier/20260805-convergence/PLAN.md
+commit  5b4c421                        (révision 6)
+sha256  944998954d73fb3650355b65cf1718ddddecc18f5a33e53777ed1bd27c87c613
+```
+
+La révision `ab52fb5` a été adoptée le même jour, puis amendée sur des clauses
+identifiées et sur elles seules : l'articulation des règles, l'indépendance de
+validation et l'ouverture d'E1 par `E1a` (`9a109d3`), puis l'ouverture de la file
+de sujets nommés d'E7 (`f2450df`). La révision 6 (`5b4c421`) ne fait que suivre le
+reclassement des fichiers : **aucun changement normatif**. Les révisions
+antérieures sont conservées comme témoins. Une révision ultérieure ne modifie pas
+cette décision ; si un volet change, une décision nouvelle remplace explicitement
+la clause concernée.
+
+**Régime d'installation** : les quatre amendements du plan ont été arbitrés
+**avant** l'entrée en vigueur de la règle 5 révisée. Ce n'est ni une exception ni
+une auto-validation — c'est la borne du régime sous lequel la règle a été
+installée.
+
+- **Impact** : M7 passe `SUSPENDU` ; la règle 13 est réécrite ; les constats,
+  hypothèses et errata sont portés aux trois rubriques nouvelles de CHANTIER.md ;
+  **rien n'est corrigé dans le code par cette décision**.
+
+### D39 — Contrat de gouvernance du registre : nature, statut et provenance sont trois axes — CONFIRMÉE (2026-08-05)
+
+> Rédigée sous l'ancien format : elle décide du nouveau contrat, elle ne peut pas
+> déjà l'appliquer.
+
+- **Contexte** : D33 a porté pendant un jour une explication de mécanisme que
+  personne n'avait exécutée, et cette explication a servi de base à un arbitrage
+  demandé à l'utilisateur ; la mesure l'a démentie sur ses trois affirmations. Le
+  même glissement s'est reproduit trois fois de plus dans la même semaine : une
+  prédiction est devenue un « contre-exemple acquis » avant d'être réfutée par
+  exécution, une hypothèse a été inscrite dans une colonne « Trouvaille » du
+  document même qui diagnostiquait ce défaut, et une affectation d'étape a été
+  changée sans arbitrage. Le registre ne distingue que trois statuts d'arbitrage ;
+  rien n'y dit **d'où une affirmation tient sa force**.
+- **Options** : **A** ajouter un statut de décision décrivant la maturité des
+  preuves ; **B** poser trois axes indépendants ; **C** s'en remettre à la
+  vigilance des rédacteurs.
+- **Décision** (utilisateur) : **B**. Un statut d'arbitrage ne peut pas porter une
+  propriété qui n'est pas de l'ordre de l'arbitrage ; et la vigilance est
+  précisément ce qui a échoué quatre fois.
+
+#### Ce que le contrat pose
+
+**1. Trois axes.**
+
+| Axe | Valeurs | Ce qu'il gouverne |
+|---|---|---|
+| Nature | décision, constat, hypothèse, erratum, plan | où l'énoncé doit vivre |
+| Statut d'arbitrage | `PENDING`, `CONFIRMÉE`, `CADUQUE` | l'autorisation d'agir |
+| Provenance | `[MESURÉ]`, `[LU]`, `[HYPOTHÈSE]` | la force de l'affirmation |
+
+**2. Sémantique stricte des balises.** `[MESURÉ]` désigne ce qu'une exécution a
+observé, et renvoie à une commande relançable avec ses entrées épinglées :
+révision, racines, **classpath**, configuration, corpus. Le classpath appartient à
+l'identité d'une mesure : sans lui, le moteur rend d'autres verdicts. `[LU]`
+désigne ce qui est visible dans une révision précise du code, et ne vaut jamais
+seul comme preuve d'un comportement exécuté. `[HYPOTHÈSE]` couvre toute
+extrapolation causale non exécutée. **Chaque proposition atomique porte sa propre
+balise.**
+
+**3. Les attentes normatives et métier ne sont dans aucune des trois.** Une
+attente du type « ce type ne devrait pas être un `DOMAIN_EVENT` » n'est ni
+mesurée, ni lue, ni hypothétique. **Règle transitoire** : avant la mise en place
+de l'oracle en E4a, une telle attente cite une décision `CONFIRMÉE` ou reste
+explicitement une question à arbitrer ; **elle ne peut pas être présentée comme un
+fait acquis**. E4a définira la provenance et la représentation des attentes
+arbitrées avec leurs premiers consommateurs réels — pas avant, pour ne pas figer
+une forme sans usage.
+
+**4. Append-only, borné.** La règle vise les **entrées porteuses de preuve ou
+d'arbitrage** : décisions, constats, hypothèses, errata, points de reprise. Un
+énoncé daté de cette nature ne se réécrit pas ; ce qui est démenti reçoit une
+requalification datée, à côté. Les **vues d'état courant** — le tableau des
+jalons, un compteur — peuvent évoluer, à condition de conserver la transition
+datée et l'ancienne valeur dans l'historique.
+
+**5. Le legs antérieur à D39 n'est pas une voie de contournement.** Une
+affirmation antérieure peut rester non balisée pour trace ; **elle ne peut pas
+servir de prémisse à une nouvelle décision** tant qu'elle n'a pas été reprise dans
+un amendement daté portant sa provenance.
+
+**6. Trois rubriques à `CHANTIER.md`.** « Constats et découvertes » (`[MESURÉ]` ou
+`[LU]`, avec preuve, portée et étape), « Hypothèses à instruire », et « Errata
+actifs » — index opérationnel consommé par la règle 13, qui relie un défaut
+documentaire à sa preuve, son étape correctrice et sa vérification.
+
+**7. Une hypothèse porte deux champs, jamais un.**
+
+| Champ | Valeurs |
+|---|---|
+| État épistémique | `OUVERTE`, `ÉTAYÉE`, `RÉFUTÉE`, `REMPLACÉE` |
+| État d'instruction | `À PRÉPARER`, `PRÊTE`, `EN COURS`, `EXÉCUTÉE`, `BLOQUÉE` |
+
+Un blocage nomme son prérequis et l'étape chargée de le lever. Une fixture absente
+ne dit rien de la vérité d'une hypothèse : elle dit que son protocole n'est pas
+exécutable. Ces états **n'autorisent aucune correction du comportement produit** —
+ils autorisent le travail de mesure prévu par le plan. Une hypothèse réfutée est
+**conservée avec son résultat**.
+
+**8. Le registre est versionné.** Les documents du chantier vivent sous
+`hexaglue-next/docs/chantier/`. Une décision peut donc citer un commit, et une
+réécriture après coup se voit en diff.
+
+- **Impact** : l'en-tête de ce registre gagne les axes et la règle append-only ;
+  `CHANTIER.md` gagne trois rubriques ; le contrat s'applique **à partir de
+  l'entrée suivante**. Une évolution future de cette grammaire remplacera D39 sans
+  rendre caduque aucune décision prise sous elle.
 
 ### D38 — Un port pilotant se lit aussi par l'intérieur : answered par le cœur, détenu par personne — CONFIRMÉE (2026-08-05)
 

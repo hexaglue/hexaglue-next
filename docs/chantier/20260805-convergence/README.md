@@ -79,6 +79,8 @@ utilement.
 | [10-B-extrait-registre.md](10-B-extrait-registre.md) | B | la structure réelle du registre et du chantier, verbatim — matière de Q5 à Q9 |
 | [11-A-avis-portage-registre.md](11-A-avis-portage-registre.md) | A | avis sur les cinq questions ; grammaire à trois axes |
 | [12-B-accord-portage.md](12-B-accord-portage.md) | B | accord ; duplication normalisée, `_internal/` non versionné, état manquant |
+| [13-A-avis-complements-portage.md](13-A-avis-complements-portage.md) | A | D39/D40 séparées, l'empreinte ne remplace pas un historique, `BLOQUÉE` est sur un 4e axe |
+| [14-B-reponse-complements.md](14-B-reponse-complements.md) | B | accord ; **l'étape 0 est déjà exécutée** (commit `ab52fb5`) |
 | [signaux/](signaux/) | B | harnais affichant les signaux retenus sur un type, hors du réacteur |
 | [MESURES.md](MESURES.md) | B | sortie datée de `mesures.sh`, avec le commit mesuré |
 | [mesures.sh](mesures.sh) | B | les mesures, relançables |

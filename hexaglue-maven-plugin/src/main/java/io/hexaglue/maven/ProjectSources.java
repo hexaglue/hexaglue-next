@@ -14,6 +14,7 @@
 package io.hexaglue.maven;
 
 import io.hexaglue.frontend.FrontendRequest;
+import io.hexaglue.model.code.CodeModelCapability;
 import io.hexaglue.model.config.AnalysisScope;
 import java.io.File;
 import java.nio.file.Files;
@@ -40,6 +41,12 @@ import org.apache.maven.project.MavenProject;
  * one an annotation processor emitted, one a dependency ships — is still knowable by its bytecode.
  * Dependency artifacts are passed as resolved: an entry the build cannot produce is the frontend's
  * to refuse loudly, not this class's to drop quietly.</p>
+ *
+ * <p>What the method bodies do is read as well. Two things a build has to know are written nowhere
+ * else: whether a use case only answers a question or changes the hexagon on the way, and which of
+ * two collaborators a class actually reaches. Both are stated in the bodies and in no declaration,
+ * so a reading that skipped them would leave the analysis to guess from names what the sources say
+ * outright.</p>
  */
 final class ProjectSources {
 
@@ -63,6 +70,7 @@ final class ProjectSources {
         FrontendRequest.Builder request = FrontendRequest.builder()
                 .sourceRoot(sourceRoot(project))
                 .scope(scope)
+                .capability(CodeModelCapability.METHOD_BODIES)
                 .javaVersion(languageLevel(project));
         compiledClasses(project).ifPresent(request::classpathEntry);
         for (Artifact artifact : project.getArtifacts()) {
@@ -89,7 +97,8 @@ final class ProjectSources {
     static FrontendRequest reactorRequest(List<MavenProject> modules, AnalysisScope scope) {
         Objects.requireNonNull(modules, "modules must not be null");
         Objects.requireNonNull(scope, "scope must not be null");
-        FrontendRequest.Builder request = FrontendRequest.builder().scope(scope);
+        FrontendRequest.Builder request =
+                FrontendRequest.builder().scope(scope).capability(CodeModelCapability.METHOD_BODIES);
         int level = FrontendRequest.DEFAULT_JAVA_VERSION;
         for (MavenProject module : modules) {
             Path sourceRoot = sourceRoot(module);

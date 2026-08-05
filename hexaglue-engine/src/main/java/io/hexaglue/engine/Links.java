@@ -100,6 +100,17 @@ final class Links {
                         .map(Parameter::type)));
     }
 
+    /**
+     * Returns the declarations of the perimeter answering the given contract. The inverse reading of
+     * {@link #answeredBy(TypeNode)}, and the only way to reach the code behind a way in: a port
+     * states what can be asked of it and nothing of what answering it involves.
+     */
+    Stream<TypeNode> answering(TypeId contract) {
+        return perimeter.types().stream()
+                .filter(type -> !type.id().equals(contract))
+                .filter(type -> answeredBy(type).anyMatch(contract::equals));
+    }
+
     /** Returns the contracts a declaration answers, named outright or inherited along the way. */
     Stream<TypeId> answeredBy(TypeNode type) {
         return Stream.concat(

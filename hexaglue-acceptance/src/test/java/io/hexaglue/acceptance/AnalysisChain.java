@@ -20,6 +20,7 @@ import io.hexaglue.frontend.SpoonFrontend;
 import io.hexaglue.knowledge.KnowledgePacks;
 import io.hexaglue.model.arch.ArchModel;
 import io.hexaglue.model.code.CodeModel;
+import io.hexaglue.model.code.CodeModelCapability;
 import io.hexaglue.model.config.AnalysisScope;
 import io.hexaglue.model.config.ClassificationConfig;
 import io.hexaglue.model.config.GenerationConfig;
@@ -69,9 +70,12 @@ public final class AnalysisChain implements AnalysisRunner {
      */
     static ArchModel modelOf(Path sources, String basePackage, ClassificationConfig classification) {
         AnalysisScope scope = new AnalysisScope(Optional.of(basePackage), List.of(), List.of());
+        // The same capabilities a build asks for: a corpus read differently from the thing it
+        // stands in for measures a chain nobody runs.
         CodeModel code = SpoonFrontend.analyze(FrontendRequest.builder()
                         .sourceRoot(sources)
                         .scope(scope)
+                        .capability(CodeModelCapability.METHOD_BODIES)
                         .build())
                 .code();
         HexaGlueConfig config = new HexaGlueConfig(

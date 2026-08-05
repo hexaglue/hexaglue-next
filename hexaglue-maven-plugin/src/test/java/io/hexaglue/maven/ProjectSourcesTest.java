@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import io.hexaglue.frontend.FrontendRequest;
+import io.hexaglue.model.code.CodeModelCapability;
 import io.hexaglue.model.config.AnalysisScope;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -127,6 +128,14 @@ class ProjectSourcesTest {
         assertThat(requestOf(project()).javaVersion()).isEqualTo(FrontendRequest.DEFAULT_JAVA_VERSION);
     }
 
+    @Test
+    @DisplayName("reads what the method bodies do, which is where a change nobody declared is written")
+    void readsWhatTheMethodBodiesDo() {
+        directory("src/main/java");
+
+        assertThat(requestOf(project()).capabilities()).contains(CodeModelCapability.METHOD_BODIES);
+    }
+
     @Nested
     @DisplayName("a whole reactor")
     class AWholeReactor {
@@ -182,6 +191,15 @@ class ProjectSourcesTest {
             infra.getProperties().setProperty("maven.compiler.release", "21");
 
             assertThat(requestOf(domain, infra).javaVersion()).isEqualTo(21);
+        }
+
+        @Test
+        @DisplayName("reads what the method bodies do, as one project does")
+        void readsWhatTheMethodBodiesDo() {
+            directory("shop-domain/src/main/java");
+
+            assertThat(requestOf(module("shop-domain", "jar")).capabilities())
+                    .contains(CodeModelCapability.METHOD_BODIES);
         }
 
         @Test

@@ -103,7 +103,7 @@
     {
       "qualifiedName": "com.acme.armada.yard.Boarding",
       "direction": "DRIVING",
-      "useCases": ["assemble: QUERY", "at: QUERY"],
+      "useCases": ["assemble: COMMAND", "at: QUERY"],
       "inputTypes": ["com.acme.armada.yard.Hull", "com.acme.armada.yard.FleetTag"],
       "outputTypes": ["com.acme.armada.yard.Fleet"],
       "confidence": "HIGH",

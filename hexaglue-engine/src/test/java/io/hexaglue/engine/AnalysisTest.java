@@ -46,6 +46,10 @@ import io.hexaglue.model.classification.RemediationAction;
 import io.hexaglue.model.classification.RemediationHint;
 import io.hexaglue.model.classification.RuleId;
 import io.hexaglue.model.code.CodeModel;
+import io.hexaglue.model.code.CodeModelCapability;
+import io.hexaglue.model.code.MethodBodyFacts;
+import io.hexaglue.model.code.MethodBodyFacts.Instantiation;
+import io.hexaglue.model.code.MethodBodyFacts.Invocation;
 import io.hexaglue.model.code.TypeNode;
 import io.hexaglue.model.config.HexaGlueConfig;
 import io.hexaglue.model.declaration.Annotation;
@@ -80,6 +84,9 @@ class AnalysisTest {
     private static final TypeId DISPATCH = TypeId.of("com.acme.hangar.core.Dispatch");
     private static final TypeId FERRYING = TypeId.of("com.acme.hangar.core.Ferrying");
     private static final TypeId CHARTERING = TypeId.of("com.acme.hangar.core.Chartering");
+    private static final TypeId MOORING = TypeId.of("com.acme.hangar.core.Mooring");
+    private static final TypeId DESK = TypeId.of("com.acme.hangar.core.MooringDesk");
+    private static final TypeId GATE = TypeId.of("com.acme.hangar.web.HangarGate");
     private static final TypeId LEDGER = TypeId.of("com.acme.hangar.store.Ledger");
     private static final TypeId DOOR = TypeId.of("com.acme.hangar.web.HangarDoor");
     private static final TypeId RECORDING = TypeId.of("com.acme.hangar.store.Recording");
@@ -121,6 +128,10 @@ class AnalysisTest {
      * nothing declares — every verdict here is reached from a relation.
      */
     private static CodeModel hexagon() {
+        return hangar().build();
+    }
+
+    private static CodeModel.Builder hangar() {
         return CodeModel.builder()
                 // The identity comes last on purpose: what carries it is read from the tie, never
                 // from the position of a field among its neighbours.
@@ -194,7 +205,44 @@ class AnalysisTest {
                 .supertypes(HULL_TAG, List.of(JMOLECULES_IDENTIFIER))
                 .supertypes(DECK_TAG, List.of(JMOLECULES_IDENTIFIER))
                 .supertypes(DISPATCH, List.of(BERTHING))
-                .supertypes(LEDGER, List.of(BOOKS, RECORDING))
+                .supertypes(LEDGER, List.of(BOOKS, RECORDING));
+    }
+
+    /**
+     * The same hangar with a second way in, whose four ways of asking about a fleet by its tag are
+     * written to be indistinguishable from one another by shape alone: each takes the tag, each
+     * answers with the fleet. What tells them apart is only in the bodies of the desk answering
+     * them, and the bodies are read here.
+     */
+    private static CodeModel hangarThatChanges() {
+        return hangar().capability(CodeModelCapability.METHOD_BODIES)
+                .addType(TypeNode.builder(MOORING, TypeNature.INTERFACE)
+                        .methods(List.of(
+                                takes("look", ref(FLEET), FLEET_TAG),
+                                takes("moor", ref(FLEET), FLEET_TAG),
+                                takes("stow", ref(FLEET), FLEET_TAG),
+                                takes("draft", ref(FLEET), FLEET_TAG)))
+                        .build())
+                .addType(TypeNode.builder(DESK, TypeNature.CLASS)
+                        .interfaces(List.of(ref(MOORING)))
+                        .fields(List.of(keeps("books", BOOKS)))
+                        .build())
+                .addType(TypeNode.builder(GATE, TypeNature.CLASS)
+                        .annotations(List.of(Annotation.of(REST_CONTROLLER)))
+                        .fields(List.of(keeps("mooring", MOORING)))
+                        .build())
+                .supertypes(DESK, List.of(MOORING))
+                // Asks the way out for a fleet, and hands it nothing back.
+                .addBodyFacts(new MethodBodyFacts(DESK, "look", List.of(new Invocation(BOOKS, "find")), List.of()))
+                // Asks, then hands the fleet over: the hangar is not what it was.
+                .addBodyFacts(new MethodBodyFacts(
+                        DESK, "moor", List.of(new Invocation(BOOKS, "find"), new Invocation(BOOKS, "keep")), List.of()))
+                // Hands the fleet over too, but through a hand of its own.
+                .addBodyFacts(new MethodBodyFacts(DESK, "stow", List.of(new Invocation(DESK, "put")), List.of()))
+                .addBodyFacts(new MethodBodyFacts(DESK, "put", List.of(new Invocation(BOOKS, "keep")), List.of()))
+                // Builds a fleet of its own and keeps it: making one is not changing the hangar.
+                .addBodyFacts(new MethodBodyFacts(
+                        DESK, "draft", List.of(new Invocation(BOOKS, "find")), List.of(new Instantiation(FLEET))))
                 .build();
     }
 
@@ -622,6 +670,20 @@ class AnalysisTest {
                     .extracting(useCase -> useCase.method().name(), UseCase::type)
                     .containsExactly(
                             tuple("berth", UseCase.UseCaseType.COMMAND), tuple("sail", UseCase.UseCaseType.QUERY));
+        }
+
+        @Test
+        @DisplayName("telling a way in that changes something from one that only asks, by the bodies")
+        void tellingAWayInThatChangesSomething() {
+            DrivingPort mooring = read(modelOf(hangarThatChanges()), MOORING, DrivingPort.class);
+
+            assertThat(mooring.useCases())
+                    .extracting(useCase -> useCase.method().name(), UseCase::type)
+                    .containsExactly(
+                            tuple("look", UseCase.UseCaseType.QUERY),
+                            tuple("moor", UseCase.UseCaseType.COMMAND),
+                            tuple("stow", UseCase.UseCaseType.COMMAND),
+                            tuple("draft", UseCase.UseCaseType.QUERY));
         }
 
         @Test

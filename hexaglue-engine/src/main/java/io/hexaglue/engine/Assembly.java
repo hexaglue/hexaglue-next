@@ -44,12 +44,14 @@ final class Assembly {
     private final Structures structures;
     private final Fields fields;
     private final DomainAssembly domain;
+    private final Effects effects;
 
     private Assembly(EngineContext context, FactBase facts, Verdicts verdicts) {
         this.links = new Links(context, facts, verdicts);
         this.structures = Structures.of(context.code());
         this.fields = new Fields(links);
         this.domain = new DomainAssembly(links);
+        this.effects = new Effects(links);
     }
 
     /**
@@ -105,7 +107,7 @@ final class Assembly {
                 type.id(),
                 structure,
                 verdict,
-                type.methods().stream().map(Assembly::useCase).toList(),
+                type.methods().stream().map(method -> useCase(type, method)).toList(),
                 Links.references(links.namedInPerimeter(type.methods().stream()
                         .flatMap(method -> method.parameters().stream())
                         .map(Parameter::type))),
@@ -113,15 +115,12 @@ final class Assembly {
     }
 
     /**
-     * A method answering with nothing has done something; a method answering with something was
-     * asked. Telling the two apart takes no more than the return type, and a method that both
-     * changes and answers cannot be told from one that only answers without reading its body.
+     * A method answering with nothing has done something, and the declaration says so on its own.
+     * One that answers with something may still have changed the hexagon on the way, and that the
+     * declaration never says — see {@link Effects} for where it is read instead.
      */
-    private static UseCase useCase(Method method) {
-        UseCase.UseCaseType type = "void".equals(method.returnType().qualifiedName())
-                ? UseCase.UseCaseType.COMMAND
-                : UseCase.UseCaseType.QUERY;
-        return new UseCase(method, method.documentation(), type);
+    private UseCase useCase(TypeNode port, Method method) {
+        return new UseCase(method, method.documentation(), effects.of(port, method));
     }
 
     /**

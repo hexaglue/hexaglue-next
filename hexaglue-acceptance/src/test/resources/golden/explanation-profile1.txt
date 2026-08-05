@@ -230,10 +230,13 @@ ApplicationLayer-theTypeBetweenTwoPortsIsTheApplication
     1 DRIVING_ADAPTER
   0 declared, 4 inferred, 0 left ambiguous
   com.acme.hangar.core.Boarding: DRIVING_PORT (HIGH, inferred)
+    [graph relation] com.acme.hangar.core.Boarding is a DRIVING_PORT because a method of HangarDoor calls it, which the bodies show directly
+      involving com.acme.hangar.web.HangarDoor, com.acme.hangar.core.Checkout
     [graph relation] com.acme.hangar.core.Boarding is a DRIVING_PORT because HangarDoor reaches the application through it and Checkout answers it
       involving com.acme.hangar.web.HangarDoor, com.acme.hangar.core.Checkout
     derivation:
-      [DECISION] DRIVING_PORT(com.acme.hangar.core.Boarding) [decided on 1 signal of graph relation]
+      [DECISION] DRIVING_PORT(com.acme.hangar.core.Boarding) [decided on 2 signals of graph relation]
+        [R5] DRIVING_PORT(com.acme.hangar.core.Boarding) [graph relation: CALLED_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor)]
         [R5] DRIVING_PORT(com.acme.hangar.core.Boarding) [graph relation: HELD_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor)]
     rules cited:
       DECISION: weighs every signal held about a type and commits to one kind
@@ -1943,10 +1946,13 @@ DomainLifecycle-theSubjectAWayOutKeepsIsTheAggregate
     1 DRIVING_ADAPTER
   0 declared, 6 inferred, 0 left ambiguous
   com.acme.hangar.core.Boarding: DRIVING_PORT (HIGH, inferred)
+    [graph relation] com.acme.hangar.core.Boarding is a DRIVING_PORT because a method of HangarDoor calls it, which the bodies show directly
+      involving com.acme.hangar.web.HangarDoor, com.acme.hangar.core.Checkout
     [graph relation] com.acme.hangar.core.Boarding is a DRIVING_PORT because HangarDoor reaches the application through it and Checkout answers it
       involving com.acme.hangar.web.HangarDoor, com.acme.hangar.core.Checkout
     derivation:
-      [DECISION] DRIVING_PORT(com.acme.hangar.core.Boarding) [decided on 1 signal of graph relation]
+      [DECISION] DRIVING_PORT(com.acme.hangar.core.Boarding) [decided on 2 signals of graph relation]
+        [R5] DRIVING_PORT(com.acme.hangar.core.Boarding) [graph relation: CALLED_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor)]
         [R5] DRIVING_PORT(com.acme.hangar.core.Boarding) [graph relation: HELD_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor)]
     rules cited:
       DECISION: weighs every signal held about a type and commits to one kind
@@ -2665,10 +2671,13 @@ PortBoundary-contractTheRingCallsAndTheCoreWritesIsADrivingPort
     1 DRIVING_ADAPTER
   0 declared, 3 inferred, 0 left ambiguous
   com.acme.hangar.core.Assembly: DRIVING_PORT (HIGH, inferred)
+    [graph relation] com.acme.hangar.core.Assembly is a DRIVING_PORT because a method of HangarDoor calls it, which the bodies show directly
+      involving com.acme.hangar.web.HangarDoor, com.acme.hangar.core.AssemblyLine
     [graph relation] com.acme.hangar.core.Assembly is a DRIVING_PORT because HangarDoor reaches the application through it and AssemblyLine answers it
       involving com.acme.hangar.web.HangarDoor, com.acme.hangar.core.AssemblyLine
     derivation:
-      [DECISION] DRIVING_PORT(com.acme.hangar.core.Assembly) [decided on 1 signal of graph relation]
+      [DECISION] DRIVING_PORT(com.acme.hangar.core.Assembly) [decided on 2 signals of graph relation]
+        [R5] DRIVING_PORT(com.acme.hangar.core.Assembly) [graph relation: CALLED_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor)]
         [R5] DRIVING_PORT(com.acme.hangar.core.Assembly) [graph relation: HELD_BY_DRIVING_ADAPTER(com.acme.hangar.web.HangarDoor)]
     rules cited:
       DECISION: weighs every signal held about a type and commits to one kind

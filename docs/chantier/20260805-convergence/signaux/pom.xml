@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Harnais de mesure des signaux retenus par le moteur sur un type donné.
+
+  Hors du réacteur : il ne modifie rien de hexaglue-next/, il consomme les
+  artefacts installés. Sa raison d'être est la règle 2 du plan — la mesure qui
+  étaye une décision doit être une commande relançable.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.hexaglue.probe</groupId>
+    <artifactId>signaux</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <hexaglue.version>7.0.0-SNAPSHOT</hexaglue.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-engine</artifactId>
+            <version>${hexaglue.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-frontend</artifactId>
+            <version>${hexaglue.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.hexaglue</groupId>
+            <artifactId>hexaglue-knowledge</artifactId>
+            <version>${hexaglue.version}</version>
+        </dependency>
+    </dependencies>
+</project>

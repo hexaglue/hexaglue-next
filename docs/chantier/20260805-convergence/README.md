@@ -1,117 +1,77 @@
-# Convergence — reprise du chantier de refactoring
+# Reprise du chantier — plan, mesures et outillage
 
-Ouvert le 2026-08-05, après l'arrêt du chantier demandé par l'utilisateur au
-milieu de M7b (voir le point de reprise en tête de
-[CHANTIER.md](../20260731-refactoring-audit/CHANTIER.md)).
+Ouvert le 2026-08-05, après l'arrêt du chantier au milieu de M7b. Ce répertoire
+portait d'abord un échange entre deux analyses ; il porte désormais **le plan de
+reprise et ce qui sert à l'exécuter**.
 
-Ce répertoire est l'espace d'échange entre deux analyses qui ne se recouvrent
-pas, et dont il faut tirer **un** plan. Il ne contient aucun code, ne pilote
-aucun lot, et rien de ce qui s'y écrit ne s'implémente : la sortie est une
-proposition, l'arbitrage reste à l'utilisateur.
+## Pourquoi le chantier s'est arrêté
 
-## Le sujet
+Il a été conduit en pensant **migration d'abord**. L'architecture cible est
+saine ; ce qui a été transplanté sans être requalifié, c'est **la définition de
+ce qui est correct** — le corpus d'acceptation, hérité des tests unitaires de
+l'ancien réacteur, devenu le cliquet de clôture de chaque jalon. Trois dettes se
+sont installées derrière ce mauvais étalon : une échelle de confiance écrasée,
+une sémantique de solveur jamais énoncée, et des conclusions tirées d'absences
+qui autorisent la génération.
 
-Le chantier a été conduit en pensant migration d'abord, réécriture ensuite. La
-conception cible est saine sur le papier ; ce qui a été transplanté sans être
-requalifié, c'est **la définition de ce qui est correct** — le corpus
-d'acceptation, hérité des tests unitaires de l'ancien réacteur, devenu le
-cliquet de clôture de chaque jalon. Trois dettes techniques se sont installées
-derrière ce mauvais étalon. Le détail est dans
-[00-etat-du-desaccord.md](00-etat-du-desaccord.md).
+Les chiffres qui l'établissent sont dans [MESURES.md](MESURES.md), tous
+relançables.
 
-## Participants
+## Ce que contient ce répertoire
 
-| Sigle | Qui | Ce qu'il peut faire | Ce qu'il doit donc |
-|---|---|---|---|
-| **A** | analyse sur documents | lit CHANTIER.md, DECISIONS.md, les docs 01-10 | énoncer des affirmations **falsifiables** et signaler ce qu'il n'a pas pu vérifier |
-| **B** | agent avec accès au dépôt | lit le code, exécute, mesure | fournir pour chaque fait une **référence `fichier:ligne` ou une commande** |
+| Fichier | Rôle | Vivant ? |
+|---|---|---|
+| [PLAN.md](PLAN.md) | **Le plan de reprise**, E0 à E8. C'est la révision épinglée par la décision qui l'adopte. | oui — se lit avant tout lot |
+| [PORTAGE.md](PORTAGE.md) | **Ce qu'il reste à écrire** dans `DECISIONS.md` et `CHANTIER.md` : sept gestes, textes prêts. | oui — jusqu'à ce que le portage soit fait |
+| [MESURES.md](MESURES.md) | La sortie datée de `mesures.sh`, avec le commit mesuré. | oui — à recalculer quand le code bouge |
+| [mesures.sh](mesures.sh) | Les mesures du corpus, du moteur, de l'échelle, de l'outillage et des bancs. | oui |
+| [MESURE-D33.md](MESURE-D33.md) | Le mécanisme énoncé par D33 n'existe pas : un signal, aucune possession, aucune pesée. | oui — cité par le registre |
+| [MESURE-PROJETS.md](MESURE-PROJETS.md) | petclinic et banking : le classpath change les verdicts, les enveloppes sont invisibles à la composition, R5b est la seule voix sur un projet qui génère. | oui — cité par le registre |
+| [signaux/](signaux/) | Le harnais qui affiche les signaux retenus sur un type. | oui |
+| [echange/](echange/) | Les vingt tours de l'échange qui a produit le plan. | non — trace |
 
-L'asymétrie est le sujet, pas un problème : A raisonne sur ce que le chantier
-dit de lui-même, B sur ce que le code fait. Les deux se sont déjà contredits
-utilement.
+## Par où entrer
 
-## Règles de l'échange
+- **Vous ouvrez un lot** → [PLAN.md](PLAN.md), puis
+  [CHANTIER.md](../20260731-refactoring-audit/CHANTIER.md) pour l'état et les
+  règles de conduite.
+- **Vous voulez savoir ce qui reste à écrire au registre** →
+  [PORTAGE.md](PORTAGE.md), §9 pour l'ordre.
+- **Vous doutez d'un chiffre** → [mesures.sh](mesures.sh), et relancez-le.
+- **Vous voulez savoir pourquoi le moteur dit ce qu'il dit d'un type** →
+  [signaux/](signaux/), avec son classpath.
+- **Vous cherchez pourquoi une décision a été prise ainsi** →
+  [echange/](echange/).
 
-1. **Un tour = un fichier**, numéroté, un seul auteur :
-   `NN-<sigle>-<slug>.md`. On n'édite pas le fichier d'un autre tour ; on en
-   écrit un nouveau.
-2. **Toute affirmation factuelle porte sa preuve** : une référence
-   `fichier:ligne`, ou une section de [`mesures.sh`](mesures.sh). Une
-   affirmation non vérifiée se marque `[non vérifié]` — c'est licite, ce n'est
-   pas disqualifiant, mais ça doit se voir.
-3. **La mesure appartient à celui qui décide.** Un chiffre ne vaut que s'il se
-   relance. Tout chiffre nouveau entre dans `mesures.sh` dans le même tour que
-   l'affirmation qu'il soutient.
-4. **[00-etat-du-desaccord.md](00-etat-du-desaccord.md) est l'état partagé**,
-   pas l'historique. Il se met à jour à chaque tour : ce qui est acquis, ce qui
-   reste en litige, ce que la mesure a tranché. Un lecteur pressé ne lit que
-   lui.
-5. **Une trouvaille ne se tranche pas dans le tour qui la fait.** C'est la
-   règle dont l'absence a produit les dérives du chantier ; elle vaut d'abord
-   ici.
-6. **`PLAN.md` est la sortie**, et il n'existe qu'une fois le désaccord vidé.
-   Il propose un ordre de travail à l'utilisateur, qui décide seul ce qui
-   s'exécute et dans quel jalon.
+## Les règles qui gouvernent le travail ici
+
+Elles sont dans [PLAN.md](PLAN.md) et s'ajoutent aux treize de `CHANTIER.md` ;
+les trois qui reviennent le plus souvent :
+
+1. **Une trouvaille faite dans un lot est enregistrée, jamais tranchée ni
+   implémentée dans ce lot.**
+2. **Toute mesure qui étaye une décision est une commande relançable**, avec ses
+   entrées — révision, racines, **classpath**, configuration, corpus.
+3. **Caractériser n'est pas garantir** : mesurer une propriété et exiger qu'elle
+   soit vraie sont deux gestes séparés, dans deux sessions séparées.
+
+## État au 2026-08-05
+
+**Le plan est adopté**, après quatre amendements arbitrés le même jour. **Le
+portage au registre n'est pas fait** : `DECISIONS.md` et `CHANTIER.md` sont
+intacts, M7 y figure encore `EN COURS`, et D33 y porte encore une explication
+que la mesure a démentie.
+
+**Prochaine action du chantier : `E1a`** — caractériser ce que le marqueur de
+génération change, avant qu'E1 décide le traitement d'un verdict fondé sur
+l'absence seule.
+
+**Code** : cinq commits poussés, CI et CodeQL vertes quatre fois sur quatre ;
+1 401 tests, 12/12 en intégration, cliquet 143/143 + 6/6 + 5/5.
 
 ## Ce que ce répertoire ne fait pas
 
-- Il ne rouvre pas les décisions du registre. La file de réévaluation par
-  familles est une **proposition** de `PLAN.md`, appliquée ailleurs.
-- Il ne modifie ni `hexaglue-next/`, ni `hexaglue/` (gelée), ni le registre.
-- Il ne remplace pas [CHANTIER.md](../20260731-refactoring-audit/CHANTIER.md) :
-  quand un plan sort d'ici, il s'inscrit là-bas, et ce répertoire se clôt.
-
-## Index
-
-| Fichier | Auteur | Contenu |
-|---|---|---|
-| [00-etat-du-desaccord.md](00-etat-du-desaccord.md) | commun | état partagé, tenu à jour |
-| [PLAN.md](PLAN.md) | commun | **la sortie** : huit étapes, proposées à l'arbitrage |
-| [01-A-arbitrage.md](01-A-arbitrage.md) | A | arbitrage des quatre litiges, résidu sur L1 |
-| [02-B-verifications.md](02-B-verifications.md) | B | vérifications sur le tour 01 |
-| [03-A-relecture-critique.md](03-A-relecture-critique.md) | A | relecture critique du plan, six corrections demandées |
-| [04-B-reponse.md](04-B-reponse.md) | B | corrections acceptées, trois `[non vérifié]` levés |
-| [05-A-reponse.md](05-A-reponse.md) | A | désaccord clos, trois formulations finales |
-| [06-B-cloture.md](06-B-cloture.md) | B | clôture ; une trouvaille part au registre (D33) |
-| [07-B-mesure-d33.md](07-B-mesure-d33.md) | B | **mesure** : le mécanisme énoncé par D33 n'existe pas |
-| [08-B-mesures-multi-projets.md](08-B-mesures-multi-projets.md) | B | **mesure** : petclinic + banking ; six résultats, dont le classpath et la boucle auto-confirmante de R5b |
-| [09-B-dossier-portage.md](09-B-dossier-portage.md) | B | **à soumettre à A** : faits, lectures, hypothèses, et cinq questions d'écriture du registre |
-| [10-B-extrait-registre.md](10-B-extrait-registre.md) | B | la structure réelle du registre et du chantier, verbatim — matière de Q5 à Q9 |
-| [11-A-avis-portage-registre.md](11-A-avis-portage-registre.md) | A | avis sur les cinq questions ; grammaire à trois axes |
-| [12-B-accord-portage.md](12-B-accord-portage.md) | B | accord ; duplication normalisée, `_internal/` non versionné, état manquant |
-| [13-A-avis-complements-portage.md](13-A-avis-complements-portage.md) | A | D39/D40 séparées, l'empreinte ne remplace pas un historique, `BLOQUÉE` est sur un 4e axe |
-| [14-B-reponse-complements.md](14-B-reponse-complements.md) | B | accord ; **l'étape 0 est déjà exécutée** (commit `ab52fb5`) |
-| [15-B-projet-de-portage.md](15-B-projet-de-portage.md) | B | les sept textes du portage, rédigés pour être critiqués avant écriture |
-| [16-A-relecture-projet-portage.md](16-A-relecture-projet-portage.md) | A | sept corrections demandées avant portage |
-| [17-B-questions-avant-revision.md](17-B-questions-avant-revision.md) | B | cinq corrections acceptées, quatre questions ouvertes |
-| [18-A-reponse-aux-quatre-questions.md](18-A-reponse-aux-quatre-questions.md) | A | les quatre réponses ; A révise deux de ses propres recommandations |
-| [19-B-remarques-et-choix.md](19-B-remarques-et-choix.md) | B | vérifications, remarques, et les trois choix |
-| [20-A-avis-sur-les-trois-choix.md](20-A-avis-sur-les-trois-choix.md) | A | adopter les trois, le 2e sous forme généralisée |
-| [21-B-choix-prets-a-arbitrer.md](21-B-choix-prets-a-arbitrer.md) | B | **les trois choix en forme finale, à trancher** |
-| [signaux/](signaux/) | B | harnais affichant les signaux retenus sur un type, hors du réacteur |
-| [MESURES.md](MESURES.md) | B | sortie datée de `mesures.sh`, avec le commit mesuré |
-| [mesures.sh](mesures.sh) | B | les mesures, relançables |
-
-**État au 2026-08-05.** Douze tours, en deux temps. **Le plan** : désaccord vidé
-en six tours, `PLAN.md` en **révision 3**, quatre arbitrages pris par
-l'utilisateur. **Le portage** : deux campagnes de mesure (07, 08) puis quatre
-tours sur la forme à donner au registre (09 à 12), clos par un accord complet.
-
-Ce qui attend est **l'exécution du portage** dans
-[DECISIONS.md](../20260731-refactoring-audit/DECISIONS.md) et
-[CHANTIER.md](../20260731-refactoring-audit/CHANTIER.md), en six gestes listés
-en fin de [12-B-accord-portage.md](12-B-accord-portage.md). Ni A ni B ne doivent
-de tour.
-
-Trois choses sortent de l'échange et vont au registre plutôt qu'au plan : **D33
-porte une explication démentie par la mesure** (07), **`_internal/` n'est sous
-aucun contrôle de version** (12, C2), et **la grammaire `[MESURÉ]` / `[LU]` /
-`[HYPOTHÈSE]` est elle-même une décision** puisqu'elle change les règles du
-registre (12, C3).
-
-Les deux documents d'ouverture vivent encore dans le dossier d'audit :
-[20-analyse-refactoring.md](../20260731-refactoring-audit/20-analyse-refactoring.md)
-(A, premier tour) et
-[20-analyse-refactoring-v2.md](../20260731-refactoring-audit/20-analyse-refactoring-v2.md)
-(A, second tour, après la réponse de B). La réponse de B au premier tour n'a pas
-été consignée ; elle est reprise dans l'état du désaccord.
+- Il ne remplace pas [le dossier d'audit](../20260731-refactoring-audit/) :
+  l'audit, le registre des décisions et le journal y restent.
+- Il ne contient aucun code de production, et le harnais `signaux/` est hors du
+  réacteur.

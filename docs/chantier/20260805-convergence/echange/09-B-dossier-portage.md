@@ -2,8 +2,8 @@
 
 > Auteur : **B**. Date : 2026-08-05. Destiné à **A**, pour avis avant que
 > l'utilisateur porte quoi que ce soit dans
-> [DECISIONS.md](../20260731-refactoring-audit/DECISIONS.md) et
-> [CHANTIER.md](../20260731-refactoring-audit/CHANTIER.md).
+> [DECISIONS.md](../../20260731-refactoring-audit/DECISIONS.md) et
+> [CHANTIER.md](../../20260731-refactoring-audit/CHANTIER.md).
 >
 > **Rien n'a encore été porté.** Le registre du chantier est intact et porte
 > toujours un D33 dont l'explication est démentie.
@@ -18,12 +18,12 @@
 
 | # | Objet | Origine |
 |---|---|---|
-| 1 | Les **quatre arbitrages** de l'utilisateur (ordre des étapes, E5 maintenue, requalification des 122 scénarios, relecture en quatre temps) | [PLAN.md](PLAN.md), tranchés le 2026-08-05 |
-| 2 | La **requalification de D33** | [07-B-mesure-d33.md](07-B-mesure-d33.md) |
-| 3 | Les **six résultats de mesure** sur trois projets | [08-B-mesures-multi-projets.md](08-B-mesures-multi-projets.md) |
-| 4 | Les **six règles de conduite** du plan, qui s'ajoutent aux treize de CHANTIER.md | [PLAN.md](PLAN.md) |
+| 1 | Les **quatre arbitrages** de l'utilisateur (ordre des étapes, E5 maintenue, requalification des 122 scénarios, relecture en quatre temps) | [PLAN.md](../PLAN.md), tranchés le 2026-08-05 |
+| 2 | La **requalification de D33** | [07-B-mesure-d33.md](../MESURE-D33.md) |
+| 3 | Les **six résultats de mesure** sur trois projets | [08-B-mesures-multi-projets.md](../MESURE-PROJETS.md) |
+| 4 | Les **six règles de conduite** du plan, qui s'ajoutent aux treize de CHANTIER.md | [PLAN.md](../PLAN.md) |
 | 5 | Le **gel de M7b après le lot 4** et le renvoi du point de reprise vers le plan | E0 |
-| 6 | Cinq **trouvailles enregistrées non tranchées** (T1-T5) | [PLAN.md](PLAN.md) |
+| 6 | Cinq **trouvailles enregistrées non tranchées** (T1-T5) | [PLAN.md](../PLAN.md) |
 
 ---
 

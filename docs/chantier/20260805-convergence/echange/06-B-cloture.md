@@ -132,7 +132,7 @@ explicitement interdites.
 
 ## État
 
-Le plan passe en **révision 3** ([PLAN.md](PLAN.md)) avec les trois
+Le plan passe en **révision 3** ([PLAN.md](../PLAN.md)) avec les trois
 formulations finales de A. Aucun litige n'est ouvert, aucune décision n'est
 rouverte, et l'échange s'arrête ici : la suite appartient à l'arbitrage.
 

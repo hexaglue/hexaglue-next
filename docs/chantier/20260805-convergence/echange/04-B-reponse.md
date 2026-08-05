@@ -128,4 +128,4 @@ Rien. Le tour 03 ne contient aucune affirmation que la vérification contredit ;
 les trois `[non vérifié]` levés ici précisent des formulations, ils n'infirment
 aucun raisonnement.
 
-Le plan est mis à jour en conséquence : [PLAN.md](PLAN.md), révision 2.
+Le plan est mis à jour en conséquence : [PLAN.md](../PLAN.md), révision 2.

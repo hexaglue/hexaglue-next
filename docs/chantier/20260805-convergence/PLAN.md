@@ -1,5 +1,10 @@
 # Plan de reprise
 
+> **Révision 6 — reclassement des liens, aucun changement normatif.** Les
+> documents de l'échange sont passés sous `echange/`, deux rapports de mesure
+> ont été renommés ; seuls les chemins ont bougé. **Le texte du plan est
+> identique à la révision 5.**
+>
 > **Statut : révision 5 — quatre amendements arbitrés le 2026-08-05.** La
 > révision 3 (commit `ab52fb5`) a été adoptée, puis amendée sur des clauses
 > identifiées et sur elles seules : l'articulation des règles, l'indépendance de
@@ -10,7 +15,7 @@
 >
 > **Statut hérité : échange clos, quatre arbitrages pris le 2026-08-05.**
 > Le désaccord entre A et B est vidé
-> ([00-etat-du-desaccord.md](00-etat-du-desaccord.md)) ; ce document est la
+> ([echange/00-etat-du-desaccord.md](echange/00-etat-du-desaccord.md)) ; ce document est la
 > sortie commune, corrigée par la relecture critique du tour 03, les
 > vérifications du tour 04 et les trois formulations finales des tours 05-06.
 > Les quatre questions ouvertes sont **tranchées** (voir la fin). Ce qui reste :
@@ -442,7 +447,7 @@ Seulement après les portes correspondantes.
 ## Ce qui reste ouvert
 
 **Le portage au chantier.** Ces quatre arbitrages, le statut requalifié de D33 et
-les six résultats de [08-B-mesures-multi-projets.md](08-B-mesures-multi-projets.md)
+les six résultats de [MESURE-PROJETS.md](MESURE-PROJETS.md)
 doivent être inscrits dans
 [DECISIONS.md](../20260731-refactoring-audit/DECISIONS.md) et
 [CHANTIER.md](../20260731-refactoring-audit/CHANTIER.md). Tant que ce n'est pas

@@ -3,7 +3,7 @@
 > Auteur : **B**. Date : 2026-08-05. Commit mesuré : `hexaglue-next` à
 > `d5386a2`, installé au dépôt local avant la mesure.
 >
-> Fait suite à [07-B-mesure-d33.md](07-B-mesure-d33.md), dont le constat
+> Fait suite à [07-B-mesure-d33.md](MESURE-D33.md), dont le constat
 > reposait sur un seul banc. Six résultats, dont deux qui portent sur la manière
 > de mesurer et invalident une partie de mes propres runs.
 
@@ -74,7 +74,7 @@ projet réel**, pas seulement sur la fixture du corpus.
 
 ## R3 — L'invisibilité des enveloppes, confirmée sur un second projet
 
-C'est le constat de [07](07-B-mesure-d33.md), qui n'était étayé que par
+C'est le constat de [07](MESURE-D33.md), qui n'était étayé que par
 `case-study-ecommerce`. `case-study-banking` le reproduit, et **sans le
 confondant** : cinq agrégats y sont reconnus, donc la composition fonctionne.
 

@@ -5,7 +5,7 @@
 >
 > Dernière mise à jour : 2026-08-05, après le tour 06. **Échange clos.**
 > Le désaccord est vidé, le plan a été contredit puis corrigé deux fois. La
-> sortie est [PLAN.md](PLAN.md) **révision 3**, qui attend l'arbitrage de
+> sortie est [PLAN.md](../PLAN.md) **révision 3**, qui attend l'arbitrage de
 > l'utilisateur.
 >
 > **Une trouvaille sort de l'échange et va au registre, pas au plan** : D33
@@ -15,9 +15,9 @@
 
 | Tour | Auteur | Apport |
 |---|---|---|
-| — | A | [20-analyse-refactoring.md](../20260731-refactoring-audit/20-analyse-refactoring.md) : diagnostic initial, neuf décisions suspectes |
+| — | A | [20-analyse-refactoring.md](../../20260731-refactoring-audit/20-analyse-refactoring.md) : diagnostic initial, neuf décisions suspectes |
 | — | B | réponse orale : vérification dans le code, la cause première est le corpus |
-| — | A | [20-analyse-refactoring-v2.md](../20260731-refactoring-audit/20-analyse-refactoring-v2.md) : corrige D38, conteste « ce n'est pas l'architecture », propose un ordre |
+| — | A | [20-analyse-refactoring-v2.md](../../20260731-refactoring-audit/20-analyse-refactoring-v2.md) : corrige D38, conteste « ce n'est pas l'architecture », propose un ordre |
 | 00 | commun | ce document : 6 acquis, 4 litiges, 6 mesures nouvelles |
 | 01 | A | [01-A-arbitrage.md](01-A-arbitrage.md) : cède L2, L3, L4 ; maintient un résidu sur L1 |
 | 02 | B | [02-B-verifications.md](02-B-verifications.md) : accepte le résidu, corrige deux points, ancre deux propriétés |
@@ -25,22 +25,22 @@
 | 04 | B | [04-B-reponse.md](04-B-reponse.md) : six corrections acceptées (une amendée), trois `[non vérifié]` levés, contre-exemple de P0 fourni |
 | 05 | A | [05-A-reponse.md](05-A-reponse.md) : désaccord clos, trois formulations finales — clé de corrélation pour P1, scission de P0, rejets dans l'oracle |
 | 06 | B | [06-B-cloture.md](06-B-cloture.md) : les trois acceptées ; la clé de score contient le texte et pas la règle ; **D33 décrit un mécanisme que le code ne produit pas** |
-| — | commun | [PLAN.md](PLAN.md), **révision 3** |
+| — | commun | [PLAN.md](../PLAN.md), **révision 3** |
 
 ## 1. Ce qui est acquis
 
 | # | Acquis | Preuve |
 |---|---|---|
 | A1 | L'architecture **modulaire** du doc 07 est saine et se conserve : frontend / modèle / moteur / backends, Spoon confiné, plugins interdits de reclassifier, faits et relations typés. | doc 07 §2, non contredit par le code |
-| A2 | Le **corpus** est la cause de gouvernance : hérité des tests unitaires de l'ancien réacteur, il est devenu le cliquet de clôture de chaque jalon. | [MESURES.md](MESURES.md) § provenance, § taille |
-| A3 | L'**échelle de confiance est écrasée** : S2, S3 et S4 sortent tous à `HIGH`, le seuil de génération ne les départage pas. | [MESURES.md](MESURES.md) § échelle |
+| A2 | Le **corpus** est la cause de gouvernance : hérité des tests unitaires de l'ancien réacteur, il est devenu le cliquet de clôture de chaque jalon. | [MESURES.md](../MESURES.md) § provenance, § taille |
+| A3 | L'**échelle de confiance est écrasée** : S2, S3 et S4 sortent tous à `HIGH`, le seuil de génération ne les départage pas. | [MESURES.md](../MESURES.md) § échelle |
 | A4 | Le **comptage d'occurrences** additionne du volume syntaxique et non de la force sémantique (mécanisme de D33). | `Aggregator.java:231-241` |
 | A5 | Il ne faut **pas rouvrir maintenant** les neuf décisions suspectes une par une. | position commune |
 | A6 | La conduite du chantier doit changer : une trouvaille faite dans un lot ne se tranche pas dans ce lot, et une mesure qui appuie une décision doit être relançable par celui qui décide. | observations n°2 et n°3 du point de reprise |
 | A7 | **Pas de réécriture du solveur.** Sa sémantique réelle se nomme et se teste ; elle ne se remplace pas. | tour 01 §L1, tour 02 |
-| A8 | **Pas de nouveau document de cible.** Le contrat de vérité est porté par des types et des tests exécutables. Le doc 07 promettait jqwik, jamais installé : une cible écrite et non honorée est le mode d'échec établi. | tour 01 §L2, [MESURES.md](MESURES.md) § outillage |
+| A8 | **Pas de nouveau document de cible.** Le contrat de vérité est porté par des types et des tests exécutables. Le doc 07 promettait jqwik, jamais installé : une cible écrite et non honorée est le mode d'échec établi. | tour 01 §L2, [MESURES.md](../MESURES.md) § outillage |
 | A9 | **Gouvernance procédurale, pas structurelle.** Pas de découpage en trois fichiers : règle temporelle, mesure reproductible, confirmation différée. Le registre existant suffit si la règle est obligatoire. | tour 01 §L3 |
-| A10 | **L'échelle avant le corpus.** La dépendance est mécanique : les goldens portent `"confidence"`, rebaser d'abord graverait `HIGH` dans autant de fichiers relus. | tour 01 §L4, [MESURES.md](MESURES.md) § confiance |
+| A10 | **L'échelle avant le corpus.** La dépendance est mécanique : les goldens portent `"confidence"`, rebaser d'abord graverait `HIGH` dans autant de fichiers relus. | tour 01 §L4, [MESURES.md](../MESURES.md) § confiance |
 | A11 | **Une conclusion tirée d'une absence seule ne doit pas autoriser une génération.** Elle alimente audit, living-doc et candidats ; elle devient générable si corroborée par une preuve positive, une déclaration, ou une politique assumée. | tour 01 §L1 (résidu), accepté au tour 02 |
 | A12 | **Projets réels et tests métamorphiques sont complémentaires**, pas substituables : les premiers trouvent des exemples, les seconds vérifient des propriétés et empêchent de corriger seulement le cas du jour. | tour 01 §métamorphiques |
 
@@ -48,18 +48,18 @@
 
 | Litige | Position finale | Où c'est repris |
 |---|---|---|
-| **L1 — Solveur** | Nommer et tester la sémantique actuelle **d'abord** ; borner ensuite l'effet générateur des règles d'absence. Pas de réécriture préalable. | [PLAN.md](PLAN.md) E2, E3, E6 |
+| **L1 — Solveur** | Nommer et tester la sémantique actuelle **d'abord** ; borner ensuite l'effet générateur des règles d'absence. Pas de réécriture préalable. | [PLAN.md](../PLAN.md) E2, E3, E6 |
 | **L2 — Contrat de vérité** | Pas de document. Trois types distincts + politique typée par consommateur + tests de contrat, dont des tests négatifs. | E1 |
 | **L3 — Gouvernance** | Règle temporelle, mesure relançable, décision différée à l'utilisateur. « Débloque le lot » n'est jamais un argument de justesse. | règles de conduite du plan |
 | **L4 — Ordre** | Palier / confiance / autorisation avant le rebasage des goldens. | E1 avant E4 |
 
 **Aucun litige ouvert.** Ce qui reste à trancher n'oppose plus A et B : ce sont
-les quatre questions posées à l'utilisateur en fin de [PLAN.md](PLAN.md).
+les quatre questions posées à l'utilisateur en fin de [PLAN.md](../PLAN.md).
 
 ## 3. Ce que la mesure a établi
 
-Détail et commandes dans [MESURES.md](MESURES.md), relançables par
-[`mesures.sh`](mesures.sh).
+Détail et commandes dans [MESURES.md](../MESURES.md), relançables par
+[`mesures.sh`](../mesures.sh).
 
 | # | Fait | Effet |
 |---|---|---|
@@ -81,8 +81,8 @@ Détail et commandes dans [MESURES.md](MESURES.md), relançables par
 | V10 | La clé de score est `(sujet, kind, palier, jeton `fact()`, distance)` : elle contient **le texte écrit à la main** et **pas la `RuleId`**, pourtant reçue par `KindEvidence.derived`. | Modifier un message change un poids. Deux règles différentes fusionnent par collision de chaînes ; une même règle compte double si elle écrit deux jetons. La clé cible `(ruleFamily, subject, candidateKind, semanticAnchor)` est constructible sans donnée nouvelle — l'ancre est `Evidence.relatedTypes`. **Changement à double sens**, donc E3a puis E3b. |
 | V11 | **D33 énonce « deux signaux R7 » ; R7 émet un jeton nommant le port, sur des types transportés `.distinct()`** (`PublishedEvent.java:94-104`). Deux méthodes du même `NotificationSender` produisent donc **une** clé, pas deux. | L'explication de D33 n'est pas celle que le code produit. Le symptôme reste réel (`Email` sort DOMAIN_EVENT à HIGH) mais **sa cause n'a jamais été vérifiée**, et une décision PENDING repose dessus. Va au registre : D33 reçoit une question de plus — d'où vient le second signal ? |
 | V12 | `excludePackages` est une **déclaration d'intention** ; l'omission d'une racine par D19 est une **perte involontaire de visibilité**. | Correction d'une erreur du tour 04 : le contre-exemple `InventoryUseCases` teste **P0b**, pas P0a. La fixture multi-racine reste **indispensable** pour P0a. |
-| **M8** | **Mesuré sur trois projets** ([08-B-mesures-multi-projets.md](08-B-mesures-multi-projets.md)) : (a) **sans classpath, petclinic passe de 3 à 1 agrégat et de 10 à 14 UNCLASSIFIED** — une mesure sans classpath ne mesure pas le même moteur ; (b) **D16 se reproduit à l'identique** (`Pet` → VALUE_OBJECT) ; (c) l'invisibilité des enveloppes est **confirmée sur banking sans confondant** — `Address` et `Money` reçoivent leurs `OWNED_BY`, `Email` et `Iban` zéro ; (d) sur banking **5 ports pilotants sur 5 viennent de R5b**, parce que les contrôleurs sont du code généré écarté par D15 ; (e) deux exceptions sortent VALUE_OBJECT, masquées sur ecommerce par une exclusion de configuration. | E4a doit imposer le classpath. **P0a gagne un cas d'école qui ne vient pas de D19** : le pipeline écarte sa propre sortie et une règle conclut de cette absence. La question des enveloppes a désormais deux projets, deux cas nominaux et un contre-exemple. |
-| **M7** | **Mesuré** ([07-B-mesure-d33.md](07-B-mesure-d33.md)) : `Email` porte **un** signal, `ANNOUNCED_BY(NotificationSender)`, et **zéro** signal de possession. R3b ne le voit pas parce que `Lifecycle.isPart` exclut tout type que `Shapes.readsAsIdentity` reconnaît — et `record Email(String)` en est un. | Les **trois** affirmations de D33 sont fausses : un signal R7 et non deux, zéro R3b et non un, **aucune pesée**. La cause réelle est générale : **un objet-valeur en forme d'enveloppe à une valeur est invisible à la composition**, sur tout projet. D33 est à requalifier, pas à trancher. |
+| **M8** | **Mesuré sur trois projets** ([08-B-mesures-multi-projets.md](../MESURE-PROJETS.md)) : (a) **sans classpath, petclinic passe de 3 à 1 agrégat et de 10 à 14 UNCLASSIFIED** — une mesure sans classpath ne mesure pas le même moteur ; (b) **D16 se reproduit à l'identique** (`Pet` → VALUE_OBJECT) ; (c) l'invisibilité des enveloppes est **confirmée sur banking sans confondant** — `Address` et `Money` reçoivent leurs `OWNED_BY`, `Email` et `Iban` zéro ; (d) sur banking **5 ports pilotants sur 5 viennent de R5b**, parce que les contrôleurs sont du code généré écarté par D15 ; (e) deux exceptions sortent VALUE_OBJECT, masquées sur ecommerce par une exclusion de configuration. | E4a doit imposer le classpath. **P0a gagne un cas d'école qui ne vient pas de D19** : le pipeline écarte sa propre sortie et une règle conclut de cette absence. La question des enveloppes a désormais deux projets, deux cas nominaux et un contre-exemple. |
+| **M7** | **Mesuré** ([07-B-mesure-d33.md](../MESURE-D33.md)) : `Email` porte **un** signal, `ANNOUNCED_BY(NotificationSender)`, et **zéro** signal de possession. R3b ne le voit pas parce que `Lifecycle.isPart` exclut tout type que `Shapes.readsAsIdentity` reconnaît — et `record Email(String)` en est un. | Les **trois** affirmations de D33 sont fausses : un signal R7 et non deux, zéro R3b et non un, **aucune pesée**. La cause réelle est générale : **un objet-valeur en forme d'enveloppe à une valeur est invisible à la composition**, sur tout projet. D33 est à requalifier, pas à trancher. |
 
 ## 4. Ce que le tour 03 a corrigé au plan
 
@@ -148,7 +148,7 @@ puis corrigé deux fois, et les neuf corrections demandées sur les tours 03 et 
 sont intégrées.
 
 Ce qui attend est l'arbitrage de l'utilisateur sur les quatre questions de
-[PLAN.md](PLAN.md), dont Q4 — qui relit les attentes des quatre projets — est la
+[PLAN.md](../PLAN.md), dont Q4 — qui relit les attentes des quatre projets — est la
 seule dont l'exécution ne peut pas être déléguée.
 
 **Une entrée est à porter au registre** avant toute reprise : D33 porte une

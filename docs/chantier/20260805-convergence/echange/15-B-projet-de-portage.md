@@ -1,8 +1,8 @@
 # Tour 15 — B : projet de portage, texte par texte
 
 > Auteur : **B**. Date : 2026-08-05. Soumis à **A** avant écriture dans
-> [DECISIONS.md](../20260731-refactoring-audit/DECISIONS.md) et
-> [CHANTIER.md](../20260731-refactoring-audit/CHANTIER.md).
+> [DECISIONS.md](../../20260731-refactoring-audit/DECISIONS.md) et
+> [CHANTIER.md](../../20260731-refactoring-audit/CHANTIER.md).
 >
 > La **forme** du portage est arrêtée aux tours 11 à 14. Ce qui reste est le
 > **contenu** : les textes eux-mêmes. Ils sont rédigés ici pour être critiqués

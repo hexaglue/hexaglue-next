@@ -1,6 +1,12 @@
 # Plan de reprise
 
-> **Statut : révision 3 — échange clos, quatre arbitrages pris le 2026-08-05.**
+> **Statut : révision 4 — trois amendements arbitrés le 2026-08-05.** La
+> révision 3 (commit `ab52fb5`) a été adoptée puis amendée sur trois clauses
+> identifiées, et sur elles seules : l'articulation des règles, l'indépendance de
+> validation, et l'ouverture d'E1 par la caractérisation `E1a`. **Les quatre
+> arbitrages ci-dessous sont inchangés.**
+>
+> **Statut hérité : échange clos, quatre arbitrages pris le 2026-08-05.**
 > Le désaccord entre A et B est vidé
 > ([00-etat-du-desaccord.md](00-etat-du-desaccord.md)) ; ce document est la
 > sortie commune, corrigée par la relecture critique du tour 03, les
@@ -44,7 +50,9 @@ D'où la règle qui structure les révisions :
 
 ## Règles de conduite du plan
 
-Elles s'ajoutent aux treize règles de CHANTIER.md et priment en cas de conflit.
+**Articulation des règles.** Les six règles gouvernent le plan de reprise. Les
+treize règles de `CHANTIER.md` restent applicables ; **toute contradiction est
+consignée et arbitrée explicitement**.
 
 1. **Une trouvaille faite dans un lot est enregistrée `PENDING`, jamais tranchée
    ni implémentée dans ce lot.**
@@ -54,7 +62,25 @@ Elles s'ajoutent aux treize règles de CHANTIER.md et priment en cas de conflit.
    et son effet sur plusieurs projets.**
 4. **« Débloque le lot » est un impact de calendrier, jamais un argument de
    justesse.**
-5. **Le cliquet ne se déplace pas par celui qui le déplace.**
+5. **Indépendance de validation.** Une même session ne peut pas à la fois
+   proposer ou implémenter une modification d'un artefact qui détermine ce qui
+   est correct, puis **valider seule** cette modification. Une session distincte
+   assure la validation et son enregistrement. Cette règle s'applique notamment
+   au déplacement d'un cliquet, à l'enregistrement d'une attente d'oracle et à
+   la fermeture d'un erratum.
+
+   **Ce que « session distincte » exige, par objet.** Pour le **déplacement d'un
+   cliquet** et l'**enregistrement d'une attente d'oracle** : une session de
+   travail distincte de celle qui a produit la modification, l'arbitrage de
+   l'utilisateur ne s'y substituant pas — c'est là qu'une sortie d'agent peut se
+   graver en référence, et le piège est connu depuis M3, quand
+   `assertMatches` créait le golden absent au lieu d'échouer. Pour la
+   **fermeture d'un erratum** : l'arbitrage de l'utilisateur suffit, la
+   correction se lisant en diff.
+
+   Les rubriques locales ne répètent pas cette règle, elles la citent : le
+   cliquet décrit ce qui constitue un déplacement, l'oracle conserve sa
+   procédure en quatre temps, les errata conservent leurs transitions.
 6. **Caractériser n'est pas garantir** (voir ci-dessus).
 
 ## Les propriétés
@@ -88,6 +114,34 @@ plan. D33 reste `PENDING` jusqu'à E7.
 ---
 
 ### E1 — Casser le couplage palier / confiance / autorisation
+
+#### E1a — Caractériser ce que le marqueur de génération change
+
+**Ouvre l'étape, avant toute conception de politique.** E1 prend le verdict
+obtenu par absence seule comme cas de conception, et ce verdict est celui de
+R5b. Or l'absence sur laquelle R5b conclut est en partie **créée par le
+pipeline** : un adapter pilotant marqué `@jakarta.annotation.Generated` est
+écarté du périmètre (D15), donc R5 ne peut plus mordre et R5b devient la seule
+voix. Décider le traitement d'un verdict fondé sur une absence sans avoir mesuré
+ce que cette exclusion change à l'absence serait décider avant de savoir.
+
+**Matériel** : les mêmes sources en deux variantes, ne différant que par la
+présence du marqueur sur l'adapter pilotant. **Aucun backend rest n'est
+nécessaire.**
+
+**Ce que la caractérisation rend** : le registre de passage montrant l'inclusion
+puis l'exclusion de l'adapter, les signaux R5 et R5b dans les deux vues, le
+verdict obtenu et l'autorisation rendue au consommateur — le tout par une
+commande relançable sur la révision de référence.
+
+**Ce que l'étape ne fait pas** : décider. Elle mesure ; E1 décide ensuite.
+
+**Ce qui reste dehors** : la fermeture du cycle — HexaGlue régénère-t-il
+l'adapter qu'il vient d'écarter ? — demande un générateur d'adapters pilotants
+et reste affectée à **E8**, comme validation bout en bout du garde-fou conçu
+ici.
+
+#### E1b — La séparation elle-même
 
 **Objet.** Trois notions aujourd'hui confondues sont séparées :
 
@@ -358,7 +412,7 @@ Seulement après les portes correspondantes.
 
 | # | Question | Décision utilisateur |
 |---|---|---|
-| Q1 | Ordre des étapes | **L'ordre commun** : E0, E1, E2, **E2b**, E3a, E3b, E4a, E4b, E5, E6, E7, puis M7b. (E2b ajoutée le 2026-08-05 : sans elle, E3a ne peut pas caractériser P0a et P0b.) E5 et E6 **non regroupées**. |
+| Q1 | Ordre des étapes | **L'ordre commun** : E0, E1 (dont **E1a**), E2, **E2b**, E3a, E3b, E4a, E4b, E5, E6, E7, puis M7b. (E2b ajoutée le 2026-08-05 : sans elle, E3a ne peut pas caractériser P0a et P0b.) E5 et E6 **non regroupées**. |
 | Q2 | E1 suffit-il à laisser D19 intacte ? | **Non. E5 reste.** L'autorisation traite le droit d'agir, elle ne rend pas l'observation complète. |
 | Q3 | Sort des 122 scénarios transplantés | **Requalification un par un**, quatre issues : conserver et renommer (l'invariant public tient encore), réécrire en scénario câblé (question pertinente, fixture mono-type incapable de l'exercer), remplacer par une propriété (plusieurs exemples du même invariant), supprimer (teste une notion du moteur abandonné, ou redondant). Les survivants **perdent le nom des anciennes méthodes de test** et portent celui de l'invariant. |
 | Q4 | Qui relit les attentes | **Relecture en quatre temps** : passe aveugle de l'agent sans afficher le verdict courant, arbitrage utilisateur, révélation et score, enregistrement par une session distincte. L'agent ne fabrique pas seul l'oracle qu'il devra satisfaire ; **le dénominateur reste exhaustif**. |
